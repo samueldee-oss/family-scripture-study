@@ -24,4 +24,4 @@ Progress in the app is saved separately from progress in Safari.
 2. Add an entry to the `WEEKS` array in `index.html` with `url:'weeks/<folder>/'` (and a scene in `SCENES` for custom scenery).
 3. Add the folder to `PAGES` in `sw.js` and bump `VERSION`.
 
-Memory and plans from the original chat are still to come.
+Context for Claude and the weekly prompt: [`CLAUDE.md`](CLAUDE.md), [`WEEKLY_PROMPT.md`](WEEKLY_PROMPT.md).

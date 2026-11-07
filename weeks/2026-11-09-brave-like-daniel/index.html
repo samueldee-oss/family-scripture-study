@@ -286,6 +286,19 @@ const TEXT = {
   17:'These great beasts, which are four, are four kings, which shall arise out of the earth.',
   18:'But the saints of the most High shall take the kingdom, and possess the kingdom for ever, even for ever and ever.'}
 };
+const SLEEPY_LION=`<svg viewBox="0 0 64 64" width="54" height="54" xmlns="http://www.w3.org/2000/svg">
+<g fill="#c8641e">${[0,30,60,90,120,150,180,210,240,270,300,330].map(a=>`<circle cx="${32+22*Math.cos(a*Math.PI/180)}" cy="${33+22*Math.sin(a*Math.PI/180)}" r="9"/>`).join('')}</g>
+<circle cx="32" cy="33" r="21" fill="#e2852f"/>
+<circle cx="17" cy="17" r="6" fill="#f6c45a" stroke="#c8641e" stroke-width="2"/><circle cx="47" cy="17" r="6" fill="#f6c45a" stroke="#c8641e" stroke-width="2"/>
+<circle cx="32" cy="35" r="17" fill="#f6c45a"/>
+<path d="M21 31 q4 4 8 0" stroke="#5a3415" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M35 31 q4 4 8 0" stroke="#5a3415" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<ellipse cx="32" cy="41" rx="7" ry="5.5" fill="#fbe3a8"/>
+<path d="M29 38 h6 l-3 3.2 z" fill="#5a3415"/>
+<path d="M29 43.5 q3 2.4 6 0" stroke="#5a3415" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<circle cx="22" cy="38" r="2.6" fill="#ff9d8a" opacity=".6"/><circle cx="42" cy="38" r="2.6" fill="#ff9d8a" opacity=".6"/>
+<text x="46" y="12" font-size="11" font-family="sans-serif" font-weight="700" fill="#7c6cff">z</text><text x="53" y="6" font-size="8" font-family="sans-serif" font-weight="700" fill="#7c6cff">z</text>
+</svg>`;
 const BOOK='Daniel', GLBOOK='dan';
 const LEVELS = [
  { dn:'Sunday', icon:'🥦', title:'Daniel’s Choice', ref:'Daniel 1:3–17', ch:[1],
@@ -337,7 +350,7 @@ const LEVELS = [
    key:['And in the days of these kings','shall the God of heaven','set up a kingdom,','which shall never be destroyed'],
    askL:'The little stone grew and grew until it filled the whole earth! How is the Church like that stone?',
    askB:'The stone was cut out "without hands." Why does it matter that God, not people, set up His kingdom?',
-   mid:{q:'In our Church, what is the stone that becomes a great mountain?', o:['God’s kingdom, the Church of Jesus Christ','A real rock','The golden statue','The king’s palace'], look:'Think about Daniel 2:44.'},
+   mid:{q:'The little stone grew until it filled the whole earth. What does that teach us?', o:['God’s kingdom will keep growing and will never be destroyed','Rocks are very heavy','Statues are strong','Only kings can build kingdoms'], look:'Think about Daniel 2:44.'},
    motion:'pop', alt:['🪨','🪨'], turn:'⛰️', bad:null, goal:16, bg:'linear-gradient(#d6ecff,#f4f0e4)',
    hint:'Tap the little stones to grow them into great mountains!',
    win:'The little stone became a great mountain and filled the whole earth! ⛰️',
@@ -374,9 +387,11 @@ const LEVELS = [
    askL:'Daniel prayed three times a day. When are three times you could pray each day?',
    askB:'Daniel prayed "as he did aforetime," just like always. Why do good habits help when hard times come?',
    mid:{q:'What did Daniel keep doing, even when it was against the law?', o:['Praying to God three times a day','Hiding in his room','Praying to the king','Nothing, he stopped'], look:'Think about Daniel 6:10.'},
-   motion:'rise', alt:['🙏','💛','✨'], bad:'📜', goal:16, bg:'linear-gradient(#ffeccf,#ffd2b8 60%,#c6a6ff)',
-   hint:'Tap the prayers as they rise to heaven! (Big kids: not the king’s decree!)',
-   win:'Your prayers rose up to heaven, three times a day, just like Daniel! 🙏',
+   motion:'run', alt:['🙏','💛'], obstacles:['📜','🪨','🪴'], bad:null, goal:3,
+   skies:['linear-gradient(#ffe2b8,#bfe3ff)','linear-gradient(#8fd0ff,#e6f6ff)','linear-gradient(#ff9e7a,#7a5ba8)','linear-gradient(#2b2d6e,#5b4b8a)'],
+   times:['Morning','Noon','Evening'], bg:'linear-gradient(#ffe2b8,#bfe3ff)',
+   hint:'Tap (or press Space) to jump! Hop over the decrees and get Roar to the open window to pray, three times a day!',
+   win:'Roar made it to the window three times a day, just like Daniel! 🙏',
    home:'Let’s pick our three times to pray each day this week.'},
  { dn:'Friday', icon:'🦁', title:'The Lions’ Den', ref:'Daniel 6:14–23, 25–28', ch:[6],
    sum:'Daniel kept praying, so he was thrown into the den of lions. King Darius was very sad.',
@@ -392,7 +407,7 @@ const LEVELS = [
    askL:'How do you think Daniel felt in the dark den? What helps you feel safe?',
    askB:'Daniel was delivered "because he believed in his God." When has trusting God helped you through something hard?',
    mid:{q:'Why was Daniel safe in the lions’ den?', o:['God sent His angel, because Daniel trusted Him','The lions were full','Daniel was a lion tamer','The king hid him'], look:'Think about Daniel 6:22–23.'},
-   motion:'wander', alt:['🦁','🦁'], turn:'😌', bad:null, goal:15, bg:'linear-gradient(#5b4a3a,#8a7259 60%,#b39a78)',
+   motion:'wander', alt:['🦁','🦁'], turn:SLEEPY_LION, bad:null, goal:15, bg:'linear-gradient(#5b4a3a,#8a7259 60%,#b39a78)',
    hint:'Tap the lions to shut their mouths! The angel is helping you!',
    win:'Every lion’s mouth is shut! "There is no other God that can deliver." 🦁',
    home:'What is something hard where we can trust the Lord this week?'},
@@ -549,13 +564,59 @@ function startGame(i){
   document.getElementById('check').style.display='none';
   basket.style.left=G.bx+'px';
   const hint=document.getElementById('hint'); hint.textContent=L.hint; hint.style.opacity=1; setTimeout(()=>hint.style.opacity=0,3500);
+  if(L.motion==='run') initRun();
   hud(); raf=requestAnimationFrame(loop);
 }
+/* ---------- runner (motion:'run') ---------- */
+const WIN=2400;
+function initRun(){
+  const {W,H,big}=G, gy=H-90;
+  G.goal=3; G.timeLeft=Infinity; G.maxMiss=big?3:Infinity; G.pray=0;
+  const ground=document.createElement('div'); ground.style.cssText=`position:absolute;left:0;right:0;top:${gy}px;bottom:0;background:linear-gradient(#c9b08a,#a88b62);border-top:6px solid #8a6d47`; area.appendChild(ground);
+  const pl=document.createElement('div'); pl.className='it'; pl.textContent='🦁'; pl.style.zIndex=3; area.appendChild(pl);
+  G.run={gy,px:Math.max(70,W*0.22),py:gy,vy:0,dist:0,nextWin:WIN*0.8,wins:0,obsT:1.6,prayT:0.9,inv:0,stopT:0,speed:big?250:170,pl,win:null};
+  game.style.background=G.L.skies[0];
+}
+function jump(){ const R=G&&G.run; if(!R||G.paused||G.over||R.stopT>0) return; if(R.py>=R.gy-0.5){ R.vy=-590; } }
+function runStep(dt){
+  const R=G.run, L=G.L, big=G.big;
+  if(R.stopT>0){ R.stopT-=dt;
+    if(R.stopT<=0){ document.getElementById('hint').style.opacity=0;
+      if(R.wins>=3) return finish(true);
+      if(R.wins===2&&!G.checked) return checkpoint(); }
+    return; }
+  const dx=R.speed*dt; R.dist+=dx;
+  R.vy+=1500*dt; R.py+=R.vy*dt; if(R.py>R.gy){R.py=R.gy;R.vy=0;}
+  const toWin=R.nextWin-R.dist;
+  R.decoT=(R.decoT||0)-dt; if(R.decoT<=0){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(['🌴','🏛️','🌴','☁️','🐪','🏠']); const cloud=el.textContent==='☁️'; el.style.fontSize=cloud?'40px':'58px'; el.style.opacity=cloud?.8:.55; el.style.zIndex=0; area.appendChild(el); (R.deco=R.deco||[]).push({el,x:G.W+60,y:cloud?rand(120,260):R.gy-34}); R.decoT=rand(1.2,2.4); }
+  if(R.deco){ for(const d of R.deco){ d.x-=dx*0.45; d.el.style.left=d.x+'px'; d.el.style.top=d.y+'px'; if(d.x<-80){d.el.remove();d.dead=true;} } R.deco=R.deco.filter(d=>!d.dead); }
+  R.obsT-=dt; if(R.obsT<=0){ if(toWin>420){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(L.obstacles); area.appendChild(el); G.items.push({el,x:G.W+40,y:R.gy-26,kind:'obs'}); } R.obsT=big?rand(0.85,1.45):rand(1.5,2.3); }
+  R.prayT-=dt; if(R.prayT<=0){ if(toWin>250){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(L.alt); el.style.fontSize='36px'; area.appendChild(el); G.items.push({el,x:G.W+40,y:R.gy-(Math.random()<.55?120:40),kind:'pray'}); } R.prayT=rand(0.8,1.4); }
+  if(!R.win && toWin < G.W-R.px+60){ const el=document.createElement('div'); el.className='it'; el.innerHTML='🪟<div style="font-size:12px;font-weight:900;background:#fff;border-radius:8px;padding:1px 6px;margin-top:-4px">toward Jerusalem</div>'; el.style.fontSize='64px'; el.style.textAlign='center'; area.appendChild(el); R.win={el,x:R.px+toWin,y:R.gy-70}; }
+  if(R.win){ R.win.x-=dx; R.win.el.style.left=R.win.x+'px'; R.win.el.style.top=R.win.y+'px';
+    if(R.win.x<=R.px+8){ R.win.el.remove(); R.win=null; R.wins++; G.score=R.wins; R.nextWin+=WIN;
+      G.items.forEach(kill); G.items=[];
+      const hint=document.getElementById('hint'); hint.textContent=`🙏 ${L.times[R.wins-1]} prayer! Roar gave thanks to God.`; hint.style.opacity=1;
+      fx(R.px,R.py-60,'🙏','+1'); game.style.background=L.skies[R.wins]; R.stopT=1.6; hud(); return; } }
+  if(R.inv>0){ R.inv-=dt; R.pl.style.opacity=(Math.floor(R.inv*10)%2)?.35:1; } else R.pl.style.opacity=1;
+  for(const it of G.items){ if(it.dead) continue; it.x-=dx;
+    if(it.x<-60){kill(it);continue;}
+    if(it.kind==='obs' && R.inv<=0 && Math.abs(it.x-R.px)<30 && R.py>R.gy-40){
+      R.inv=1.2; R.vy=-300; fx(R.px,R.py-40,'💫'); flash(game);
+      if(big){ G.miss++; if(G.miss>=G.maxMiss){ hud(); return finish(false);} } }
+    if(it.kind==='pray' && Math.abs(it.x-R.px)<36 && Math.abs(it.y-(R.py-26))<44){ G.pray++; fx(it.x,it.y,it.el.textContent,'+1'); kill(it); continue; }
+    it.el.style.left=it.x+'px'; it.el.style.top=it.y+'px'; }
+  G.items=G.items.filter(i=>!i.dead);
+  R.pl.style.left=R.px+'px'; R.pl.style.top=(R.py-26)+'px';
+}
+game.addEventListener('pointerdown',e=>{ if(G&&G.L.motion==='run'&&!e.target.closest('#bar,#check')) jump(); });
+window.addEventListener('keydown',e=>{ if(G&&G.L.motion==='run'&&(e.code==='Space'||e.code==='ArrowUp')){ e.preventDefault(); jump(); } });
 function stop(){ cancelAnimationFrame(raf); if(G) G.over=true; }
 function hud(){
   document.getElementById('score').textContent=`${G.score}/${G.goal}`;
   document.querySelector('#prog i').style.width=Math.min(100,G.score/G.goal*100)+'%';
   document.querySelector('#prog b').textContent=G.checked?'✅':'❓';
+  if(G.L.motion==='run'){ document.getElementById('extra').textContent='🙏'+(G.pray||0)+(G.big?' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):''); return; }
   document.getElementById('extra').textContent=G.big?'⏱'+Math.ceil(G.timeLeft)+' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):'🐣';
 }
 function spawn(){
@@ -576,7 +637,7 @@ function spawn(){
 const place=it=>{it.el.style.left=it.x+'px';it.el.style.top=it.y+'px';};
 const kill=it=>{it.dead=true;it.el.remove();};
 function fx(x,y,e,t){
-  if(e){const b=document.createElement('div');b.className='boom';b.textContent=e;b.style.left=x+'px';b.style.top=y+'px';area.appendChild(b);setTimeout(()=>b.remove(),700);}
+  if(e){const b=document.createElement('div');b.className='boom';if(e[0]==='<')b.innerHTML=e;else b.textContent=e;b.style.left=x+'px';b.style.top=y+'px';area.appendChild(b);setTimeout(()=>b.remove(),700);}
   if(t){const p=document.createElement('div');p.className='plus';p.textContent=t;p.style.left=x+'px';p.style.top=(y-30)+'px';area.appendChild(p);setTimeout(()=>p.remove(),700);}
 }
 function good(it,e){ G.score++; fx(it.x,it.y,e||it.el.textContent,'+1'); kill(it); hud();
@@ -595,6 +656,7 @@ function checkpoint(){
 function loop(now){
   if(!G||G.over||G.paused) return;
   const dt=Math.min(.05,(now-G.last)/1000); G.last=now; G.spawnT+=dt;
+  if(G.L.motion==='run'){ runStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
   if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} }
   if(G.spawnT>=G.spawnEvery){ G.spawnT=0; spawn(); }
   const {W,H,L}=G;
