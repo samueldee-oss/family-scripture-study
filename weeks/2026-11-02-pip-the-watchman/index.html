@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pip the Watchman — Ezekiel Week</title>
+<style>
+  :root{--ink:#3b2f4a;--card:#fff;--accent:#ff8a65;--accent2:#7c9cff;--gold:#ffc94d;--ok:#4caf7a;--r:22px;--sh:#f0dcc6}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#fdf3e7}
+  button{font:inherit;cursor:pointer;border:0;color:inherit}
+  .screen{display:none;min-height:100%;padding:18px 16px 32px;max-width:720px;margin:0 auto}
+  .screen.on{display:block}
+  .trailbtn{display:inline-block;background:#fff;padding:7px 14px;border-radius:999px;font-weight:800;text-decoration:none;color:#3b2f4a;box-shadow:0 2px 0 #f0dcc6;font-size:14px}
+  h1{font-size:30px;margin:6px 0 2px}
+  h2{font-size:24px;margin:4px 0 8px}
+  .hero{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+  .pip{font-size:64px;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+  .modes{display:flex;gap:8px;background:#fff;border-radius:999px;padding:5px;width:max-content;box-shadow:0 2px 0 var(--sh);margin:6px 0 16px}
+  .modes button{padding:8px 16px;border-radius:999px;background:transparent;font-weight:700}
+  .modes button.sel{background:var(--accent2);color:#fff}
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .day{background:var(--card);border-radius:var(--r);padding:14px;text-align:left;box-shadow:0 4px 0 var(--sh);position:relative}
+  .day{cursor:pointer}.day:active{transform:translateY(3px)}
+  .day.today.done::after{bottom:auto;top:34px}
+  .redo{display:flex;gap:6px;margin-top:10px}
+  .redo button{flex:1;padding:7px 4px;border-radius:10px;font-weight:800;font-size:13px;background:#eef1ff;color:#3d4fb8;box-shadow:0 2px 0 #c9d3ff}
+  .redo .rp{background:#ffe7dc;color:#b04a24;box-shadow:0 2px 0 #ffc6ad}
+  .day.locked{opacity:.5}
+  .day .dn{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.6}
+  .day .ic{font-size:36px;margin:4px 0}
+  .day .t{font-weight:800;font-size:16px;line-height:1.2}
+  .day .ref{font-size:12.5px;opacity:.7;margin-top:4px}
+  .day .badges{position:absolute;top:10px;right:12px;font-size:16px}
+  .day.today{outline:4px solid var(--gold)}
+  .day.today::after{content:"Today";position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:800;background:var(--gold);padding:2px 8px;border-radius:99px}
+  .back{background:#fff;padding:8px 14px;border-radius:999px;font-weight:700;box-shadow:0 2px 0 var(--sh)}
+  .panel{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 4px 0 var(--sh);margin-top:14px}
+  .panel h3{margin:0 0 8px;font-size:18px}
+  .panel.lock{opacity:.55}
+  .step{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#a0784d}
+  .part{border:2px solid #f3e6d6;border-radius:16px;padding:12px;margin-top:10px}
+  .part.done{border-color:#bfe6cf;background:#f3fbf6}
+  .part.wait{opacity:.45}
+  .part .pr{font-weight:800;font-size:17px}
+  .scripture{margin-top:10px;background:#fffdf7;border-left:5px solid #e7c98f;border-radius:10px;padding:6px 14px;font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.6}
+  .vs{margin:8px 0}.vs.easy{color:#3f37c9;font-weight:700}.legend{font-size:13.5px;margin-top:6px}.legend b{color:#3f37c9}.vs sup{font-family:inherit;font-weight:700;color:#b07a2a;font-size:12px}
+  .words{margin-top:8px;font-size:14px;background:#f2f6ff;border-radius:10px;padding:8px 10px;line-height:1.45}
+  .gl{display:inline-block;margin:6px 6px 0 0;padding:6px 12px;border-radius:999px;background:#eef1ff;color:#3d4fb8;text-decoration:none;font-weight:700;font-size:14px}
+  .btn{display:inline-block;margin-top:10px;padding:10px 16px;border-radius:14px;background:var(--accent2);color:#fff;font-weight:800;box-shadow:0 3px 0 #5a77d6}
+  .q{margin-top:10px;font-weight:800;font-size:16.5px}
+  .opts{display:grid;gap:8px;margin-top:8px}
+  .opt{background:#fff7ee;border:2px solid #f0dcc6;border-radius:14px;padding:11px 12px;text-align:left;font-weight:700}
+  .opt.no{background:#ffe5e0;border-color:#ff9f8a;animation:shake .4s}
+  .opt.yes{background:#dcf5e6;border-color:var(--ok)}
+  .opt:disabled{opacity:.6}
+  .look{font-size:14px;color:#b04a24;font-weight:700;margin-top:6px}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .lesson{font-size:20px;font-weight:900;background:linear-gradient(90deg,#fff3c4,#ffe0d2);padding:12px 14px;border-radius:14px}
+  .vtarget{min-height:56px;border:2px dashed #d9c3a6;border-radius:14px;padding:10px;margin-top:10px;font-family:Georgia,serif;font-size:18px;line-height:1.5}
+  .vtarget.full{border:2px solid var(--ok);background:#f3fbf6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{background:#eef1ff;border-radius:12px;padding:8px 12px;font-family:Georgia,serif;font-size:16px;box-shadow:0 2px 0 #c9d3ff}
+  .chip.no{background:#ffe5e0;animation:shake .4s}
+  .ask p{margin:6px 0}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-right:6px}
+  .tag.l{background:#ffe2d6;color:#b04a24}.tag.b{background:#dfe6ff;color:#3346a8}
+  .play{display:block;width:100%;margin-top:16px;padding:16px;border-radius:var(--r);background:var(--accent);color:#fff;font-size:22px;font-weight:800;box-shadow:0 5px 0 #d9663f}
+  .play:disabled{background:#d6c8bb;box-shadow:0 5px 0 #bfae9e}
+  .journal{display:grid;gap:8px}
+  .jl{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 2px 0 var(--sh);font-weight:700;font-size:15px}
+  .jl.no{opacity:.45}
+  .foot{font-size:12.5px;opacity:.6;margin-top:18px;text-align:center}
+  .tiny{background:none;text-decoration:underline;font-size:12.5px;opacity:.6}
+  /* game */
+  #game{padding:0;max-width:none;height:100vh;height:100dvh;position:relative;overflow:hidden;touch-action:none;user-select:none}
+  #bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:10px 12px;z-index:5}
+  #bar .pill,#quit{background:rgba(255,255,255,.88);padding:6px 12px;border-radius:999px;font-weight:800;font-size:16px}
+  #prog{flex:1;height:14px;background:rgba(255,255,255,.6);border-radius:99px;overflow:hidden;position:relative}
+  #prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  #prog b{position:absolute;left:50%;top:-3px;font-size:14px;transform:translateX(-50%)}
+  #area{position:absolute;inset:0}
+  .it{position:absolute;font-size:46px;line-height:1;transform:translate(-50%,-50%);padding:8px}
+  .boom,.plus{position:absolute;transform:translate(-50%,-50%);pointer-events:none;animation:boom .7s ease-out forwards}
+  .boom{font-size:46px}.plus{font-weight:900;font-size:22px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+  @keyframes boom{to{transform:translate(-50%,-140%) scale(1.4);opacity:0}}
+  #hint{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;padding:10px 16px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;max-width:88%;z-index:4;transition:opacity .6s}
+  #basket{position:absolute;bottom:18px;font-size:60px;transform:translateX(-50%);pointer-events:none;z-index:3;display:none}
+  #village{position:absolute;bottom:0;left:0;right:0;height:96px;display:none;z-index:2;background:linear-gradient(#c9b08a,#a88b62);border-top:8px solid #8a6d47;font-size:38px;text-align:center;padding-top:10px;letter-spacing:6px}
+  #village.hit{animation:shake .4s}
+  #wallpip{position:absolute;bottom:84px;left:12px;font-size:52px;z-index:3;display:none}
+  #river{position:absolute;left:0;right:0;top:30%;height:50%;background:linear-gradient(#7fd3ff,#3fa7e8);display:none;opacity:.85}
+  #check{position:absolute;inset:0;background:rgba(40,30,60,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  #check .panel{max-width:460px;width:100%}
+  .center{text-align:center}
+  .stars{font-size:54px;margin:8px 0}
+  .bigpip{font-size:96px;animation:bob 1.6s ease-in-out infinite}
+  .home q{display:block;font-size:20px;font-weight:800;margin:8px 0;quotes:none}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .row button{flex:1;padding:14px;border-radius:var(--r);font-weight:800;font-size:17px}
+  .ghost{background:#fff;box-shadow:0 4px 0 var(--sh)}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen on">
+  <a class="trailbtn" href="https://claude.ai/artifact/5hWMgs2fzqj2LWWxBo3Xoc" target="_blank" rel="noopener">🏞️ All weeks</a>
+  <div class="hero">
+    <div class="pip">🦉</div>
+    <div><h1>Pip the Watchman</h1>
+      <p style="margin:0;opacity:.75">Read it. Learn it. Then play it. About half a chapter each morning.</p></div>
+  </div>
+  <div class="modes" id="modes">
+    <button data-m="little">🐣 Little Kids</button>
+    <button data-m="big">🦅 Big Kids</button>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="panel">
+    <h3>📓 Watchman’s Journal</h3>
+    <p style="margin:0 0 10px;opacity:.75;font-size:14px">Collect each day’s lesson by reading and building the key verse.</p>
+    <div class="journal" id="journal"></div>
+  </div>
+  <p class="foot">Come, Follow Me · Nov 2–8 · Ezekiel 1–3; 33–34; 36–37; 47<br>
+    <button class="tiny" id="unlockAll">Parent: unlock all days</button> · <button class="tiny" id="reset">Reset progress</button></p>
+  <div id="confirmBox" class="panel" style="display:none"></div>
+</section>
+
+<section id="day" class="screen">
+  <button class="back" onclick="show('home')">← All days</button>
+  <h2 id="dTitle" style="margin-top:14px"></h2>
+  <p id="dSum" style="line-height:1.5;margin:4px 0 0"></p>
+
+  <div class="panel" id="readPanel">
+    <div class="step">Step 1</div>
+    <h3>📖 Read together</h3>
+    <div style="font-size:14px;opacity:.75">About half a chapter, in three parts. Read each part out loud (take turns!), then answer Pip’s question to unlock the next part.</div>
+    <div id="parts"></div>
+  </div>
+
+  <div class="panel" id="lessonPanel">
+    <div class="step">Step 2</div>
+    <h3>💡 Today’s lesson</h3>
+    <div id="lessonBody"></div>
+  </div>
+
+  <div class="panel" id="playPanel">
+    <div class="step">Step 3</div>
+    <h3>🎮 Play the level</h3>
+    <div style="font-size:14px;opacity:.75">There’s a question checkpoint halfway through, so remember what you learned!</div>
+    <button class="play" id="playBtn">▶ Play Level</button>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div id="area"></div>
+  <div id="river"></div>
+  <div id="village">🏠 🏡 ⛪ 🏠 🏡</div>
+  <div id="wallpip">🦉</div>
+  <div id="basket">🦉🧺</div>
+  <div id="bar">
+    <button id="quit">✕</button>
+    <div id="prog"><i></i><b>❓</b></div>
+    <span class="pill" id="score">0/0</span>
+    <span class="pill" id="extra"></span>
+  </div>
+  <div id="hint"></div>
+  <div id="check"><div class="panel">
+    <div class="step">Watchman checkpoint</div>
+    <h3>🦉 Pip asks…</h3>
+    <div class="q" id="cQ"></div><div class="opts" id="cO"></div><div class="look" id="cL"></div>
+  </div></div>
+</section>
+
+<section id="win" class="screen center">
+  <div class="bigpip" id="wIcon">🦉</div>
+  <h2 id="wTitle"></h2>
+  <div class="stars" id="wStars"></div>
+  <div class="panel" id="wMsg" style="font-size:18px;line-height:1.5"></div>
+  <div class="panel" style="text-align:left"><div class="step">Today’s lesson</div><div class="lesson" id="wLesson" style="margin-top:6px"></div></div>
+  <div class="panel home"><h3>🏡 Bring it home</h3><q id="wHome"></q></div>
+  <div class="row">
+    <button class="ghost" id="again">↻ Play again</button>
+    <button class="play" style="margin:0" onclick="show('home')">All days</button>
+  </div>
+</section>
+
+<script>
+const GL = c => `https://www.churchofjesuschrist.org/study/scriptures/ot/ezek/${c}?lang=eng`;
+/* King James Version (public domain). TEXT[chapter][verse] */
+const TEXT = {
+ 2:{1:'And he said unto me, Son of man, stand upon thy feet, and I will speak unto thee.',
+  2:'And the spirit entered into me when he spake unto me, and set me upon my feet, that I heard him that spake unto me.',
+  3:'And he said unto me, Son of man, I send thee to the children of Israel, to a rebellious nation that hath rebelled against me: they and their fathers have transgressed against me, even unto this very day.',
+  4:'For they are impudent children and stiffhearted. I do send thee unto them; and thou shalt say unto them, Thus saith the Lord GOD.',
+  5:'And they, whether they will hear, or whether they will forbear, (for they are a rebellious house,) yet shall know that there hath been a prophet among them.',
+  6:'And thou, son of man, be not afraid of them, neither be afraid of their words, though briers and thorns be with thee, and thou dost dwell among scorpions: be not afraid of their words, nor be dismayed at their looks, though they be a rebellious house.',
+  7:'And thou shalt speak my words unto them, whether they will hear, or whether they will forbear: for they are most rebellious.',
+  8:'But thou, son of man, hear what I say unto thee; Be not thou rebellious like that rebellious house: open thy mouth, and eat that I give thee.',
+  9:'And when I looked, behold, an hand was sent unto me; and, lo, a roll of a book was therein;',
+  10:'And he spread it before me; and it was written within and without: and there was written therein lamentations, and mourning, and woe.'},
+ 3:{1:'Moreover he said unto me, Son of man, eat that thou findest; eat this roll, and go speak unto the house of Israel.',
+  2:'So I opened my mouth, and he caused me to eat that roll.',
+  3:'And he said unto me, Son of man, cause thy belly to eat, and fill thy bowels with this roll that I give thee. Then did I eat it; and it was in my mouth as honey for sweetness.',
+  10:'Moreover he said unto me, Son of man, all my words that I shall speak unto thee receive in thine heart, and hear with thine ears.',
+  11:'And go, get thee to them of the captivity, unto the children of thy people, and speak unto them, and tell them, Thus saith the Lord GOD; whether they will hear, or whether they will forbear.',
+  12:'Then the spirit took me up, and I heard behind me a voice of a great rushing, saying, Blessed be the glory of the LORD from his place.',
+  13:'I heard also the noise of the wings of the living creatures that touched one another, and the noise of the wheels over against them, and a noise of a great rushing.',
+  14:'So the spirit lifted me up, and took me away, and I went in bitterness, in the heat of my spirit; but the hand of the LORD was strong upon me.',
+  15:'Then I came to them of the captivity at Tel-abib, that dwelt by the river of Chebar, and I sat where they sat, and remained there astonished among them seven days.',
+  16:'And it came to pass at the end of seven days, that the word of the LORD came unto me, saying,',
+  17:'Son of man, I have made thee a watchman unto the house of Israel: therefore hear the word at my mouth, and give them warning from me.',
+  18:'When I say unto the wicked, Thou shalt surely die; and thou givest him not warning, nor speakest to warn the wicked from his wicked way, to save his life; the same wicked man shall die in his iniquity; but his blood will I require at thine hand.',
+  19:'Yet if thou warn the wicked, and he turn not from his wickedness, nor from his wicked way, he shall die in his iniquity; but thou hast delivered thy soul.',
+  20:'Again, When a righteous man doth turn from his righteousness, and commit iniquity, and I lay a stumblingblock before him, he shall die: because thou hast not given him warning, he shall die in his sin, and his righteousness which he hath done shall not be remembered; but his blood will I require at thine hand.',
+  21:'Nevertheless if thou warn the righteous man, that the righteous sin not, and he doth not sin, he shall surely live, because he is warned; also thou hast delivered thy soul.'},
+ 33:{1:'Again the word of the LORD came unto me, saying,',
+  2:'Son of man, speak to the children of thy people, and say unto them, When I bring the sword upon a land, if the people of the land take a man of their coasts, and set him for their watchman:',
+  3:'If when he seeth the sword come upon the land, he blow the trumpet, and warn the people;',
+  4:'Then whosoever heareth the sound of the trumpet, and taketh not warning; if the sword come, and take him away, his blood shall be upon his own head.',
+  5:'He heard the sound of the trumpet, and took not warning; his blood shall be upon him. But he that taketh warning shall deliver his soul.',
+  6:'But if the watchman see the sword come, and blow not the trumpet, and the people be not warned; if the sword come, and take any person from among them, he is taken away in his iniquity; but his blood will I require at the watchman’s hand.',
+  7:'So thou, O son of man, I have set thee a watchman unto the house of Israel; therefore thou shalt hear the word at my mouth, and warn them from me.',
+  8:'When I say unto the wicked, O wicked man, thou shalt surely die; if thou dost not speak to warn the wicked from his way, that wicked man shall die in his iniquity; but his blood will I require at thine hand.',
+  9:'Nevertheless, if thou warn the wicked of his way to turn from it; if he do not turn from his way, he shall die in his iniquity; but thou hast delivered thy soul.',
+  10:'Therefore, O thou son of man, speak unto the house of Israel; Thus ye speak, saying, If our transgressions and our sins be upon us, and we pine away in them, how should we then live?',
+  11:'Say unto them, As I live, saith the Lord GOD, I have no pleasure in the death of the wicked; but that the wicked turn from his way and live: turn ye, turn ye from your evil ways; for why will ye die, O house of Israel?',
+  12:'Therefore, thou son of man, say unto the children of thy people, The righteousness of the righteous shall not deliver him in the day of his transgression: as for the wickedness of the wicked, he shall not fall thereby in the day that he turneth from his wickedness; neither shall the righteous be able to live for his righteousness in the day that he sinneth.',
+  13:'When I shall say to the righteous, that he shall surely live; if he trust to his own righteousness, and commit iniquity, all his righteousnesses shall not be remembered; but for his iniquity that he hath committed, he shall die for it.',
+  14:'Again, when I say unto the wicked, Thou shalt surely die; if he turn from his sin, and do that which is lawful and right;',
+  15:'If the wicked restore the pledge, give again that he had robbed, walk in the statutes of life, without committing iniquity; he shall surely live, he shall not die.',
+  16:'None of his sins that he hath committed shall be mentioned unto him: he hath done that which is lawful and right; he shall surely live.'},
+ 34:{1:'And the word of the LORD came unto me, saying,',
+  2:'Son of man, prophesy against the shepherds of Israel, prophesy, and say unto them, Thus saith the Lord GOD unto the shepherds; Woe be to the shepherds of Israel that do feed themselves! should not the shepherds feed the flocks?',
+  3:'Ye eat the fat, and ye clothe you with the wool, ye kill them that are fed: but ye feed not the flock.',
+  4:'The diseased have ye not strengthened, neither have ye healed that which was sick, neither have ye bound up that which was broken, neither have ye brought again that which was driven away, neither have ye sought that which was lost; but with force and with cruelty have ye ruled them.',
+  5:'And they were scattered, because there is no shepherd: and they became meat to all the beasts of the field, when they were scattered.',
+  6:'My sheep wandered through all the mountains, and upon every high hill: yea, my flock was scattered upon all the face of the earth, and none did search or seek after them.',
+  7:'Therefore, ye shepherds, hear the word of the LORD;',
+  8:'As I live, saith the Lord GOD, surely because my flock became a prey, and my flock became meat to every beast of the field, because there was no shepherd, neither did my shepherds search for my flock, but the shepherds fed themselves, and fed not my flock;',
+  9:'Therefore, O ye shepherds, hear the word of the LORD;',
+  10:'Thus saith the Lord GOD; Behold, I am against the shepherds; and I will require my flock at their hand, and cause them to cease from feeding the flock; neither shall the shepherds feed themselves any more; for I will deliver my flock from their mouth, that they may not be meat for them.',
+  11:'For thus saith the Lord GOD; Behold, I, even I, will both search my sheep, and seek them out.',
+  12:'As a shepherd seeketh out his flock in the day that he is among his sheep that are scattered; so will I seek out my sheep, and will deliver them out of all places where they have been scattered in the cloudy and dark day.',
+  13:'And I will bring them out from the people, and gather them from the countries, and will bring them to their own land, and feed them upon the mountains of Israel by the rivers, and in all the inhabited places of the country.',
+  14:'I will feed them in a good pasture, and upon the high mountains of Israel shall their fold be: there shall they lie in a good fold, and in a fat pasture shall they feed upon the mountains of Israel.',
+  15:'I will feed my flock, and I will cause them to lie down, saith the Lord GOD.',
+  16:'I will seek that which was lost, and bring again that which was driven away, and will bind up that which was broken, and will strengthen that which was sick: but I will destroy the fat and the strong; I will feed them with judgment.'},
+ 36:{24:'For I will take you from among the heathen, and gather you out of all countries, and will bring you into your own land.',
+  25:'Then will I sprinkle clean water upon you, and ye shall be clean: from all your filthiness, and from all your idols, will I cleanse you.',
+  26:'A new heart also will I give you, and a new spirit will I put within you: and I will take away the stony heart out of your flesh, and I will give you an heart of flesh.',
+  27:'And I will put my spirit within you, and cause you to walk in my statutes, and ye shall keep my judgments, and do them.',
+  28:'And ye shall dwell in the land that I gave to your fathers; and ye shall be my people, and I will be your God.',
+  29:'I will also save you from all your uncleannesses: and I will call for the corn, and will increase it, and lay no famine upon you.',
+  30:'And I will multiply the fruit of the tree, and the increase of the field, that ye shall receive no more reproach of famine among the heathen.',
+  31:'Then shall ye remember your own evil ways, and your doings that were not good, and shall lothe yourselves in your own sight for your iniquities and for your abominations.',
+  32:'Not for your sakes do I this, saith the Lord GOD, be it known unto you: be ashamed and confounded for your own ways, O house of Israel.',
+  33:'Thus saith the Lord GOD; In the day that I shall have cleansed you from all your iniquities I will also cause you to dwell in the cities, and the wastes shall be builded.',
+  34:'And the desolate land shall be tilled, whereas it lay desolate in the sight of all that passed by.',
+  35:'And they shall say, This land that was desolate is become like the garden of Eden; and the waste and desolate and ruined cities are become fenced, and are inhabited.'},
+ 37:{1:'The hand of the LORD was upon me, and carried me out in the spirit of the LORD, and set me down in the midst of the valley which was full of bones,',
+  2:'And caused me to pass by them round about: and, behold, there were very many in the open valley; and, lo, they were very dry.',
+  3:'And he said unto me, Son of man, can these bones live? And I answered, O Lord GOD, thou knowest.',
+  4:'Again he said unto me, Prophesy upon these bones, and say unto them, O ye dry bones, hear the word of the LORD.',
+  5:'Thus saith the Lord GOD unto these bones; Behold, I will cause breath to enter into you, and ye shall live:',
+  6:'And I will lay sinews upon you, and will bring up flesh upon you, and cover you with skin, and put breath in you, and ye shall live; and ye shall know that I am the LORD.',
+  7:'So I prophesied as I was commanded: and as I prophesied, there was a noise, and behold a shaking, and the bones came together, bone to his bone.',
+  8:'And when I beheld, lo, the sinews and the flesh came up upon them, and the skin covered them above: but there was no breath in them.',
+  9:'Then said he unto me, Prophesy unto the wind, prophesy, son of man, and say to the wind, Thus saith the Lord GOD; Come from the four winds, O breath, and breathe upon these slain, that they may live.',
+  10:'So I prophesied as he commanded me, and the breath came into them, and they lived, and stood up upon their feet, an exceeding great army.',
+  11:'Then he said unto me, Son of man, these bones are the whole house of Israel: behold, they say, Our bones are dried, and our hope is lost: we are cut off for our parts.',
+  12:'Therefore prophesy and say unto them, Thus saith the Lord GOD; Behold, O my people, I will open your graves, and cause you to come up out of your graves, and bring you into the land of Israel.',
+  13:'And ye shall know that I am the LORD, when I have opened your graves, O my people, and brought you up out of your graves,',
+  14:'And shall put my spirit in you, and ye shall live, and I shall place you in your own land: then shall ye know that I the LORD have spoken it, and performed it, saith the LORD.',
+  15:'The word of the LORD came again unto me, saying,',
+  16:'Moreover, thou son of man, take thee one stick, and write upon it, For Judah, and for the children of Israel his companions: then take another stick, and write upon it, For Joseph, the stick of Ephraim, and for all the house of Israel his companions:',
+  17:'And join them one to another into one stick; and they shall become one in thine hand.'},
+ 47:{1:'Afterward he brought me again unto the door of the house; and, behold, waters issued out from under the threshold of the house eastward: for the forefront of the house stood toward the east, and the waters came down from under from the right side of the house, at the south side of the altar.',
+  2:'Then brought he me out of the way of the gate northward, and led me about the way without unto the utter gate by the way that looketh eastward; and, behold, there ran out waters on the right side.',
+  3:'And when the man that had the line in his hand went forth eastward, he measured a thousand cubits, and he brought me through the waters; the waters were to the ancles.',
+  4:'Again he measured a thousand, and brought me through the waters; the waters were to the knees. Again he measured a thousand, and brought me through; the waters were to the loins.',
+  5:'Afterward he measured a thousand; and it was a river that I could not pass over: for the waters were risen, waters to swim in, a river that could not be passed over.',
+  6:'And he said unto me, Son of man, hast thou seen this? Then he brought me, and caused me to return to the brink of the river.',
+  7:'Now when I had returned, behold, at the bank of the river were very many trees on the one side and on the other.',
+  8:'Then said he unto me, These waters issue out toward the east country, and go down into the desert, and go into the sea: which being brought forth into the sea, the waters shall be healed.',
+  9:'And it shall come to pass, that every thing that liveth, which moveth, whithersoever the rivers shall come, shall live: and there shall be a very great multitude of fish, because these waters shall come thither: for they shall be healed; and every thing shall live whither the river cometh.',
+  10:'And it shall come to pass, that the fishers shall stand upon it from En-gedi even unto En-eglaim; they shall be a place to spread forth nets; their fish shall be according to their kinds, as the fish of the great sea, exceeding many.',
+  11:'But the miry places thereof and the marshes thereof shall not be healed; they shall be given to salt.',
+  12:'And by the river upon the bank thereof, on this side and on that side, shall grow all trees for meat, whose leaf shall not fade, neither shall the fruit thereof be consumed: it shall bring forth new fruit according to his months, because their waters they issued out of the sanctuary: and the fruit thereof shall be for meat, and the leaf thereof for medicine.'}
+};
+/* parts: ch, a..b verses; first option in each question is correct (shuffled on screen); w = word help */
+const LEVELS = [
+ { dn:'Sunday', icon:'🌈', title:'The Call of Ezekiel', ref:'Ezekiel 2:1 – 3:3', ch:[2,3],
+   sum:'In chapter 1, Ezekiel, a captive in Babylon, saw the glory of the Lord, with a rainbow around His throne. Now the Lord gives Ezekiel a job.',
+   parts:[
+    {ch:2,a:1,b:5, w:'impudent = rude · stiffhearted = stubborn · forbear = refuse to listen',
+     q:'Even if the people won’t listen, what will they still know?', o:['That there hath been a prophet among them','That Ezekiel is a king','That the scroll is lost','That the city is safe'], look:'Look again at verse 5.'},
+    {ch:2,a:6,b:10, w:'briers = thorny bushes · dismayed = scared · roll = a scroll',
+     q:'What was written in the roll (scroll)?', o:['Lamentations, and mourning, and woe','Songs of joy','A map of Israel','The names of the kings'], look:'Look again at verse 10.'},
+    {ch:3,a:1,b:3, w:'bowels = insides, tummy',
+     q:'When Ezekiel ate the roll, what did it taste like?', o:['As honey for sweetness','Bitter like salt','Like bread','Like nothing at all'], look:'Look again at verse 3.'}],
+   lesson:'The Lord calls prophets to speak His words, even when it’s hard.', keyRef:'Ezekiel 2:7',
+   key:['And thou shalt speak','my words unto them,','whether they will hear,','or whether they will forbear'],
+   askL:'The Lord told Ezekiel "be not afraid." When have you needed to be brave?',
+   askB:'The scroll was full of sad words, but it tasted sweet. Why might God’s words feel sweet even when they’re hard?',
+   mid:{q:'Why does the Lord call prophets?', o:['To speak His words to us, whether people listen or not','So they can be famous','Only to tell stories','To build palaces'], look:'Think about Ezekiel 2:7.'},
+   motion:'rise', alt:['🌈','✨','⭐'], bad:'🦂', goal:14, bg:'linear-gradient(#2b2d6e,#7a4fb5 55%,#ffb37a)',
+   hint:'Tap the rainbows and sparkles of the Lord’s glory! (Big kids: don’t tap scorpions!)',
+   win:'You saw the glory of the Lord, and you weren’t afraid of the scorpions!',
+   home:'Who is a prophet who speaks the Lord’s words to us today?'},
+ { dn:'Monday', icon:'📜', title:'The Watchman', ref:'Ezekiel 3:10–21', ch:[3],
+   sum:'Ezekiel goes to live among the captives, and the Lord gives him a special title.',
+   parts:[
+    {ch:3,a:10,b:15, w:'captivity = the captives in Babylon · astonished = stunned, amazed',
+     q:'How long did Ezekiel sit among the captives at Tel-abib?', o:['Seven days','Forty years','One hour','Three months'], look:'Look again at verse 15.'},
+    {ch:3,a:16,b:19, w:'iniquity = sin · require at thine hand = hold you responsible · delivered thy soul = you did your job',
+     q:'If the watchman warns the wicked, but the wicked man won’t turn, what about the watchman?', o:['He has delivered his soul (he did his job)','He is in trouble too','He must stop being a watchman','He has to move away'], look:'Look again at verse 19.'},
+    {ch:3,a:20,b:21, w:'stumblingblock = something that trips you up',
+     q:'If the watchman warns a righteous man and he does not sin, what happens?', o:['He shall surely live','He shall be forgotten','He shall become a watchman','Nothing happens'], look:'Look again at verse 21.'}],
+   lesson:'Prophets are like watchmen who warn us of danger.', keyRef:'Ezekiel 3:17',
+   key:['Son of man,','I have made thee a watchman','unto the house of Israel:','therefore hear the word at my mouth,','and give them warning from me.'],
+   askL:'Point to your eyes, ears and mouth. How does a watchman use each one?',
+   askB:'A watchman can see danger we can’t. What is something a prophet has warned us about lately?',
+   mid:{q:'What does a watchman do?', o:['Watches for danger and warns the people','Sleeps at the city gate','Builds the city wall','Collects the taxes'], look:'Think about Ezekiel 3:17.'},
+   motion:'fall', alt:['📜','📜','🍯'], bad:'🦂', goal:14, bg:'linear-gradient(#ffe7a8,#ffc76b)',
+   hint:'Slide Pip to catch the scrolls of warning! (Big kids: dodge the scorpions!)',
+   win:'You caught every warning, like a faithful watchman! 🔔',
+   home:'How can you be a kind watchman for someone in our family this week?'},
+ { dn:'Tuesday', icon:'🔔', title:'Turn and Live', ref:'Ezekiel 33:1–16', ch:[33],
+   sum:'The Lord explains the watchman’s job again, then says something wonderful about forgiveness.',
+   parts:[
+    {ch:33,a:1,b:6, w:'coasts = borders · his blood shall be upon his own head = it’s his own fault',
+     q:'When the watchman sees the sword coming, what does he do?', o:['Blows the trumpet and warns the people','Runs away to hide','Opens the gates','Says nothing'], look:'Look again at verse 3.'},
+    {ch:33,a:7,b:11, w:'transgressions = sins · pine away = waste away from sadness',
+     q:'The people felt their sins were too heavy. What did they ask?', o:['How should we then live?','Where is the watchman?','When will the sword come?','Who will be our king?'], look:'Look again at verse 10.'},
+    {ch:33,a:12,b:16, w:'pledge = something borrowed · lawful and right = good and fair',
+     q:'When a wicked man turns from sin and does right, what happens to his old sins?', o:['None of them shall be mentioned unto him','They are written on the wall','He has to carry them forever','They get doubled'], look:'Look again at verse 16.'}],
+   lesson:'The Lord wants to forgive.', keyRef:'Ezekiel 33:11',
+   key:['I have no pleasure','in the death of the wicked;','but that the wicked','turn from his way','and live'],
+   askL:'How does it feel when someone forgives you? How do you think Heavenly Father feels when we turn back to Him?',
+   askB:'The people asked, "How should we then live?" How does verse 11 answer them?',
+   mid:{q:'What does the Lord want when we make mistakes?', o:['For us to turn from our sins and live','For us to give up','For us to hide from Him','Nothing, He doesn’t care'], look:'Think about Ezekiel 33:11.'},
+   motion:'storm', alt:['⛈️','🌪️'], bad:null, goal:16, bg:'linear-gradient(#9fc6ff,#e3f0ff)',
+   hint:'Storms are coming! Tap them to blow the trumpet before they reach the village!',
+   win:'The whole village was warned in time. The Lord wants everyone to turn and live! 🔔',
+   home:'Is there something we should say sorry for? The Lord is ready to forgive.'},
+ { dn:'Wednesday', icon:'🐑', title:'The Good Shepherd', ref:'Ezekiel 34:1–16', ch:[34],
+   sum:'The Lord talks about shepherds: the bad ones, and Himself, the Good Shepherd.',
+   parts:[
+    {ch:34,a:1,b:6, w:'flock = a group of sheep · diseased = sick · bound up = bandaged · meat = food',
+     q:'What were the bad shepherds doing?', o:['Feeding themselves, not the flock','Searching for lost sheep','Healing the sick sheep','Building a strong fold'], look:'Look again at verses 2–3.'},
+    {ch:34,a:7,b:10, w:'prey = something hunted · require = demand back · cease = stop',
+     q:'What will the Lord do about the bad shepherds?', o:['Take His flock back from them','Give them more sheep','Make them kings','Let them keep feeding themselves'], look:'Look again at verse 10.'},
+    {ch:34,a:11,b:16, w:'fold = a safe pen for sheep · pasture = a grassy field',
+     q:'What does the Lord promise to do for His sheep?', o:['Search for them and seek them out','Sell them','Leave them in the dark','Count them once a year'], look:'Look again at verse 11.'}],
+   lesson:'The Lord invites me to feed His sheep.', keyRef:'Ezekiel 34:16',
+   key:['I will seek','that which was lost,','and bring again','that which was driven away,','and will bind up','that which was broken'],
+   askL:'How does the Good Shepherd feel when He finds a lost lamb?',
+   askB:'Verse 4 lists what the bad shepherds didn’t do. Which one could you do for someone this week?',
+   mid:{q:'How can you help "feed" the Lord’s sheep?', o:['Be kind to and help people who are lost or lonely','Only take care of yourself','Wait for someone else to help','Chase the sheep away'], look:'Think about Ezekiel 34:16.'},
+   motion:'wander', alt:['🐑','🐏'], bad:'🐺', goal:15, bg:'linear-gradient(#bfe8ff,#c9f0a8 45%,#9cd67a)',
+   hint:'Tap the lost sheep to bring them home! (Big kids: watch out for wolves!)',
+   win:'Every lost sheep is home safe! You helped seek the lost, like the Good Shepherd.',
+   home:'Who might feel lost or lonely this week? How can we help find them?'},
+ { dn:'Thursday', icon:'❤️', title:'A New Heart', ref:'Ezekiel 36:24–35', ch:[36],
+   sum:'The Lord promises to gather His people and make them new again, from the inside out.',
+   parts:[
+    {ch:36,a:24,b:27, w:'heathen = other nations · statutes = God’s laws · stony = made of stone',
+     q:'What will the Lord sprinkle on His people to make them clean?', o:['Clean water','Sand','Ashes','Oil'], look:'Look again at verse 25.'},
+    {ch:36,a:28,b:31, w:'corn = grain · famine = no food · reproach = shame · lothe = feel sick about',
+     q:'What will the Lord make grow, so there is no more famine?', o:['The corn and the fruit of the tree','Only weeds','Rocks and thorns','Nothing at all'], look:'Look again at verses 29–30.'},
+    {ch:36,a:32,b:35, w:'confounded = embarrassed · tilled = plowed and planted · fenced = protected by walls',
+     q:'The empty land will become like what garden?', o:['The garden of Eden','The king’s garden','A garden of weeds','The garden of Babylon'], look:'Look again at verse 35.'}],
+   lesson:'Jesus Christ can help me change my heart.', keyRef:'Ezekiel 36:26',
+   key:['A new heart also will I give you,','and a new spirit','will I put within you:','and I will take away the stony heart','out of your flesh'],
+   askL:'What would a heart of stone feel like? What about a soft, kind heart?',
+   askB:'Verse 27 says the Lord will put His Spirit in us. How does the Spirit help change our hearts?',
+   mid:{q:'What does it mean to get a "heart of flesh"?', o:['A soft heart that listens to God and loves others','A heart that is bigger in size','A heart that never feels sad','A heart made of stone'], look:'Think about Ezekiel 36:26.'},
+   motion:'pop', alt:['🪨','🪨'], turn:'❤️', bad:null, goal:16, bg:'linear-gradient(#ffd6e0,#fff0f4)',
+   hint:'Tap the stony hearts to turn them into new hearts!',
+   win:'Stony hearts became new hearts! Jesus Christ can change our hearts too. ❤️',
+   home:'What’s one way to show a soft, kind heart today?'},
+ { dn:'Friday', icon:'🦴', title:'Dry Bones & Two Sticks', ref:'Ezekiel 37:1–17', ch:[37],
+   sum:'Ezekiel sees a valley of dry bones, then joins two sticks together.',
+   parts:[
+    {ch:37,a:1,b:6, w:'prophesy = speak God’s words · sinews = the stretchy cords that hold bones together',
+     q:'When the Lord asked, "Can these bones live?", what did Ezekiel answer?', o:['O Lord GOD, thou knowest','No, never','Yes, by myself','I am afraid'], look:'Look again at verse 3.'},
+    {ch:37,a:7,b:14, w:'slain = people who died · exceeding = very',
+     q:'What came into the bones so they lived and stood up?', o:['Breath','Water','Fire','Sunlight'], look:'Look again at verse 10.'},
+    {ch:37,a:15,b:17, w:'companions = friends and family with them',
+     q:'What did the Lord tell Ezekiel to write on the two sticks?', o:['For Judah, and for Joseph','For Moses, and for Aaron','For Egypt, and for Babylon','For Adam, and for Eve'], look:'Look again at verse 16.'}],
+   lesson:'The Lord is gathering His people and giving them new life. The Bible and the Book of Mormon help gather us to Jesus Christ.', keyRef:'Ezekiel 37:17',
+   key:['And join them','one to another','into one stick;','and they shall become','one in thine hand.'],
+   askL:'Hold the Bible and the Book of Mormon together. What do they both teach about Jesus?',
+   askB:'The people said, "Our hope is lost." How did the Lord answer them in verses 12–14?',
+   mid:{q:'In our Church, what can the two sticks stand for?', o:['The Bible and the Book of Mormon','Two swords','Two walking sticks','Two trees in a garden'], look:'Think about Ezekiel 37:16–17.'},
+   motion:'rise', alt:['🦴','🦴'], turn:'🙌', bad:'🪨', goal:16, bg:'linear-gradient(#e8d9b8,#fff6e3)',
+   hint:'Tap the dry bones to breathe new life into them! (Big kids: skip the rocks!)',
+   win:'The dry bones live! The Lord gathers His people and gives them new life. 🙌',
+   home:'Let’s read one verse from the Book of Mormon and one from the Bible together tonight.'},
+ { dn:'Saturday', icon:'🐟', title:'The River from the Temple', ref:'Ezekiel 47:1–12', ch:[47],
+   sum:'Ezekiel sees water flowing out of the temple, and it heals everything it touches.',
+   parts:[
+    {ch:47,a:1,b:5, w:'the house = the temple · threshold = the floor of a doorway · cubit = about 18 inches · loins = waist',
+     q:'As Ezekiel walked farther, what happened to the water?', o:['It got deeper, until it was a river he couldn’t cross','It dried up','It turned into ice','It stayed the same'], look:'Look again at verses 3–5.'},
+    {ch:47,a:6,b:9, w:'brink = edge · healed = made fresh and good again · thither = there',
+     q:'What happens wherever the river goes?', o:['Every thing shall live','Everything turns to stone','The trees fall down','The land floods away'], look:'Look again at verse 9.'},
+    {ch:47,a:10,b:12, w:'meat = food · miry = muddy · sanctuary = the temple',
+     q:'What were the leaves of the trees by the river for?', o:['For medicine','For building houses','For making paper','For feeding camels'], look:'Look again at verse 12.'}],
+   lesson:'I can find spiritual healing in the house of the Lord.', keyRef:'Ezekiel 47:9',
+   key:['and every thing','shall live','whither the river','cometh.'],
+   askL:'The river started small and grew bigger and bigger. How do temple blessings grow in a family?',
+   askB:'The river healed the salty Dead Sea. What kind of healing can come from the temple?',
+   mid:{q:'Where did the healing river come from?', o:['The house of the Lord (the temple)','A mountain glacier','The ocean','A well in Babylon'], look:'Think about Ezekiel 47:1.'},
+   motion:'swim', alt:['🐟','🐠','🐡'], bad:'🪵', goal:18, bg:'linear-gradient(#e4f6d6,#b8e3a0)',
+   hint:'The river from the temple brings life! Tap the fish! (Big kids: not the logs!)',
+   win:'The river from the temple healed the land, and now it’s full of life! 🌳',
+   home:'What can we do this week to bring the temple’s blessings into our home?'}
+];
+
+const EASY=new Set(['2:1','2:9','3:2','3:16','3:17','33:1','33:3','34:1','34:7','34:9','34:11','34:15','36:24','36:28','37:3','37:5','37:15','37:17','47:6','47:7']);
+/* ---------- state ---------- */
+let mode='little', P={};
+try{ P=JSON.parse(localStorage.getItem('pip3')||'{}'); mode=localStorage.getItem('pipMode')||'little'; }catch(e){}
+function save(){ try{ localStorage.setItem('pip3',JSON.stringify(P)); localStorage.setItem('pipMode',mode);}catch(e){} }
+function dp(i){ return P[i]=P[i]||{read:0,verse:false}; }
+function unlocked(i){ return P.all || i===0 || (P[i-1]&&P[i-1].verse); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id)); if(id==='home') renderHome(); window.scrollTo(0,0); }
+
+/* ---------- home ---------- */
+function renderHome(){
+  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('sel',b.dataset.m===mode));
+  const today=new Date().getDay(), d=document.getElementById('days'); d.innerHTML='';
+  LEVELS.forEach((L,i)=>{
+    const p=P[i]||{}, ok=unlocked(i), b=document.createElement('div');
+    b.className='day'+(i===today?' today':'')+(ok?'':' locked')+(p.verse?' done':'');
+    b.innerHTML=`<div class="badges">${ok?'':'🔒'}${p.verse?'📓':''}${p.little?'🐣':''}${p.big?'🦅':''}</div>
+      <div class="dn">${L.dn}</div><div class="ic">${L.icon}</div><div class="t">${L.title}</div><div class="ref">${L.ref}</div>`;
+    b.onclick=()=> ok ? openDay(i) : flash(b);
+    if(p.verse){
+      const r=document.createElement('div'); r.className='redo';
+      r.innerHTML='<button class="rr">📖 Read</button><button class="rp">🎮 Play</button>';
+      r.querySelector('.rr').onclick=e=>{e.stopPropagation(); p.read=0; save(); openDay(i);};
+      r.querySelector('.rp').onclick=e=>{e.stopPropagation(); cur=i; startGame(i);};
+      b.appendChild(r);
+    }
+    d.appendChild(b);
+  });
+  document.getElementById('journal').innerHTML=LEVELS.map((L,i)=>(P[i]&&P[i].verse)
+    ? `<div class="jl">${L.icon} <b>${L.dn}:</b> ${L.lesson} <span style="opacity:.6">(${L.keyRef})</span></div>`
+    : `<div class="jl no">🔒 ${L.dn}: finish the reading to collect this lesson</div>`).join('');
+}
+function flash(el){ el.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:300}); }
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;save();renderHome();});
+function confirmBox(msg,fn){ const c=document.getElementById('confirmBox'); c.style.display='block';
+  c.innerHTML=`<b>${msg}</b><div class="row"><button class="ghost" id="cNo">Cancel</button><button class="play" style="margin:0;font-size:17px" id="cYes">Yes</button></div>`;
+  c.querySelector('#cNo').onclick=()=>c.style.display='none'; c.querySelector('#cYes').onclick=()=>{c.style.display='none';fn();}; c.scrollIntoView({behavior:'smooth'}); }
+document.getElementById('unlockAll').onclick=()=>confirmBox('Unlock every day? (Reading and verse are still required before each level.)',()=>{P.all=true;save();renderHome();});
+document.getElementById('reset').onclick=()=>confirmBox('Erase all progress and start the week over?',()=>{P={};save();renderHome();});
+
+/* ---------- day ---------- */
+let cur=0;
+function openDay(i){ cur=i; const L=LEVELS[i];
+  document.getElementById('dTitle').textContent=`${L.icon} ${L.dn}: ${L.title}`;
+  document.getElementById('dSum').textContent=L.sum;
+  renderParts(); renderLesson(); renderPlay(); show('day'); }
+
+function askQ(box,Q,onRight){
+  box.innerHTML=`<div class="q">${Q.q}</div><div class="opts"></div><div class="look"></div>`;
+  const opts=box.querySelector('.opts'), look=box.querySelector('.look');
+  shuffle(Q.o.map((t,k)=>({t,right:k===0}))).forEach(o=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o.t;
+    b.onclick=()=>{
+      if(o.right){ b.classList.add('yes'); opts.querySelectorAll('button').forEach(x=>x.disabled=true); setTimeout(onRight,500); }
+      else{ b.classList.add('no'); look.textContent='Not quite. '+Q.look+' Try again in a moment…';
+        opts.querySelectorAll('button').forEach(x=>x.disabled=true);
+        setTimeout(()=>askQ(box,Q,onRight),3000); }
+    };
+    opts.appendChild(b);
+  });
+}
+function renderParts(){
+  const L=LEVELS[cur], p=dp(cur), wrap=document.getElementById('parts'); wrap.innerHTML='';
+  L.parts.forEach((pt,k)=>{
+    const div=document.createElement('div');
+    const done=k<p.read, active=k===p.read;
+    div.className='part'+(done?' done':active?'':' wait');
+    const r=`Ezekiel ${pt.ch}:${pt.a}–${pt.b}`;
+    div.innerHTML=`<div class="pr">${done?'✅':active?'📖':'🔒'} Part ${k+1}: ${r}</div>`;
+    if(active){
+      let vs=''; for(let v=pt.a;v<=pt.b;v++) vs+=`<p class="vs${EASY.has(pt.ch+':'+v)?' easy':''}"><sup>${v}</sup> ${TEXT[pt.ch][v]}</p>`;
+      div.innerHTML+=`${vs.includes(' easy')?'<div class="legend">🐣 <b>Indigo verses</b> are great for little readers!</div>':''}<div class="scripture">${vs}</div>
+        <div class="words">🔎 <b>Word help:</b> ${pt.w}</div>
+        <a class="gl" href="${GL(pt.ch)}" target="_blank" rel="noopener">Open in Gospel Library ↗</a><br>
+        <button class="btn">✋ We read it out loud! Ask me</button><div class="qbox"></div>`;
+      div.querySelector('.btn').onclick=e=>{ e.target.remove(); askQ(div.querySelector('.qbox'),pt,()=>{ p.read++; save(); renderParts(); renderLesson(); renderPlay(); }); };
+    }
+    wrap.appendChild(div);
+  });
+}
+function renderLesson(){
+  const L=LEVELS[cur], p=dp(cur), box=document.getElementById('lessonBody'), panel=document.getElementById('lessonPanel');
+  if(p.read<L.parts.length){ panel.classList.add('lock'); box.innerHTML='🔒 Finish all three reading parts to unlock today’s lesson.'; return; }
+  panel.classList.remove('lock');
+  box.innerHTML=`<div class="lesson">${L.lesson}</div>
+    <p style="margin:12px 0 0;font-weight:800">🧩 Build the key verse: ${L.keyRef}</p>
+    <div style="font-size:14px;opacity:.75">Tap the pieces in the right order.</div>
+    <div class="vtarget"></div><div class="chips"></div><div class="vdone"></div>`;
+  const tgt=box.querySelector('.vtarget'), chips=box.querySelector('.chips');
+  if(p.verse){ tgt.textContent=L.key.join(' '); tgt.classList.add('full'); chips.remove(); showTalk(box); return; }
+  let n=0;
+  shuffle(L.key).forEach(t=>{
+    const c=document.createElement('button'); c.className='chip'; c.textContent=t;
+    c.onclick=()=>{
+      if(t===L.key[n]){ n++; c.remove(); tgt.textContent=L.key.slice(0,n).join(' ');
+        if(n===L.key.length){ tgt.classList.add('full'); p.verse=true; save(); showTalk(box); renderPlay(); } }
+      else{ c.classList.remove('no'); void c.offsetWidth; c.classList.add('no'); }
+    };
+    chips.appendChild(c);
+  });
+}
+function showTalk(box){ const L=LEVELS[cur];
+  box.querySelector('.vdone').innerHTML=`<p style="color:var(--ok);font-weight:800;margin:10px 0">📓 Lesson added to your Watchman’s Journal!</p>
+   <div class="ask"><b>💬 Talk about it</b><p><span class="tag l">LITTLE</span>${L.askL}</p><p><span class="tag b">BIG</span>${L.askB}</p></div>`; }
+function renderPlay(){ const p=dp(cur), b=document.getElementById('playBtn'), panel=document.getElementById('playPanel');
+  b.disabled=!p.verse; panel.classList.toggle('lock',!p.verse); b.textContent=p.verse?'▶ Play Level':'🔒 Build the verse to unlock'; }
+document.getElementById('playBtn').onclick=()=>{ if(dp(cur).verse) startGame(cur); };
+document.getElementById('again').onclick=()=>startGame(cur);
+document.getElementById('quit').onclick=()=>{stop();openDay(cur);};
+
+/* ---------- game ---------- */
+const area=document.getElementById('area'), game=document.getElementById('game');
+const basket=document.getElementById('basket'), village=document.getElementById('village');
+let G=null, raf=0;
+const rand=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)];
+
+function startGame(i){
+  stop(); show('game');
+  const L=LEVELS[i], big=mode==='big';
+  game.style.background=L.bg; area.innerHTML='';
+  const W=game.clientWidth,H=game.clientHeight;
+  G={L,big,W,H,score:0,miss:0,items:[],spawnT:0,
+     goal:big?Math.round(L.goal*1.6):L.goal, spawnEvery:big?0.7:1.05, speed:big?1.55:1.1,
+     timeLeft:big?70:Infinity, maxMiss:big?3:Infinity, bx:W/2, last:performance.now(),
+     over:false, paused:false, checked:false};
+  basket.style.display=L.motion==='fall'?'block':'none';
+  village.style.display=L.motion==='storm'?'block':'none';
+  document.getElementById('wallpip').style.display=L.motion==='storm'?'block':'none';
+  document.getElementById('river').style.display=L.motion==='swim'?'block':'none';
+  document.getElementById('check').style.display='none';
+  basket.style.left=G.bx+'px';
+  const hint=document.getElementById('hint'); hint.textContent=L.hint; hint.style.opacity=1; setTimeout(()=>hint.style.opacity=0,3500);
+  hud(); raf=requestAnimationFrame(loop);
+}
+function stop(){ cancelAnimationFrame(raf); if(G) G.over=true; }
+function hud(){
+  document.getElementById('score').textContent=`${G.score}/${G.goal}`;
+  document.querySelector('#prog i').style.width=Math.min(100,G.score/G.goal*100)+'%';
+  document.querySelector('#prog b').textContent=G.checked?'✅':'❓';
+  document.getElementById('extra').textContent=G.big?'⏱'+Math.ceil(G.timeLeft)+' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):'🐣';
+}
+function spawn(){
+  const {L,W,H,big,speed}=G, isBad=L.bad&&big&&Math.random()<0.3;
+  const el=document.createElement('div'); el.className='it'; el.textContent=isBad?L.bad:pick(L.alt);
+  const it={el,bad:isBad,life:Infinity,x:0,y:0,vx:0,vy:0};
+  switch(L.motion){
+    case 'rise': it.x=rand(40,W-40); it.y=H+30; it.vy=-rand(60,100)*speed; it.vx=rand(-15,15); break;
+    case 'fall': it.x=rand(40,W-40); it.y=40; it.vy=rand(95,145)*speed; break;
+    case 'storm': it.x=rand(50,W-50); it.y=60; it.vy=rand(38,58)*speed; it.vx=rand(-10,10); break;
+    case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
+    case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
+    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+  }
+  place(it); el.addEventListener('pointerdown',e=>{e.stopPropagation();tapItem(it);});
+  area.appendChild(el); G.items.push(it);
+}
+const place=it=>{it.el.style.left=it.x+'px';it.el.style.top=it.y+'px';};
+const kill=it=>{it.dead=true;it.el.remove();};
+function fx(x,y,e,t){
+  if(e){const b=document.createElement('div');b.className='boom';b.textContent=e;b.style.left=x+'px';b.style.top=y+'px';area.appendChild(b);setTimeout(()=>b.remove(),700);}
+  if(t){const p=document.createElement('div');p.className='plus';p.textContent=t;p.style.left=x+'px';p.style.top=(y-30)+'px';area.appendChild(p);setTimeout(()=>p.remove(),700);}
+}
+function good(it,e){ G.score++; fx(it.x,it.y,e||it.el.textContent,'+1'); kill(it); hud();
+  if(!G.checked && G.score>=Math.ceil(G.goal/2)) return checkpoint();
+  if(G.score>=G.goal) finish(true); }
+function bad(it){ fx(it.x,it.y,'💥'); kill(it); if(G.big){G.miss++;G.score=Math.max(0,G.score-1);} hud(); flash(game); if(G.miss>=G.maxMiss) finish(false); }
+function tapItem(it){ if(G.over||G.paused||it.dead||G.L.motion==='fall') return; if(it.bad) return bad(it);
+  const m=G.L.motion; good(it, G.L.turn || (m==='storm'?'🎺':m==='wander'?'💛':null)); }
+function checkpoint(){
+  G.paused=true; G.items.forEach(kill); G.items=[];
+  const c=document.getElementById('check'); c.style.display='flex';
+  const box=c.querySelector('.panel'); const Q=G.L.mid;
+  const qb=document.createElement('div'); box.querySelectorAll('.q,.opts,.look').forEach(x=>x.remove()); box.appendChild(qb);
+  askQ(qb,Q,()=>{ c.style.display='none'; G.checked=true; G.paused=false; G.last=performance.now(); fx(G.W/2,G.H/2,'✅','Keep going!'); hud(); raf=requestAnimationFrame(loop); });
+}
+function loop(now){
+  if(!G||G.over||G.paused) return;
+  const dt=Math.min(.05,(now-G.last)/1000); G.last=now; G.spawnT+=dt;
+  if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} }
+  if(G.spawnT>=G.spawnEvery){ G.spawnT=0; spawn(); }
+  const {W,H,L}=G;
+  for(const it of G.items){
+    if(it.dead) continue;
+    it.x+=it.vx*dt; it.y+=it.vy*dt;
+    if(L.motion==='wander'){ if(it.x<40||it.x>W-40) it.vx*=-1; if(it.y<100||it.y>H-50) it.vy*=-1; }
+    if(it.life!==Infinity){ it.life-=dt; it.el.style.opacity=Math.min(1,it.life); if(it.life<=0){kill(it);continue;} }
+    if(L.motion==='fall'&&it.y>H-95&&it.y<H-20&&Math.abs(it.x-G.bx)<60){ it.bad?bad(it):good(it); if(G.paused||G.over) return; continue; }
+    if(L.motion==='storm'&&it.y>H-110){ kill(it); fx(it.x,H-110,'💦'); village.classList.remove('hit'); void village.offsetWidth; village.classList.add('hit');
+      if(G.big){G.miss++;hud(); if(G.miss>=G.maxMiss) return finish(false);} continue; }
+    if(it.y<-60||it.y>H+60||it.x<-60||it.x>W+60){kill(it);continue;}
+    place(it);
+  }
+  G.items=G.items.filter(i=>!i.dead); hud();
+  if(!G.over&&!G.paused) raf=requestAnimationFrame(loop);
+}
+function moveBasket(e){ if(!G||G.L.motion!=='fall'||G.paused) return; G.bx=Math.max(40,Math.min(G.W-40,e.clientX)); basket.style.left=G.bx+'px'; }
+game.addEventListener('pointermove',moveBasket); game.addEventListener('pointerdown',moveBasket);
+window.addEventListener('resize',()=>{ if(G){G.W=game.clientWidth;G.H=game.clientHeight;} });
+
+function finish(won){
+  if(G.over) return; stop(); const L=G.L;
+  document.getElementById('wIcon').textContent=won?L.icon:'🦉';
+  document.getElementById('wTitle').textContent=won?'You did it!':'So close! Try again!';
+  let stars=0;
+  if(won){ stars=!G.big?3:(G.miss===0?3:G.miss===1?2:1); dp(cur)[mode]=true; save(); }
+  document.getElementById('wStars').textContent=won?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'💪';
+  document.getElementById('wMsg').textContent=won?L.win:'Pip believes in you! Watchmen keep trying. Tap "Play again."';
+  document.getElementById('wLesson').textContent=`${L.lesson} (${L.keyRef})`;
+  document.getElementById('wHome').textContent=L.home;
+  setTimeout(()=>show('win'),300);
+}
+renderHome();
+</script>
+</body>
+</html>

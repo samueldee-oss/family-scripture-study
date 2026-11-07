@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scripture Trail — Our Come, Follow Me Games</title>
+<style>
+  :root{--ink:#3b2f4a;--sh:#e9d6bf;--r:20px}
+  *{box-sizing:border-box}
+  html,body{margin:0;font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#fdf3e7}
+  header{padding:18px 16px 6px;max-width:900px;margin:0 auto}
+  h1{margin:0;font-size:30px}
+  .sub{margin:2px 0 0;opacity:.7}
+  .trailwrap{position:relative;margin:12px 0 0}
+  .trail{overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;border-top:3px solid var(--sh);border-bottom:3px solid var(--sh)}
+  .trail svg{display:block;height:340px}
+  .stop{cursor:pointer}
+  .stop:hover .halo,.stop:focus .halo{opacity:1}
+  .halo{opacity:0;transition:opacity .2s}
+  .bob{animation:bob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes bob{50%{transform:translateY(-6px)}}
+  .hintbar{text-align:center;font-size:13px;opacity:.6;margin:6px 0 0}
+  main{max-width:900px;margin:0 auto;padding:10px 16px 30px}
+  h2{font-size:20px;margin:18px 0 10px}
+  .weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .wk{display:flex;gap:12px;align-items:center;background:#fff;border-radius:var(--r);padding:14px;box-shadow:0 4px 0 var(--sh);text-decoration:none;color:inherit;position:relative}
+  .wk:active{transform:translateY(3px)}
+  .wk .ic{font-size:46px;width:60px;text-align:center}
+  .wk .d{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;opacity:.6}
+  .wk .t{font-weight:900;font-size:18px;line-height:1.2}
+  .wk .r{font-size:13px;opacity:.75;margin-top:2px}
+  .wk.now{outline:4px solid #ffc94d}
+  .wk.now::after{content:"This week";position:absolute;top:-10px;right:12px;background:#ffc94d;font-size:11px;font-weight:900;padding:3px 9px;border-radius:99px}
+  .wk.soon{opacity:.55;pointer-events:none}
+  .foot{font-size:12.5px;opacity:.6;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏞️ Scripture Trail</h1>
+  <p class="sub">Our family’s Come, Follow Me games. A new stop appears on the trail every week.</p>
+</header>
+
+<div class="trailwrap">
+  <div class="trail" id="trail"></div>
+  <p class="hintbar">← swipe the trail · tap a friend to play their week →</p>
+</div>
+
+<main>
+  <h2>All weeks</h2>
+  <div class="weeks" id="weeks"></div>
+  <p class="foot">Old Testament 2026 · Come, Follow Me — For Home and Church</p>
+</main>
+
+<script>
+/* ===== ADD EACH NEW WEEK HERE (oldest first) =====
+   start/end: ISO dates of the Come, Follow Me week (Mon–Sun) used for the "This week" badge.
+   scene: one of the keys in SCENES below (or 'generic'). */
+const WEEKS = [
+  { start:'2026-11-02', end:'2026-11-08', dates:'Nov 2–8, 2026',
+    title:'Pip the Watchman', mascot:'🦉', ref:'Ezekiel 1–3; 33–34; 36–37; 47',
+    scene:'ezekiel', url:'https://claude.ai/artifact/9qm8LcCZUq8rWqyZLm6Wcm' }
+];
+
+/* ===== landscape ===== */
+const SEG = 420, H = 340, GROUND = 250;
+// each scene draws inside one segment starting at x; returns SVG
+const SCENES = {
+  ezekiel: x => `
+    <!-- river flowing from the temple -->
+    <path d="M${x+300} ${GROUND+2} C ${x+330} ${GROUND+30}, ${x+260} ${GROUND+50}, ${x+300} ${H}" stroke="#5bb8ef" stroke-width="22" fill="none" opacity=".85"/>
+    <!-- temple -->
+    <rect x="${x+262}" y="${GROUND-70}" width="78" height="70" fill="#f4ecdc" stroke="#cdbb98" stroke-width="3"/>
+    <polygon points="${x+256},${GROUND-70} ${x+301},${GROUND-100} ${x+346},${GROUND-70}" fill="#e8dcc2" stroke="#cdbb98" stroke-width="3"/>
+    <rect x="${x+290}" y="${GROUND-34}" width="22" height="34" rx="11" fill="#c9a86b"/>
+    <text x="${x+372}" y="${GROUND-30}" font-size="26">🌳</text>
+    <text x="${x+340}" y="${GROUND+60}" font-size="20">🐟</text>
+    <!-- city wall with watchman -->
+    <rect x="${x+40}" y="${GROUND-80}" width="150" height="80" fill="#d9c29a" stroke="#a88b62" stroke-width="3"/>
+    ${[0,1,2,3,4].map(i=>`<rect x="${x+40+i*32}" y="${GROUND-96}" width="22" height="18" fill="#d9c29a" stroke="#a88b62" stroke-width="3"/>`).join('')}
+    <rect x="${x+98}" y="${GROUND-40}" width="34" height="40" rx="17" fill="#8a6d47"/>
+    <text x="${x+200}" y="${GROUND+10}" font-size="22">🐑</text><text x="${x+225}" y="${GROUND+24}" font-size="18">🐑</text>`,
+  generic: x => `
+    <text x="${x+60}" y="${GROUND-6}" font-size="44">🌳</text>
+    <text x="${x+300}" y="${GROUND-2}" font-size="36">🌲</text>
+    <text x="${x+200}" y="${GROUND+40}" font-size="22">🌼</text>`
+};
+function mascotPos(w,i){ const x=i*SEG; return w.scene==='ezekiel' ? {x:x+115,y:GROUND-118} : {x:x+210,y:GROUND-60}; }
+
+function thisWeek(w){ const t=new Date(); t.setHours(12); return t>=new Date(w.start+'T00:00') && t<=new Date(w.end+'T23:59'); }
+
+function draw(){
+  const n = WEEKS.length, W = Math.max((n+1)*SEG, document.getElementById('trail').clientWidth||0);          // +1 = the "trail continues" segment
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd3ff"/><stop offset="1" stop-color="#fff2d9"/></linearGradient>
+      <linearGradient id="fog" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fdf3e7" stop-opacity="0"/><stop offset=".7" stop-color="#fdf3e7" stop-opacity=".95"/></linearGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#sky)"/>
+    <circle cx="80" cy="60" r="30" fill="#ffd66b"/>`;
+  // far hills
+  let far = `M0 ${GROUND-40}`; for(let x=0;x<=W;x+=140) far+=` Q ${x+70} ${GROUND-110-((x/140)%3)*18} ${x+140} ${GROUND-40}`;
+  s += `<path d="${far} L ${W} ${H} L 0 ${H} Z" fill="#b9dca0"/>`;
+  // clouds
+  for(let x=200;x<W;x+=330) s+=`<text x="${x}" y="${50+(x%3)*14}" font-size="34" opacity=".9">☁️</text>`;
+  // ground
+  s += `<rect y="${GROUND}" width="${W}" height="${H-GROUND}" fill="#8fc96b"/>`;
+  // winding path
+  let p = `M0 ${GROUND+50}`; for(let i=0;i<=n;i++){ const x=i*SEG; p+=` C ${x+140} ${GROUND+20}, ${x+280} ${GROUND+80}, ${x+SEG} ${GROUND+50}`; }
+  s += `<path d="${p}" stroke="#e9cf9f" stroke-width="26" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="${p}" stroke="#d8b878" stroke-width="2" stroke-dasharray="2 14" fill="none"/>`;
+  // scenes + mascots
+  WEEKS.forEach((w,i)=>{
+    s += (SCENES[w.scene]||SCENES.generic)(i*SEG);
+    const m = mascotPos(w,i);
+    s += `<a href="${w.url}" target="_blank" rel="noopener" class="stop" aria-label="${w.title}">
+      <circle class="halo" cx="${m.x+22}" cy="${m.y-16}" r="40" fill="#fff6c7"/>
+      <text class="bob" x="${m.x}" y="${m.y}" font-size="48">${w.mascot}</text>
+      <rect x="${i*SEG+130}" y="14" width="170" height="40" rx="12" fill="#fff" stroke="${thisWeek(w)?'#ffc94d':'#e9d6bf'}" stroke-width="${thisWeek(w)?4:2}"/>
+      <text x="${i*SEG+215}" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#3b2f4a">${w.title}</text>
+      <text x="${i*SEG+215}" y="47" text-anchor="middle" font-size="11" fill="#6b5d7a">${w.dates}</text></a>`;
+  });
+  // the trail continues…
+  const fx = n*SEG;
+  s += `<text x="${fx+150}" y="${GROUND+12}" font-size="40" opacity=".8">🪧</text>
+        <text x="${fx+120}" y="${GROUND+70}" font-size="15" font-weight="800" fill="#6b5d7a">Next week’s friend…</text>
+        <rect x="${fx}" y="0" width="${W-fx}" height="${H}" fill="url(#fog)"/>`;
+  s += `</svg>`;
+  const tr=document.getElementById('trail'); tr.innerHTML=s;
+  // scroll so this week's stop is in view
+  const idx = Math.max(0, WEEKS.findIndex(thisWeek)); tr.scrollLeft = idx===-1?0:Math.max(0, idx*SEG - 40);
+}
+
+function list(){
+  const el=document.getElementById('weeks');
+  el.innerHTML = WEEKS.slice().reverse().map(w=>`
+    <a class="wk${thisWeek(w)?' now':''}" href="${w.url}" target="_blank" rel="noopener">
+      <div class="ic">${w.mascot}</div>
+      <div><div class="d">${w.dates}</div><div class="t">${w.title}</div><div class="r">${w.ref}</div></div>
+    </a>`).join('') +
+    `<div class="wk soon"><div class="ic">🪧</div><div><div class="d">Coming soon</div><div class="t">Next week’s game</div><div class="r">A new friend joins the trail</div></div></div>`;
+}
+draw(); list();
+</script>
+</body>
+</html>
