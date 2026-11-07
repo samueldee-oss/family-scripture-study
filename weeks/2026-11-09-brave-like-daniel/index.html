@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#fdf3e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Scripture Trail">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../../icons/icon-192.png">
+<title>Brave Like Daniel — Daniel Week</title>
+<style>
+  :root{--ink:#3b2f4a;--card:#fff;--accent:#ff8a65;--accent2:#7c9cff;--gold:#ffc94d;--ok:#4caf7a;--r:22px;--sh:#f0dcc6}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#fdf3e7}
+  button{font:inherit;cursor:pointer;border:0;color:inherit}
+  .screen{display:none;min-height:100%;padding:18px 16px 32px;max-width:720px;margin:0 auto}
+  .screen.on{display:block}
+  .trailbtn{display:inline-block;background:#fff;padding:7px 14px;border-radius:999px;font-weight:800;text-decoration:none;color:#3b2f4a;box-shadow:0 2px 0 #f0dcc6;font-size:14px}
+  h1{font-size:30px;margin:6px 0 2px}
+  h2{font-size:24px;margin:4px 0 8px}
+  .hero{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+  .pip{font-size:64px;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+  .modes{display:flex;gap:8px;background:#fff;border-radius:999px;padding:5px;width:max-content;box-shadow:0 2px 0 var(--sh);margin:6px 0 16px}
+  .modes button{padding:8px 16px;border-radius:999px;background:transparent;font-weight:700}
+  .modes button.sel{background:var(--accent2);color:#fff}
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .day{background:var(--card);border-radius:var(--r);padding:14px;text-align:left;box-shadow:0 4px 0 var(--sh);position:relative}
+  .day{cursor:pointer}.day:active{transform:translateY(3px)}
+  .day.today.done::after{bottom:auto;top:34px}
+  .redo{display:flex;gap:6px;margin-top:10px}
+  .redo button{flex:1;padding:7px 4px;border-radius:10px;font-weight:800;font-size:13px;background:#eef1ff;color:#3d4fb8;box-shadow:0 2px 0 #c9d3ff}
+  .redo .rp{background:#ffe7dc;color:#b04a24;box-shadow:0 2px 0 #ffc6ad}
+  .day.locked{opacity:.5}
+  .day .dn{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.6}
+  .day .ic{font-size:36px;margin:4px 0}
+  .day .t{font-weight:800;font-size:16px;line-height:1.2}
+  .day .ref{font-size:12.5px;opacity:.7;margin-top:4px}
+  .day .badges{position:absolute;top:10px;right:12px;font-size:16px}
+  .day.today{outline:4px solid var(--gold)}
+  .day.today::after{content:"Today";position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:800;background:var(--gold);padding:2px 8px;border-radius:99px}
+  .back{background:#fff;padding:8px 14px;border-radius:999px;font-weight:700;box-shadow:0 2px 0 var(--sh)}
+  .panel{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 4px 0 var(--sh);margin-top:14px}
+  .panel h3{margin:0 0 8px;font-size:18px}
+  .panel.lock{opacity:.55}
+  .step{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#a0784d}
+  .part{border:2px solid #f3e6d6;border-radius:16px;padding:12px;margin-top:10px}
+  .part.done{border-color:#bfe6cf;background:#f3fbf6}
+  .part.wait{opacity:.45}
+  .part .pr{font-weight:800;font-size:17px}
+  .scripture{margin-top:10px;background:#fffdf7;border-left:5px solid #e7c98f;border-radius:10px;padding:6px 14px;font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.6}
+  .vs{margin:8px 0}.vs.easy{color:#3f37c9;font-weight:700}.legend{font-size:13.5px;margin-top:6px}.legend b{color:#3f37c9}.vs sup{font-family:inherit;font-weight:700;color:#b07a2a;font-size:12px}
+  .words{margin-top:8px;font-size:14px;background:#f2f6ff;border-radius:10px;padding:8px 10px;line-height:1.45}
+  .gl{display:inline-block;margin:6px 6px 0 0;padding:6px 12px;border-radius:999px;background:#eef1ff;color:#3d4fb8;text-decoration:none;font-weight:700;font-size:14px}
+  .btn{display:inline-block;margin-top:10px;padding:10px 16px;border-radius:14px;background:var(--accent2);color:#fff;font-weight:800;box-shadow:0 3px 0 #5a77d6}
+  .q{margin-top:10px;font-weight:800;font-size:16.5px}
+  .opts{display:grid;gap:8px;margin-top:8px}
+  .opt{background:#fff7ee;border:2px solid #f0dcc6;border-radius:14px;padding:11px 12px;text-align:left;font-weight:700}
+  .opt.no{background:#ffe5e0;border-color:#ff9f8a;animation:shake .4s}
+  .opt.yes{background:#dcf5e6;border-color:var(--ok)}
+  .opt:disabled{opacity:.6}
+  .look{font-size:14px;color:#b04a24;font-weight:700;margin-top:6px}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .lesson{font-size:20px;font-weight:900;background:linear-gradient(90deg,#fff3c4,#ffe0d2);padding:12px 14px;border-radius:14px}
+  .vtarget{min-height:56px;border:2px dashed #d9c3a6;border-radius:14px;padding:10px;margin-top:10px;font-family:Georgia,serif;font-size:18px;line-height:1.5}
+  .vtarget.full{border:2px solid var(--ok);background:#f3fbf6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{background:#eef1ff;border-radius:12px;padding:8px 12px;font-family:Georgia,serif;font-size:16px;box-shadow:0 2px 0 #c9d3ff}
+  .chip.no{background:#ffe5e0;animation:shake .4s}
+  .ask p{margin:6px 0}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-right:6px}
+  .tag.l{background:#ffe2d6;color:#b04a24}.tag.b{background:#dfe6ff;color:#3346a8}
+  .play{display:block;width:100%;margin-top:16px;padding:16px;border-radius:var(--r);background:var(--accent);color:#fff;font-size:22px;font-weight:800;box-shadow:0 5px 0 #d9663f}
+  .play:disabled{background:#d6c8bb;box-shadow:0 5px 0 #bfae9e}
+  .journal{display:grid;gap:8px}
+  .jl{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 2px 0 var(--sh);font-weight:700;font-size:15px}
+  .jl.no{opacity:.45}
+  .foot{font-size:12.5px;opacity:.6;margin-top:18px;text-align:center}
+  .tiny{background:none;text-decoration:underline;font-size:12.5px;opacity:.6}
+  /* game */
+  #game{padding:0;max-width:none;height:100vh;height:100dvh;position:relative;overflow:hidden;touch-action:none;user-select:none}
+  #bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:10px 12px;z-index:5}
+  #bar .pill,#quit{background:rgba(255,255,255,.88);padding:6px 12px;border-radius:999px;font-weight:800;font-size:16px}
+  #prog{flex:1;height:14px;background:rgba(255,255,255,.6);border-radius:99px;overflow:hidden;position:relative}
+  #prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  #prog b{position:absolute;left:50%;top:-3px;font-size:14px;transform:translateX(-50%)}
+  #area{position:absolute;inset:0}
+  .it{position:absolute;font-size:46px;line-height:1;transform:translate(-50%,-50%);padding:8px}
+  .boom,.plus{position:absolute;transform:translate(-50%,-50%);pointer-events:none;animation:boom .7s ease-out forwards}
+  .boom{font-size:46px}.plus{font-weight:900;font-size:22px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+  @keyframes boom{to{transform:translate(-50%,-140%) scale(1.4);opacity:0}}
+  #hint{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;padding:10px 16px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;max-width:88%;z-index:4;transition:opacity .6s}
+  #basket{position:absolute;bottom:18px;font-size:60px;transform:translateX(-50%);pointer-events:none;z-index:3;display:none}
+  #village{position:absolute;bottom:0;left:0;right:0;height:96px;display:none;z-index:2;background:linear-gradient(#c9b08a,#a88b62);border-top:8px solid #8a6d47;font-size:38px;text-align:center;padding-top:10px;letter-spacing:6px}
+  #village.hit{animation:shake .4s}
+  #wallpip{position:absolute;bottom:84px;left:12px;font-size:52px;z-index:3;display:none}
+  #river{position:absolute;left:0;right:0;top:30%;height:50%;background:linear-gradient(#7fd3ff,#3fa7e8);display:none;opacity:.85}
+  #check{position:absolute;inset:0;background:rgba(40,30,60,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  #check .panel{max-width:460px;width:100%}
+  .center{text-align:center}
+  .stars{font-size:54px;margin:8px 0}
+  .bigpip{font-size:96px;animation:bob 1.6s ease-in-out infinite}
+  .home q{display:block;font-size:20px;font-weight:800;margin:8px 0;quotes:none}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .row button{flex:1;padding:14px;border-radius:var(--r);font-weight:800;font-size:17px}
+  .ghost{background:#fff;box-shadow:0 4px 0 var(--sh)}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen on">
+  <a class="trailbtn" href="../../">🏞️ All weeks</a>
+  <div class="hero">
+    <div class="pip">🦁</div>
+    <div><h1>Brave Like Daniel</h1>
+      <p style="margin:0;opacity:.75">Read it. Learn it. Then play it. About half a chapter each morning.</p></div>
+  </div>
+  <div class="modes" id="modes">
+    <button data-m="little">🐣 Little Kids</button>
+    <button data-m="big">🦅 Big Kids</button>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="panel">
+    <h3>📓 Brave Journal</h3>
+    <p style="margin:0 0 10px;opacity:.75;font-size:14px">Collect each day’s lesson by reading and building the key verse.</p>
+    <div class="journal" id="journal"></div>
+  </div>
+  <p class="foot">Come, Follow Me · Nov 9–15 · Daniel 1–7<br>
+    <button class="tiny" id="unlockAll">Parent: unlock all days</button> · <button class="tiny" id="reset">Reset progress</button></p>
+  <div id="confirmBox" class="panel" style="display:none"></div>
+</section>
+
+<section id="day" class="screen">
+  <button class="back" onclick="show('home')">← All days</button>
+  <h2 id="dTitle" style="margin-top:14px"></h2>
+  <p id="dSum" style="line-height:1.5;margin:4px 0 0"></p>
+
+  <div class="panel" id="readPanel">
+    <div class="step">Step 1</div>
+    <h3>📖 Read together</h3>
+    <div style="font-size:14px;opacity:.75">About half a chapter, in three parts. Read each part out loud (take turns!), then answer Roar’s question to unlock the next part.</div>
+    <div id="parts"></div>
+  </div>
+
+  <div class="panel" id="lessonPanel">
+    <div class="step">Step 2</div>
+    <h3>💡 Today’s lesson</h3>
+    <div id="lessonBody"></div>
+  </div>
+
+  <div class="panel" id="playPanel">
+    <div class="step">Step 3</div>
+    <h3>🎮 Play the level</h3>
+    <div style="font-size:14px;opacity:.75">There’s a question checkpoint halfway through, so remember what you learned!</div>
+    <button class="play" id="playBtn">▶ Play Level</button>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div id="area"></div>
+  <div id="river"></div>
+  <div id="village">🏠 🏡 ⛪ 🏠 🏡</div>
+  <div id="wallpip"></div>
+  <div id="basket">🦁🧺</div>
+  <div id="bar">
+    <button id="quit">✕</button>
+    <div id="prog"><i></i><b>❓</b></div>
+    <span class="pill" id="score">0/0</span>
+    <span class="pill" id="extra"></span>
+  </div>
+  <div id="hint"></div>
+  <div id="check"><div class="panel">
+    <div class="step">Brave checkpoint</div>
+    <h3>🦁 Roar asks…</h3>
+    <div class="q" id="cQ"></div><div class="opts" id="cO"></div><div class="look" id="cL"></div>
+  </div></div>
+</section>
+
+<section id="win" class="screen center">
+  <div class="bigpip" id="wIcon">🦁</div>
+  <h2 id="wTitle"></h2>
+  <div class="stars" id="wStars"></div>
+  <div class="panel" id="wMsg" style="font-size:18px;line-height:1.5"></div>
+  <div class="panel" style="text-align:left"><div class="step">Today’s lesson</div><div class="lesson" id="wLesson" style="margin-top:6px"></div></div>
+  <div class="panel home"><h3>🏡 Bring it home</h3><q id="wHome"></q></div>
+  <div class="row">
+    <button class="ghost" id="again">↻ Play again</button>
+    <button class="play" style="margin:0" onclick="show('home')">All days</button>
+  </div>
+</section>
+
+<script>
+const GL = c => `https://www.churchofjesuschrist.org/study/scriptures/ot/dan/${c}?lang=eng`;
+/* King James Version (public domain). TEXT[chapter][verse] */
+const TEXT = {
+ 1:{3:'And the king spake unto Ashpenaz the master of his eunuchs, that he should bring certain of the children of Israel, and of the king’s seed, and of the princes;',
+  4:'Children in whom was no blemish, but well favoured, and skilful in all wisdom, and cunning in knowledge, and understanding science, and such as had ability in them to stand in the king’s palace, and whom they might teach the learning and the tongue of the Chaldeans.',
+  5:'And the king appointed them a daily provision of the king’s meat, and of the wine which he drank: so nourishing them three years, that at the end thereof they might stand before the king.',
+  6:'Now among these were of the children of Judah, Daniel, Hananiah, Mishael, and Azariah:',
+  7:'Unto whom the prince of the eunuchs gave names: for he gave unto Daniel the name of Belteshazzar; and to Hananiah, of Shadrach; and to Mishael, of Meshach; and to Azariah, of Abed-nego.',
+  8:'But Daniel purposed in his heart that he would not defile himself with the portion of the king’s meat, nor with the wine which he drank: therefore he requested of the prince of the eunuchs that he might not defile himself.',
+  9:'Now God had brought Daniel into favour and tender love with the prince of the eunuchs.',
+  10:'And the prince of the eunuchs said unto Daniel, I fear my lord the king, who hath appointed your meat and your drink: for why should he see your faces worse liking than the children which are of your sort? then shall ye make me endanger my head to the king.',
+  11:'Then said Daniel to Melzar, whom the prince of the eunuchs had set over Daniel, Hananiah, Mishael, and Azariah,',
+  12:'Prove thy servants, I beseech thee, ten days; and let them give us pulse to eat, and water to drink.',
+  13:'Then let our countenances be looked upon before thee, and the countenance of the children that eat of the portion of the king’s meat: and as thou seest, deal with thy servants.',
+  14:'So he consented to them in this matter, and proved them ten days.',
+  15:'And at the end of ten days their countenances appeared fairer and fatter in flesh than all the children which did eat the portion of the king’s meat.',
+  16:'Thus Melzar took away the portion of their meat, and the wine that they should drink; and gave them pulse.',
+  17:'As for these four children, God gave them knowledge and skill in all learning and wisdom: and Daniel had understanding in all visions and dreams.'},
+ 2:{16:'Then Daniel went in, and desired of the king that he would give him time, and that he would shew the king the interpretation.',
+  17:'Then Daniel went to his house, and made the thing known to Hananiah, Mishael, and Azariah, his companions:',
+  18:'That they would desire mercies of the God of heaven concerning this secret; that Daniel and his fellows should not perish with the rest of the wise men of Babylon.',
+  19:'Then was the secret revealed unto Daniel in a night vision. Then Daniel blessed the God of heaven.',
+  20:'Daniel answered and said, Blessed be the name of God for ever and ever: for wisdom and might are his:',
+  21:'And he changeth the times and the seasons: he removeth kings, and setteth up kings: he giveth wisdom unto the wise, and knowledge to them that know understanding:',
+  22:'He revealeth the deep and secret things: he knoweth what is in the darkness, and the light dwelleth with him.',
+  23:'I thank thee, and praise thee, O thou God of my fathers, who hast given me wisdom and might, and hast made known unto me now what we desired of thee: for thou hast now made known unto us the king’s matter.',
+  24:'Therefore Daniel went in unto Arioch, whom the king had ordained to destroy the wise men of Babylon: he went and said thus unto him; Destroy not the wise men of Babylon: bring me in before the king, and I will shew unto the king the interpretation.',
+  25:'Then Arioch brought in Daniel before the king in haste, and said thus unto him, I have found a man of the captives of Judah, that will make known unto the king the interpretation.',
+  26:'The king answered and said to Daniel, whose name was Belteshazzar, Art thou able to make known unto me the dream which I have seen, and the interpretation thereof?',
+  27:'Daniel answered in the presence of the king, and said, The secret which the king hath demanded cannot the wise men, the astrologers, the magicians, the soothsayers, shew unto the king;',
+  28:'But there is a God in heaven that revealeth secrets, and maketh known to the king Nebuchadnezzar what shall be in the latter days. Thy dream, and the visions of thy head upon thy bed, are these;',
+  31:'Thou, O king, sawest, and behold a great image. This great image, whose brightness was excellent, stood before thee; and the form thereof was terrible.',
+  32:'This image’s head was of fine gold, his breast and his arms of silver, his belly and his thighs of brass,',
+  33:'His legs of iron, his feet part of iron and part of clay.',
+  34:'Thou sawest till that a stone was cut out without hands, which smote the image upon his feet that were of iron and clay, and brake them to pieces.',
+  35:'Then was the iron, the clay, the brass, the silver, and the gold, broken to pieces together, and became like the chaff of the summer threshingfloors; and the wind carried them away, that no place was found for them: and the stone that smote the image became a great mountain, and filled the whole earth.',
+  36:'This is the dream; and we will tell the interpretation thereof before the king.',
+  37:'Thou, O king, art a king of kings: for the God of heaven hath given thee a kingdom, power, and strength, and glory.',
+  38:'And wheresoever the children of men dwell, the beasts of the field and the fowls of the heaven hath he given into thine hand, and hath made thee ruler over them all. Thou art this head of gold.',
+  39:'And after thee shall arise another kingdom inferior to thee, and another third kingdom of brass, which shall bear rule over all the earth.',
+  40:'And the fourth kingdom shall be strong as iron: forasmuch as iron breaketh in pieces and subdueth all things: and as iron that breaketh all these, shall it break in pieces and bruise.',
+  44:'And in the days of these kings shall the God of heaven set up a kingdom, which shall never be destroyed: and the kingdom shall not be left to other people, but it shall break in pieces and consume all these kingdoms, and it shall stand for ever.',
+  45:'Forasmuch as thou sawest that the stone was cut out of the mountain without hands, and that it brake in pieces the iron, the brass, the clay, the silver, and the gold; the great God hath made known to the king what shall come to pass hereafter: and the dream is certain, and the interpretation thereof sure.'},
+ 3:{13:'Then Nebuchadnezzar in his rage and fury commanded to bring Shadrach, Meshach, and Abed-nego. Then they brought these men before the king.',
+  14:'Nebuchadnezzar spake and said unto them, Is it true, O Shadrach, Meshach, and Abed-nego, do not ye serve my gods, nor worship the golden image which I have set up?',
+  15:'Now if ye be ready that at what time ye hear the sound of the cornet, flute, harp, sackbut, psaltery, and dulcimer, and all kinds of musick, ye fall down and worship the image which I have made; well: but if ye worship not, ye shall be cast the same hour into the midst of a burning fiery furnace; and who is that God that shall deliver you out of my hands?',
+  16:'Shadrach, Meshach, and Abed-nego, answered and said to the king, O Nebuchadnezzar, we are not careful to answer thee in this matter.',
+  17:'If it be so, our God whom we serve is able to deliver us from the burning fiery furnace, and he will deliver us out of thine hand, O king.',
+  18:'But if not, be it known unto thee, O king, that we will not serve thy gods, nor worship the golden image which thou hast set up.',
+  19:'Then was Nebuchadnezzar full of fury, and the form of his visage was changed against Shadrach, Meshach, and Abed-nego: therefore he spake, and commanded that they should heat the furnace one seven times more than it was wont to be heated.',
+  20:'And he commanded the most mighty men that were in his army to bind Shadrach, Meshach, and Abed-nego, and to cast them into the burning fiery furnace.',
+  21:'Then these men were bound in their coats, their hosen, and their hats, and their other garments, and were cast into the midst of the burning fiery furnace.',
+  22:'Therefore because the king’s commandment was urgent, and the furnace exceeding hot, the flame of the fire slew those men that took up Shadrach, Meshach, and Abed-nego.',
+  23:'And these three men, Shadrach, Meshach, and Abed-nego, fell down bound into the midst of the burning fiery furnace.',
+  24:'Then Nebuchadnezzar the king was astonied, and rose up in haste, and spake, and said unto his counsellors, Did not we cast three men bound into the midst of the fire? They answered and said unto the king, True, O king.',
+  25:'He answered and said, Lo, I see four men loose, walking in the midst of the fire, and they have no hurt; and the form of the fourth is like the Son of God.'},
+ 6:{1:'It pleased Darius to set over the kingdom an hundred and twenty princes, which should be over the whole kingdom;',
+  2:'And over these three presidents; of whom Daniel was first: that the princes might give accounts unto them, and the king should have no damage.',
+  3:'Then this Daniel was preferred above the presidents and princes, because an excellent spirit was in him; and the king thought to set him over the whole realm.',
+  4:'Then the presidents and princes sought to find occasion against Daniel concerning the kingdom; but they could find none occasion nor fault; forasmuch as he was faithful, neither was there any error or fault found in him.',
+  5:'Then said these men, We shall not find any occasion against this Daniel, except we find it against him concerning the law of his God.',
+  6:'Then these presidents and princes assembled together to the king, and said thus unto him, King Darius, live for ever.',
+  7:'All the presidents of the kingdom, the governors, and the princes, the counsellors, and the captains, have consulted together to establish a royal statute, and to make a firm decree, that whosoever shall ask a petition of any God or man for thirty days, save of thee, O king, he shall be cast into the den of lions.',
+  8:'Now, O king, establish the decree, and sign the writing, that it be not changed, according to the law of the Medes and Persians, which altereth not.',
+  9:'Wherefore king Darius signed the writing and the decree.',
+  10:'Now when Daniel knew that the writing was signed, he went into his house; and his windows being open in his chamber toward Jerusalem, he kneeled upon his knees three times a day, and prayed, and gave thanks before his God, as he did aforetime.',
+  11:'Then these men assembled, and found Daniel praying and making supplication before his God.',
+  12:'Then they came near, and spake before the king concerning the king’s decree; Hast thou not signed a decree, that every man that shall ask a petition of any God or man within thirty days, save of thee, O king, shall be cast into the den of lions? The king answered and said, The thing is true, according to the law of the Medes and Persians, which altereth not.',
+  13:'Then answered they and said before the king, That Daniel, which is of the children of the captivity of Judah, regardeth not thee, O king, nor the decree that thou hast signed, but maketh his petition three times a day.',
+  14:'Then the king, when he heard these words, was sore displeased with himself, and set his heart on Daniel to deliver him: and he laboured till the going down of the sun to deliver him.',
+  15:'Then these men assembled unto the king, and said unto the king, Know, O king, that the law of the Medes and Persians is, That no decree nor statute which the king establisheth may be changed.',
+  16:'Then the king commanded, and they brought Daniel, and cast him into the den of lions. Now the king spake and said unto Daniel, Thy God whom thou servest continually, he will deliver thee.',
+  17:'And a stone was brought, and laid upon the mouth of the den; and the king sealed it with his own signet, and with the signet of his lords; that the purpose might not be changed concerning Daniel.',
+  18:'Then the king went to his palace, and passed the night fasting: neither were instruments of musick brought before him: and his sleep went from him.',
+  19:'Then the king arose very early in the morning, and went in haste unto the den of lions.',
+  20:'And when he came to the den, he cried with a lamentable voice unto Daniel: and the king spake and said to Daniel, O Daniel, servant of the living God, is thy God, whom thou servest continually, able to deliver thee from the lions?',
+  21:'Then said Daniel unto the king, O king, live for ever.',
+  22:'My God hath sent his angel, and hath shut the lions’ mouths, that they have not hurt me: forasmuch as before him innocency was found in me; and also before thee, O king, have I done no hurt.',
+  23:'Then was the king exceeding glad for him, and commanded that they should take Daniel up out of the den. So Daniel was taken up out of the den, and no manner of hurt was found upon him, because he believed in his God.',
+  25:'Then king Darius wrote unto all people, nations, and languages, that dwell in all the earth; Peace be multiplied unto you.',
+  26:'I make a decree, That in every dominion of my kingdom men tremble and fear before the God of Daniel: for he is the living God, and stedfast for ever, and his kingdom that which shall not be destroyed, and his dominion shall be even unto the end.',
+  27:'He delivereth and rescueth, and he worketh signs and wonders in heaven and in earth, who hath delivered Daniel from the power of the lions.',
+  28:'So this Daniel prospered in the reign of Darius, and in the reign of Cyrus the Persian.'},
+ 7:{9:'I beheld till the thrones were cast down, and the Ancient of days did sit, whose garment was white as snow, and the hair of his head like the pure wool: his throne was like the fiery flame, and his wheels as burning fire.',
+  10:'A fiery stream issued and came forth from before him: thousand thousands ministered unto him, and ten thousand times ten thousand stood before him: the judgment was set, and the books were opened.',
+  13:'I saw in the night visions, and, behold, one like the Son of man came with the clouds of heaven, and came to the Ancient of days, and they brought him near before him.',
+  14:'And there was given him dominion, and glory, and a kingdom, that all people, nations, and languages, should serve him: his dominion is an everlasting dominion, which shall not pass away, and his kingdom that which shall not be destroyed.',
+  15:'I Daniel was grieved in my spirit in the midst of my body, and the visions of my head troubled me.',
+  16:'I came near unto one of them that stood by, and asked him the truth of all this. So he told me, and made me know the interpretation of the things.',
+  17:'These great beasts, which are four, are four kings, which shall arise out of the earth.',
+  18:'But the saints of the most High shall take the kingdom, and possess the kingdom for ever, even for ever and ever.'}
+};
+const BOOK='Daniel', GLBOOK='dan';
+const LEVELS = [
+ { dn:'Sunday', icon:'🥦', title:'Daniel’s Choice', ref:'Daniel 1:3–17', ch:[1],
+   sum:'King Nebuchadnezzar of Babylon has taken young men from Judah to train in his palace, and Daniel and his three friends are among them.',
+   parts:[
+    {ch:1,a:3,b:7, w:'eunuchs = palace servants · well favoured = good-looking · Chaldeans = people of Babylon',
+     q:'What new name did the prince of the eunuchs give Daniel?', o:['Belteshazzar','Shadrach','Meshach','Abed-nego'], look:'Look again at verse 7.'},
+    {ch:1,a:8,b:12, w:'purposed = decided · defile = make unclean · beseech = beg · prove = test · pulse = vegetables and beans',
+     q:'For ten days, what did Daniel ask to eat and drink?', o:['Pulse and water','The king’s meat and wine','Bread and honey','Nothing at all'], look:'Look again at verse 12.'},
+    {ch:1,a:13,b:17, w:'countenance = face · fairer and fatter = healthier · consented = said yes',
+     q:'After ten days, how did Daniel and his friends look?', o:['Fairer and fatter, healthier than the others','Tired and weak','Exactly the same','Sad and hungry'], look:'Look again at verse 15.'}],
+   lesson:'Heavenly Father wants me to take care of my body.', keyRef:'Daniel 1:8',
+   key:['But Daniel purposed','in his heart','that he would not defile himself','with the portion','of the king’s meat'],
+   askL:'Daniel chose healthy food. What healthy choices can you make for your body?',
+   askB:'Daniel "purposed in his heart" before he was tested. Why does it help to decide ahead of time? What is the Word of Wisdom?',
+   mid:{q:'Why did Daniel choose pulse and water?', o:['He chose to keep God’s law and take care of his body','He didn’t like the king','He wasn’t hungry','The king told him to'], look:'Think about Daniel 1:8.'},
+   motion:'fall', alt:['🥦','🥕','🥬','💧'], bad:'🍖', goal:14, bg:'linear-gradient(#e8f6d6,#c7e8a7)',
+   hint:'Slide Roar to catch the pulse and water! (Big kids: skip the king’s meat!)',
+   win:'You chose like Daniel, and God blessed him with knowledge and wisdom! 🥦',
+   home:'What is one healthy choice we can make together this week?'},
+ { dn:'Monday', icon:'🌠', title:'The Secret Revealed', ref:'Daniel 2:16–28', ch:[2],
+   sum:'The king had a dream and wanted his wise men to tell him the dream and what it meant. No one could, so the king ordered all the wise men to be killed, Daniel too.',
+   parts:[
+    {ch:2,a:16,b:19, w:'desired = asked · shew = show · interpretation = what it means · perish = die',
+     q:'What did Daniel ask his three friends to do?', o:['Ask the God of heaven for mercy about the secret','Run away from Babylon','Hide from the king','Make up a dream'], look:'Look again at verses 17–18.'},
+    {ch:2,a:20,b:23, w:'might = power · revealeth = shows · dwelleth = lives',
+     q:'After the secret was revealed, what did Daniel do?', o:['Thanked and praised God','Went back to sleep','Bragged to the wise men','Ran to tell his mother'], look:'Look again at verses 19 and 23.'},
+    {ch:2,a:24,b:28, w:'ordained = ordered · astrologers, soothsayers = people who claimed to tell the future · latter days = the last days (our time!)',
+     q:'Who could NOT tell the king his dream?', o:['The wise men, astrologers, magicians and soothsayers','Daniel','The God of heaven','Arioch’s soldiers'], look:'Look again at verse 27.'}],
+   lesson:'Heavenly Father answers prayers. Spiritual preparation helps us receive revelation.', keyRef:'Daniel 2:28',
+   key:['But there is a God in heaven','that revealeth secrets,','and maketh known','to the king Nebuchadnezzar','what shall be in the latter days.'],
+   askL:'Daniel and his friends prayed together. What can we pray about as a family?',
+   askB:'Daniel asked for time, gathered his friends to pray, and then thanked God. What can we learn from how he prepared?',
+   mid:{q:'What did Daniel and his friends do before the secret was revealed?', o:['They prayed and asked God for help','They guessed','They asked the magicians','They went to a party'], look:'Think about Daniel 2:17–19.'},
+   motion:'swim', alt:['🌠','✨','⭐'], bad:'🔮', goal:15, bg:'linear-gradient(#1c1f4a,#3d3a8a 60%,#6a5acd)',
+   hint:'A night vision! Tap the shooting stars! (Big kids: not the crystal balls!)',
+   win:'The secret was revealed! There is a God in heaven who reveals secrets. 🌠',
+   home:'Let’s each say one prayer this week asking Heavenly Father for help with something real.'},
+ { dn:'Tuesday', icon:'⛰️', title:'The Stone and the Mountain', ref:'Daniel 2:31–40, 44–45', ch:[2],
+   sum:'Daniel tells the king his dream: a giant statue, and a little stone that becomes a mountain.',
+   parts:[
+    {ch:2,a:31,b:35, w:'image = statue · smote = hit hard · chaff = dry husks that blow away',
+     q:'What was the statue’s head made of?', o:['Fine gold','Silver','Iron','Clay'], look:'Look again at verse 32.'},
+    {ch:2,a:36,b:40, w:'inferior = not as great · subdueth = conquers · bruise = crush',
+     q:'Who was the head of gold?', o:['King Nebuchadnezzar','Daniel','The fourth kingdom','The wise men'], look:'Look again at verses 37–38.'},
+    {ch:2,a:44,b:45, w:'consume = destroy · certain, sure = definitely true',
+     q:'How was the stone cut out of the mountain?', o:['Without hands','With a hammer','By the king’s soldiers','By a storm'], look:'Look again at verse 45.'}],
+   lesson:'The Church of Jesus Christ of Latter-day Saints is the kingdom of God on the earth.', keyRef:'Daniel 2:44',
+   key:['And in the days of these kings','shall the God of heaven','set up a kingdom,','which shall never be destroyed'],
+   askL:'The little stone grew and grew until it filled the whole earth! How is the Church like that stone?',
+   askB:'The stone was cut out "without hands." Why does it matter that God, not people, set up His kingdom?',
+   mid:{q:'In our Church, what is the stone that becomes a great mountain?', o:['God’s kingdom, the Church of Jesus Christ','A real rock','The golden statue','The king’s palace'], look:'Think about Daniel 2:44.'},
+   motion:'pop', alt:['🪨','🪨'], turn:'⛰️', bad:null, goal:16, bg:'linear-gradient(#d6ecff,#f4f0e4)',
+   hint:'Tap the little stones to grow them into great mountains!',
+   win:'The little stone became a great mountain and filled the whole earth! ⛰️',
+   home:'How can our family help the Lord’s kingdom grow this week?'},
+ { dn:'Wednesday', icon:'🔥', title:'The Fiery Furnace', ref:'Daniel 3:13–25', ch:[3],
+   sum:'King Nebuchadnezzar made a huge golden statue and ordered everyone to bow down to it. Shadrach, Meshach, and Abed-nego would not.',
+   parts:[
+    {ch:3,a:13,b:16, w:'fury = big anger · sackbut, psaltery, dulcimer = old instruments · cast = thrown',
+     q:'What did the king want them to do when the music played?', o:['Fall down and worship the golden image','Dance and sing','Leave Babylon','Eat the king’s meat'], look:'Look again at verse 15.'},
+    {ch:3,a:17,b:21, w:'be it known = know this · visage = face · wont = used to · hosen = leggings',
+     q:'How much hotter did the king make the furnace?', o:['Seven times more','Twice as hot','Ten times more','A little bit'], look:'Look again at verse 19.'},
+    {ch:3,a:22,b:25, w:'slew = killed · astonied = amazed · counsellors = advisers',
+     q:'How many men did the king see walking in the fire?', o:['Four','Three','Two','None'], look:'Look again at verse 25.'}],
+   lesson:'Jesus will help me do what is right, even when it is hard.', keyRef:'Daniel 3:17',
+   key:['our God whom we serve','is able to deliver us','from the burning fiery furnace,','and he will deliver us','out of thine hand, O king.'],
+   askL:'When is it hard to do what’s right? Who helps you be brave?',
+   askB:'Verse 18 says "But if not." What does it mean to trust God even if things don’t turn out how we hope?',
+   mid:{q:'What did Shadrach, Meshach and Abed-nego say they’d do, even "if not"?', o:['Still not worship the golden image','Bow down after all','Run away','Fight the king'], look:'Think about Daniel 3:18.'},
+   motion:'storm', alt:['🔥','🔥'], turn:'💧', village:'🧍 🧍 🧍', villageBg:'linear-gradient(#e8b26a,#c9773b)', bad:null, goal:16, bg:'linear-gradient(#ffd7a8,#ffe9cf)',
+   hint:'Tap the flames to cool them before they reach the three friends!',
+   win:'They had no hurt! Not even a hair was singed. The Lord was with them in the fire. 🔥',
+   home:'What is one right choice we can be brave about this week?'},
+ { dn:'Thursday', icon:'🙏', title:'Three Times a Day', ref:'Daniel 6:1–13', ch:[6],
+   sum:'Years later, a new king, Darius, rules. Daniel is so faithful that the other leaders get jealous.',
+   parts:[
+    {ch:6,a:1,b:5, w:'presidents, princes = leaders · preferred = chosen · occasion = a reason to blame',
+     q:'Why couldn’t the leaders find any fault in Daniel?', o:['Because he was faithful','Because he was hiding','Because he was the king','Because he was asleep'], look:'Look again at verse 4.'},
+    {ch:6,a:6,b:9, w:'statute, decree = a law · petition = a request, a prayer · save = except · altereth not = can’t be changed',
+     q:'For how many days did the new law say no one could pray to anyone but the king?', o:['Thirty days','Seven days','Three days','One hundred days'], look:'Look again at verse 7.'},
+    {ch:6,a:10,b:13, w:'chamber = room · aforetime = before · supplication = humble praying · regardeth not = ignores',
+     q:'Which way were Daniel’s windows open when he prayed?', o:['Toward Jerusalem','Toward the palace','Toward the lions’ den','They were shut'], look:'Look again at verse 10.'}],
+   lesson:'Heavenly Father wants me to pray often.', keyRef:'Daniel 6:10',
+   key:['he kneeled upon his knees','three times a day,','and prayed, and gave thanks','before his God,','as he did aforetime.'],
+   askL:'Daniel prayed three times a day. When are three times you could pray each day?',
+   askB:'Daniel prayed "as he did aforetime," just like always. Why do good habits help when hard times come?',
+   mid:{q:'What did Daniel keep doing, even when it was against the law?', o:['Praying to God three times a day','Hiding in his room','Praying to the king','Nothing, he stopped'], look:'Think about Daniel 6:10.'},
+   motion:'rise', alt:['🙏','💛','✨'], bad:'📜', goal:16, bg:'linear-gradient(#ffeccf,#ffd2b8 60%,#c6a6ff)',
+   hint:'Tap the prayers as they rise to heaven! (Big kids: not the king’s decree!)',
+   win:'Your prayers rose up to heaven, three times a day, just like Daniel! 🙏',
+   home:'Let’s pick our three times to pray each day this week.'},
+ { dn:'Friday', icon:'🦁', title:'The Lions’ Den', ref:'Daniel 6:14–23, 25–28', ch:[6],
+   sum:'Daniel kept praying, so he was thrown into the den of lions. King Darius was very sad.',
+   parts:[
+    {ch:6,a:14,b:18, w:'sore displeased = very upset · laboured = worked hard · signet = a ring used to seal things',
+     q:'What did the king do all night while Daniel was in the den?', o:['Fasted and couldn’t sleep','Had a big feast','Played music','Slept soundly'], look:'Look again at verse 18.'},
+    {ch:6,a:19,b:23, w:'lamentable = sad · continually = all the time · innocency = being innocent',
+     q:'Why was no hurt found on Daniel?', o:['Because he believed in his God','Because the lions were asleep','Because he wore armor','Because the king saved him'], look:'Look again at verse 23.'},
+    {ch:6,a:25,b:28, w:'dominion = land a king rules · stedfast = never changing · prospered = did well',
+     q:'In his new decree, what did King Darius call Daniel’s God?', o:['The living God, stedfast for ever','A god of the Persians','A secret god','The god of the lions'], look:'Look again at verse 26.'}],
+   lesson:'I can trust the Lord when my faith is tested.', keyRef:'Daniel 6:22',
+   key:['My God hath sent his angel,','and hath shut the lions’ mouths,','that they have not hurt me'],
+   askL:'How do you think Daniel felt in the dark den? What helps you feel safe?',
+   askB:'Daniel was delivered "because he believed in his God." When has trusting God helped you through something hard?',
+   mid:{q:'Why was Daniel safe in the lions’ den?', o:['God sent His angel, because Daniel trusted Him','The lions were full','Daniel was a lion tamer','The king hid him'], look:'Think about Daniel 6:22–23.'},
+   motion:'wander', alt:['🦁','🦁'], turn:'😌', bad:null, goal:15, bg:'linear-gradient(#5b4a3a,#8a7259 60%,#b39a78)',
+   hint:'Tap the lions to shut their mouths! The angel is helping you!',
+   win:'Every lion’s mouth is shut! "There is no other God that can deliver." 🦁',
+   home:'What is something hard where we can trust the Lord this week?'},
+ { dn:'Saturday', icon:'☁️', title:'The Everlasting Kingdom', ref:'Daniel 7:9–10, 13–18', ch:[7],
+   sum:'Daniel has a vision of the future: the Ancient of days, and one like the Son of man coming in the clouds of heaven.',
+   parts:[
+    {ch:7,a:9,b:10, w:'Ancient of days = Adam (see Doctrine and Covenants 116) · ministered = served',
+     q:'What was the Ancient of days’ garment like?', o:['White as snow','Purple like a king’s','Gold and silver','Dark like night'], look:'Look again at verse 9.'},
+    {ch:7,a:13,b:14, w:'Son of man = a name for Jesus Christ · dominion = power to rule · everlasting = forever',
+     q:'How did one like the Son of man come?', o:['With the clouds of heaven','On a horse','In a ship','Riding a lion'], look:'Look again at verse 13.'},
+    {ch:7,a:15,b:18, w:'grieved = sad, troubled · beasts = scary animals in the vision · saints = God’s faithful people',
+     q:'Who shall take the kingdom and keep it for ever?', o:['The saints of the most High','The four beasts','The four kings','King Darius'], look:'Look again at verse 18.'}],
+   lesson:'Jesus Christ is the Son of the Eternal Father, and His kingdom will never be destroyed.', keyRef:'Daniel 7:14',
+   key:['his dominion is','an everlasting dominion,','which shall not pass away,','and his kingdom','that which shall not be destroyed.'],
+   askL:'Jesus will come again in the clouds of heaven! How can we get ready for Him?',
+   askB:'Kingdoms in Daniel rise and fall, but one lasts forever. What can we build in our lives that will last forever?',
+   mid:{q:'Who is the "Son of man" who comes with the clouds of heaven?', o:['Jesus Christ','King Nebuchadnezzar','Daniel','One of the beasts'], look:'Think about Daniel 7:13–14.'},
+   motion:'rise', alt:['☁️','☁️','✨'], turn:'👑', bad:null, goal:16, bg:'linear-gradient(#7fb6ff,#cfe6ff 55%,#fff6dc)',
+   hint:'Tap the clouds of heaven! His kingdom shall never be destroyed!',
+   win:'His dominion is an everlasting dominion! Jesus Christ’s kingdom will last forever. 👑',
+   home:'This week, how did Daniel and his friends show they trusted God? Which story was your favorite?'}
+];
+const EASY=new Set(['1:12','1:14','2:19','2:20','2:33','2:36','3:13','3:23','6:6','6:9','6:19','6:21','7:16','7:17']);
+
+/* ---------- state ---------- */
+let mode='little', P={};
+try{ P=JSON.parse(localStorage.getItem('daniel-2026-11-09')||'{}'); mode=localStorage.getItem('pipMode')||'little'; }catch(e){}
+function save(){ try{ localStorage.setItem('daniel-2026-11-09',JSON.stringify(P)); localStorage.setItem('pipMode',mode);}catch(e){} }
+function dp(i){ return P[i]=P[i]||{read:0,verse:false}; }
+function unlocked(i){ return P.all || i===0 || (P[i-1]&&P[i-1].verse); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id)); if(id==='home') renderHome(); window.scrollTo(0,0); }
+
+/* ---------- home ---------- */
+function renderHome(){
+  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('sel',b.dataset.m===mode));
+  const today=new Date().getDay(), d=document.getElementById('days'); d.innerHTML='';
+  LEVELS.forEach((L,i)=>{
+    const p=P[i]||{}, ok=unlocked(i), b=document.createElement('div');
+    b.className='day'+(i===today?' today':'')+(ok?'':' locked')+(p.verse?' done':'');
+    b.innerHTML=`<div class="badges">${ok?'':'🔒'}${p.verse?'📓':''}${p.little?'🐣':''}${p.big?'🦅':''}</div>
+      <div class="dn">${L.dn}</div><div class="ic">${L.icon}</div><div class="t">${L.title}</div><div class="ref">${L.ref}</div>`;
+    b.onclick=()=> ok ? openDay(i) : flash(b);
+    if(p.verse){
+      const r=document.createElement('div'); r.className='redo';
+      r.innerHTML='<button class="rr">📖 Read</button><button class="rp">🎮 Play</button>';
+      r.querySelector('.rr').onclick=e=>{e.stopPropagation(); p.read=0; save(); openDay(i);};
+      r.querySelector('.rp').onclick=e=>{e.stopPropagation(); cur=i; startGame(i);};
+      b.appendChild(r);
+    }
+    d.appendChild(b);
+  });
+  document.getElementById('journal').innerHTML=LEVELS.map((L,i)=>(P[i]&&P[i].verse)
+    ? `<div class="jl">${L.icon} <b>${L.dn}:</b> ${L.lesson} <span style="opacity:.6">(${L.keyRef})</span></div>`
+    : `<div class="jl no">🔒 ${L.dn}: finish the reading to collect this lesson</div>`).join('');
+}
+function flash(el){ el.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:300}); }
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;save();renderHome();});
+function confirmBox(msg,fn){ const c=document.getElementById('confirmBox'); c.style.display='block';
+  c.innerHTML=`<b>${msg}</b><div class="row"><button class="ghost" id="cNo">Cancel</button><button class="play" style="margin:0;font-size:17px" id="cYes">Yes</button></div>`;
+  c.querySelector('#cNo').onclick=()=>c.style.display='none'; c.querySelector('#cYes').onclick=()=>{c.style.display='none';fn();}; c.scrollIntoView({behavior:'smooth'}); }
+document.getElementById('unlockAll').onclick=()=>confirmBox('Unlock every day? (Reading and verse are still required before each level.)',()=>{P.all=true;save();renderHome();});
+document.getElementById('reset').onclick=()=>confirmBox('Erase all progress and start the week over?',()=>{P={};save();renderHome();});
+
+/* ---------- day ---------- */
+let cur=0;
+function openDay(i){ cur=i; const L=LEVELS[i];
+  document.getElementById('dTitle').textContent=`${L.icon} ${L.dn}: ${L.title}`;
+  document.getElementById('dSum').textContent=L.sum;
+  renderParts(); renderLesson(); renderPlay(); show('day'); }
+
+function askQ(box,Q,onRight){
+  box.innerHTML=`<div class="q">${Q.q}</div><div class="opts"></div><div class="look"></div>`;
+  const opts=box.querySelector('.opts'), look=box.querySelector('.look');
+  shuffle(Q.o.map((t,k)=>({t,right:k===0}))).forEach(o=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o.t;
+    b.onclick=()=>{
+      if(o.right){ b.classList.add('yes'); opts.querySelectorAll('button').forEach(x=>x.disabled=true); setTimeout(onRight,500); }
+      else{ b.classList.add('no'); look.textContent='Not quite. '+Q.look+' Try again in a moment…';
+        opts.querySelectorAll('button').forEach(x=>x.disabled=true);
+        setTimeout(()=>askQ(box,Q,onRight),3000); }
+    };
+    opts.appendChild(b);
+  });
+}
+function renderParts(){
+  const L=LEVELS[cur], p=dp(cur), wrap=document.getElementById('parts'); wrap.innerHTML='';
+  L.parts.forEach((pt,k)=>{
+    const div=document.createElement('div');
+    const done=k<p.read, active=k===p.read;
+    div.className='part'+(done?' done':active?'':' wait');
+    const r=`Daniel ${pt.ch}:${pt.a}–${pt.b}`;
+    div.innerHTML=`<div class="pr">${done?'✅':active?'📖':'🔒'} Part ${k+1}: ${r}</div>`;
+    if(active){
+      let vs=''; for(let v=pt.a;v<=pt.b;v++) vs+=`<p class="vs${EASY.has(pt.ch+':'+v)?' easy':''}"><sup>${v}</sup> ${TEXT[pt.ch][v]}</p>`;
+      div.innerHTML+=`${vs.includes(' easy')?'<div class="legend">🐣 <b>Indigo verses</b> are great for little readers!</div>':''}<div class="scripture">${vs}</div>
+        <div class="words">🔎 <b>Word help:</b> ${pt.w}</div>
+        <a class="gl" href="${GL(pt.ch)}" target="_blank" rel="noopener">Open in Gospel Library ↗</a><br>
+        <button class="btn">✋ We read it out loud! Ask me</button><div class="qbox"></div>`;
+      div.querySelector('.btn').onclick=e=>{ e.target.remove(); askQ(div.querySelector('.qbox'),pt,()=>{ p.read++; save(); renderParts(); renderLesson(); renderPlay(); }); };
+    }
+    wrap.appendChild(div);
+  });
+}
+function renderLesson(){
+  const L=LEVELS[cur], p=dp(cur), box=document.getElementById('lessonBody'), panel=document.getElementById('lessonPanel');
+  if(p.read<L.parts.length){ panel.classList.add('lock'); box.innerHTML='🔒 Finish all three reading parts to unlock today’s lesson.'; return; }
+  panel.classList.remove('lock');
+  box.innerHTML=`<div class="lesson">${L.lesson}</div>
+    <p style="margin:12px 0 0;font-weight:800">🧩 Build the key verse: ${L.keyRef}</p>
+    <div style="font-size:14px;opacity:.75">Tap the pieces in the right order.</div>
+    <div class="vtarget"></div><div class="chips"></div><div class="vdone"></div>`;
+  const tgt=box.querySelector('.vtarget'), chips=box.querySelector('.chips');
+  if(p.verse){ tgt.textContent=L.key.join(' '); tgt.classList.add('full'); chips.remove(); showTalk(box); return; }
+  let n=0;
+  shuffle(L.key).forEach(t=>{
+    const c=document.createElement('button'); c.className='chip'; c.textContent=t;
+    c.onclick=()=>{
+      if(t===L.key[n]){ n++; c.remove(); tgt.textContent=L.key.slice(0,n).join(' ');
+        if(n===L.key.length){ tgt.classList.add('full'); p.verse=true; save(); showTalk(box); renderPlay(); } }
+      else{ c.classList.remove('no'); void c.offsetWidth; c.classList.add('no'); }
+    };
+    chips.appendChild(c);
+  });
+}
+function showTalk(box){ const L=LEVELS[cur];
+  box.querySelector('.vdone').innerHTML=`<p style="color:var(--ok);font-weight:800;margin:10px 0">📓 Lesson added to your Brave Journal!</p>
+   <div class="ask"><b>💬 Talk about it</b><p><span class="tag l">LITTLE</span>${L.askL}</p><p><span class="tag b">BIG</span>${L.askB}</p></div>`; }
+function renderPlay(){ const p=dp(cur), b=document.getElementById('playBtn'), panel=document.getElementById('playPanel');
+  b.disabled=!p.verse; panel.classList.toggle('lock',!p.verse); b.textContent=p.verse?'▶ Play Level':'🔒 Build the verse to unlock'; }
+document.getElementById('playBtn').onclick=()=>{ if(dp(cur).verse) startGame(cur); };
+document.getElementById('again').onclick=()=>startGame(cur);
+document.getElementById('quit').onclick=()=>{stop();openDay(cur);};
+
+/* ---------- game ---------- */
+const area=document.getElementById('area'), game=document.getElementById('game');
+const basket=document.getElementById('basket'), village=document.getElementById('village');
+let G=null, raf=0;
+const rand=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)];
+
+function startGame(i){
+  stop(); show('game');
+  const L=LEVELS[i], big=mode==='big';
+  game.style.background=L.bg; area.innerHTML='';
+  const W=game.clientWidth,H=game.clientHeight;
+  G={L,big,W,H,score:0,miss:0,items:[],spawnT:0,
+     goal:big?Math.round(L.goal*1.6):L.goal, spawnEvery:big?0.7:1.05, speed:big?1.55:1.1,
+     timeLeft:big?70:Infinity, maxMiss:big?3:Infinity, bx:W/2, last:performance.now(),
+     over:false, paused:false, checked:false};
+  basket.style.display=L.motion==='fall'?'block':'none';
+  village.style.display=L.motion==='storm'?'block':'none'; village.textContent=L.village||'🏠 🏡 ⛪ 🏠 🏡'; village.style.background=L.villageBg||'';
+  document.getElementById('wallpip').style.display=L.motion==='storm'?'block':'none';
+  document.getElementById('river').style.display=(L.motion==='swim'&&L.river)?'block':'none';
+  document.getElementById('check').style.display='none';
+  basket.style.left=G.bx+'px';
+  const hint=document.getElementById('hint'); hint.textContent=L.hint; hint.style.opacity=1; setTimeout(()=>hint.style.opacity=0,3500);
+  hud(); raf=requestAnimationFrame(loop);
+}
+function stop(){ cancelAnimationFrame(raf); if(G) G.over=true; }
+function hud(){
+  document.getElementById('score').textContent=`${G.score}/${G.goal}`;
+  document.querySelector('#prog i').style.width=Math.min(100,G.score/G.goal*100)+'%';
+  document.querySelector('#prog b').textContent=G.checked?'✅':'❓';
+  document.getElementById('extra').textContent=G.big?'⏱'+Math.ceil(G.timeLeft)+' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):'🐣';
+}
+function spawn(){
+  const {L,W,H,big,speed}=G, isBad=L.bad&&big&&Math.random()<0.3;
+  const el=document.createElement('div'); el.className='it'; el.textContent=isBad?L.bad:pick(L.alt);
+  const it={el,bad:isBad,life:Infinity,x:0,y:0,vx:0,vy:0};
+  switch(L.motion){
+    case 'rise': it.x=rand(40,W-40); it.y=H+30; it.vy=-rand(60,100)*speed; it.vx=rand(-15,15); break;
+    case 'fall': it.x=rand(40,W-40); it.y=40; it.vy=rand(95,145)*speed; break;
+    case 'storm': it.x=rand(50,W-50); it.y=60; it.vy=rand(38,58)*speed; it.vx=rand(-10,10); break;
+    case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
+    case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
+    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+  }
+  place(it); el.addEventListener('pointerdown',e=>{e.stopPropagation();tapItem(it);});
+  area.appendChild(el); G.items.push(it);
+}
+const place=it=>{it.el.style.left=it.x+'px';it.el.style.top=it.y+'px';};
+const kill=it=>{it.dead=true;it.el.remove();};
+function fx(x,y,e,t){
+  if(e){const b=document.createElement('div');b.className='boom';b.textContent=e;b.style.left=x+'px';b.style.top=y+'px';area.appendChild(b);setTimeout(()=>b.remove(),700);}
+  if(t){const p=document.createElement('div');p.className='plus';p.textContent=t;p.style.left=x+'px';p.style.top=(y-30)+'px';area.appendChild(p);setTimeout(()=>p.remove(),700);}
+}
+function good(it,e){ G.score++; fx(it.x,it.y,e||it.el.textContent,'+1'); kill(it); hud();
+  if(!G.checked && G.score>=Math.ceil(G.goal/2)) return checkpoint();
+  if(G.score>=G.goal) finish(true); }
+function bad(it){ fx(it.x,it.y,'💥'); kill(it); if(G.big){G.miss++;G.score=Math.max(0,G.score-1);} hud(); flash(game); if(G.miss>=G.maxMiss) finish(false); }
+function tapItem(it){ if(G.over||G.paused||it.dead||G.L.motion==='fall') return; if(it.bad) return bad(it);
+  const m=G.L.motion; good(it, G.L.turn || (m==='storm'?'🎺':m==='wander'?'💛':null)); }
+function checkpoint(){
+  G.paused=true; G.items.forEach(kill); G.items=[];
+  const c=document.getElementById('check'); c.style.display='flex';
+  const box=c.querySelector('.panel'); const Q=G.L.mid;
+  const qb=document.createElement('div'); box.querySelectorAll('.q,.opts,.look').forEach(x=>x.remove()); box.appendChild(qb);
+  askQ(qb,Q,()=>{ c.style.display='none'; G.checked=true; G.paused=false; G.last=performance.now(); fx(G.W/2,G.H/2,'✅','Keep going!'); hud(); raf=requestAnimationFrame(loop); });
+}
+function loop(now){
+  if(!G||G.over||G.paused) return;
+  const dt=Math.min(.05,(now-G.last)/1000); G.last=now; G.spawnT+=dt;
+  if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} }
+  if(G.spawnT>=G.spawnEvery){ G.spawnT=0; spawn(); }
+  const {W,H,L}=G;
+  for(const it of G.items){
+    if(it.dead) continue;
+    it.x+=it.vx*dt; it.y+=it.vy*dt;
+    if(L.motion==='wander'){ if(it.x<40||it.x>W-40) it.vx*=-1; if(it.y<100||it.y>H-50) it.vy*=-1; }
+    if(it.life!==Infinity){ it.life-=dt; it.el.style.opacity=Math.min(1,it.life); if(it.life<=0){kill(it);continue;} }
+    if(L.motion==='fall'&&it.y>H-95&&it.y<H-20&&Math.abs(it.x-G.bx)<60){ it.bad?bad(it):good(it); if(G.paused||G.over) return; continue; }
+    if(L.motion==='storm'&&it.y>H-110){ kill(it); fx(it.x,H-110,'💦'); village.classList.remove('hit'); void village.offsetWidth; village.classList.add('hit');
+      if(G.big){G.miss++;hud(); if(G.miss>=G.maxMiss) return finish(false);} continue; }
+    if(it.y<-60||it.y>H+60||it.x<-60||it.x>W+60){kill(it);continue;}
+    place(it);
+  }
+  G.items=G.items.filter(i=>!i.dead); hud();
+  if(!G.over&&!G.paused) raf=requestAnimationFrame(loop);
+}
+function moveBasket(e){ if(!G||G.L.motion!=='fall'||G.paused) return; G.bx=Math.max(40,Math.min(G.W-40,e.clientX)); basket.style.left=G.bx+'px'; }
+game.addEventListener('pointermove',moveBasket); game.addEventListener('pointerdown',moveBasket);
+window.addEventListener('resize',()=>{ if(G){G.W=game.clientWidth;G.H=game.clientHeight;} });
+
+function finish(won){
+  if(G.over) return; stop(); const L=G.L;
+  document.getElementById('wIcon').textContent=won?L.icon:'🦁';
+  document.getElementById('wTitle').textContent=won?'You did it!':'So close! Try again!';
+  let stars=0;
+  if(won){ stars=!G.big?3:(G.miss===0?3:G.miss===1?2:1); dp(cur)[mode]=true; save(); }
+  document.getElementById('wStars').textContent=won?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'💪';
+  document.getElementById('wMsg').textContent=won?L.win:'Roar believes in you! Brave kids keep trying. Tap "Play again."';
+  document.getElementById('wLesson').textContent=`${L.lesson} (${L.keyRef})`;
+  document.getElementById('wHome').textContent=L.home;
+  setTimeout(()=>show('win'),300);
+}
+renderHome();
+</script>
+<script>
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('../../sw.js').catch(function(){}); } catch (e) {} }
+</script>
+</body>
+</html>
