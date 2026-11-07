@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fdf3e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Scripture Trail">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
 <title>Scripture Trail — Our Come, Follow Me Games</title>
 <style>
   :root{--ink:#3b2f4a;--sh:#e9d6bf;--r:20px}
@@ -59,7 +67,7 @@
 const WEEKS = [
   { start:'2026-11-02', end:'2026-11-08', dates:'Nov 2–8, 2026',
     title:'Pip the Watchman', mascot:'🦉', ref:'Ezekiel 1–3; 33–34; 36–37; 47',
-    scene:'ezekiel', url:'https://claude.ai/artifact/9qm8LcCZUq8rWqyZLm6Wcm' }
+    scene:'ezekiel', url:'weeks/2026-11-02-pip-the-watchman/' }
 ];
 
 /* ===== landscape ===== */
@@ -113,7 +121,7 @@ function draw(){
   WEEKS.forEach((w,i)=>{
     s += (SCENES[w.scene]||SCENES.generic)(i*SEG);
     const m = mascotPos(w,i);
-    s += `<a href="${w.url}" target="_blank" rel="noopener" class="stop" aria-label="${w.title}">
+    s += `<a href="${w.url}" class="stop" aria-label="${w.title}">
       <circle class="halo" cx="${m.x+22}" cy="${m.y-16}" r="40" fill="#fff6c7"/>
       <text class="bob" x="${m.x}" y="${m.y}" font-size="48">${w.mascot}</text>
       <rect x="${i*SEG+130}" y="14" width="170" height="40" rx="12" fill="#fff" stroke="${thisWeek(w)?'#ffc94d':'#e9d6bf'}" stroke-width="${thisWeek(w)?4:2}"/>
@@ -134,13 +142,16 @@ function draw(){
 function list(){
   const el=document.getElementById('weeks');
   el.innerHTML = WEEKS.slice().reverse().map(w=>`
-    <a class="wk${thisWeek(w)?' now':''}" href="${w.url}" target="_blank" rel="noopener">
+    <a class="wk${thisWeek(w)?' now':''}" href="${w.url}">
       <div class="ic">${w.mascot}</div>
       <div><div class="d">${w.dates}</div><div class="t">${w.title}</div><div class="r">${w.ref}</div></div>
     </a>`).join('') +
     `<div class="wk soon"><div class="ic">🪧</div><div><div class="d">Coming soon</div><div class="t">Next week’s game</div><div class="r">A new friend joins the trail</div></div></div>`;
 }
 draw(); list();
+</script>
+<script>
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(function(){}); } catch (e) {} }
 </script>
 </body>
 </html>

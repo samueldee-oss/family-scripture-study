@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#fdf3e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Scripture Trail">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../../icons/icon-192.png">
 <title>Pip the Watchman — Ezekiel Week</title>
 <style>
   :root{--ink:#3b2f4a;--card:#fff;--accent:#ff8a65;--accent2:#7c9cff;--gold:#ffc94d;--ok:#4caf7a;--r:22px;--sh:#f0dcc6}
@@ -105,7 +113,7 @@
 <body>
 
 <section id="home" class="screen on">
-  <a class="trailbtn" href="https://claude.ai/artifact/5hWMgs2fzqj2LWWxBo3Xoc" target="_blank" rel="noopener">🏞️ All weeks</a>
+  <a class="trailbtn" href="../../">🏞️ All weeks</a>
   <div class="hero">
     <div class="pip">🦉</div>
     <div><h1>Pip the Watchman</h1>
@@ -631,6 +639,9 @@ function finish(won){
   setTimeout(()=>show('win'),300);
 }
 renderHome();
+</script>
+<script>
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('../../sw.js').catch(function(){}); } catch (e) {} }
 </script>
 </body>
 </html>
