@@ -67,7 +67,10 @@
 const WEEKS = [
   { start:'2026-11-02', end:'2026-11-08', dates:'Nov 2–8, 2026',
     title:'Pip the Watchman', mascot:'🦉', ref:'Ezekiel 1–3; 33–34; 36–37; 47',
-    scene:'ezekiel', url:'weeks/2026-11-02-pip-the-watchman/' }
+    scene:'ezekiel', url:'weeks/2026-11-02-pip-the-watchman/' },
+  { start:'2026-11-09', end:'2026-11-15', dates:'Nov 9–15, 2026',
+    title:'Sunny the Lion', mascot:'🦁', ref:'Daniel 1–6',
+    scene:'daniel', url:'weeks/2026-11-09-sunny-the-lion/' }
 ];
 
 /* ===== landscape ===== */
@@ -88,12 +91,28 @@ const SCENES = {
     ${[0,1,2,3,4].map(i=>`<rect x="${x+40+i*32}" y="${GROUND-96}" width="22" height="18" fill="#d9c29a" stroke="#a88b62" stroke-width="3"/>`).join('')}
     <rect x="${x+98}" y="${GROUND-40}" width="34" height="40" rx="17" fill="#8a6d47"/>
     <text x="${x+200}" y="${GROUND+10}" font-size="22">🐑</text><text x="${x+225}" y="${GROUND+24}" font-size="18">🐑</text>`,
+  daniel: x => `
+    <!-- Babylon palace -->
+    <rect x="${x+250}" y="${GROUND-60}" width="120" height="60" fill="#e9c98a" stroke="#b8925a" stroke-width="3"/>
+    <rect x="${x+270}" y="${GROUND-95}" width="80" height="35" fill="#e9c98a" stroke="#b8925a" stroke-width="3"/>
+    <rect x="${x+290}" y="${GROUND-120}" width="40" height="25" fill="#e9c98a" stroke="#b8925a" stroke-width="3"/>
+    <rect x="${x+298}" y="${GROUND-34}" width="24" height="34" rx="12" fill="#8a6d47"/>
+    <text x="${x+380}" y="${GROUND-8}" font-size="26">🌴</text>
+    <!-- furnace with a 4th friend's glow -->
+    <ellipse cx="${x+215}" cy="${GROUND+30}" rx="22" ry="8" fill="#000" opacity=".08"/>
+    <path d="M${x+190} ${GROUND+28} Q ${x+215} ${GROUND-20} ${x+240} ${GROUND+28} Z" fill="#c9773f" stroke="#8a4a22" stroke-width="3"/>
+    <text x="${x+204}" y="${GROUND+24}" font-size="16">🔥</text>
+    <!-- lions' den: rocky hill with a cave -->
+    <path d="M${x+30} ${GROUND+4} Q ${x+50} ${GROUND-90} ${x+115} ${GROUND-96} Q ${x+180} ${GROUND-90} ${x+200} ${GROUND+4} Z" fill="#b9a88c" stroke="#8f7d61" stroke-width="3"/>
+    <path d="M${x+85} ${GROUND+4} Q ${x+115} ${GROUND-56} ${x+145} ${GROUND+4} Z" fill="#4a3b2c"/>
+    <text x="${x+150}" y="${GROUND-60}" font-size="18">😇</text>`,
   generic: x => `
     <text x="${x+60}" y="${GROUND-6}" font-size="44">🌳</text>
     <text x="${x+300}" y="${GROUND-2}" font-size="36">🌲</text>
     <text x="${x+200}" y="${GROUND+40}" font-size="22">🌼</text>`
 };
-function mascotPos(w,i){ const x=i*SEG; return w.scene==='ezekiel' ? {x:x+115,y:GROUND-118} : {x:x+210,y:GROUND-60}; }
+const MASCOT_AT = { ezekiel:{dx:115,y:GROUND-118}, daniel:{dx:92,y:GROUND-100} };
+function mascotPos(w,i){ const m=MASCOT_AT[w.scene]||{dx:210,y:GROUND-60}; return {x:i*SEG+m.dx,y:m.y}; }
 
 function thisWeek(w){ const t=new Date(); t.setHours(12); return t>=new Date(w.start+'T00:00') && t<=new Date(w.end+'T23:59'); }
 

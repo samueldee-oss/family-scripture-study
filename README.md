@@ -8,6 +8,7 @@ week's friend to play that week's game.
 |---|---|---|
 | 🏞️ Scripture Trail (hub, app start page) | [`index.html`](index.html) | https://claude.ai/artifact/5hWMgs2fzqj2LWWxBo3Xoc |
 | 🦉 Pip the Watchman — Ezekiel (Nov 2–8, 2026) | [`weeks/2026-11-02-pip-the-watchman/index.html`](weeks/2026-11-02-pip-the-watchman/index.html) | https://claude.ai/artifact/9qm8LcCZUq8rWqyZLm6Wcm |
+| 🦁 Sunny the Lion — Daniel 1–6 (Nov 9–15, 2026) | [`weeks/2026-11-09-sunny-the-lion/index.html`](weeks/2026-11-09-sunny-the-lion/index.html) | (repo only) |
 
 ## Home Screen app
 - `manifest.webmanifest`: app name, colours, icons.
