@@ -89,11 +89,11 @@
   #prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
   #prog b{position:absolute;left:50%;top:-3px;font-size:14px;transform:translateX(-50%)}
   #area{position:absolute;inset:0}
-  .it{position:absolute;font-size:46px;line-height:1;transform:translate(-50%,-50%);padding:8px}
+  .it{position:absolute;font-size:46px;line-height:1;transform:translate(-50%,-50%);padding:8px;pointer-events:none}
   .boom,.plus{position:absolute;transform:translate(-50%,-50%);pointer-events:none;animation:boom .7s ease-out forwards}
   .boom{font-size:46px}.plus{font-weight:900;font-size:22px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3)}
   @keyframes boom{to{transform:translate(-50%,-140%) scale(1.4);opacity:0}}
-  #hint{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;padding:10px 16px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;max-width:88%;z-index:4;transition:opacity .6s}
+  #hint{pointer-events:none;position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;padding:10px 16px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;max-width:88%;z-index:4;transition:opacity .6s}
   #basket{position:absolute;bottom:18px;font-size:60px;transform:translateX(-50%);pointer-events:none;z-index:3;display:none}
   #village{position:absolute;bottom:0;left:0;right:0;height:96px;display:none;z-index:2;background:linear-gradient(#c9b08a,#a88b62);border-top:8px solid #8a6d47;font-size:38px;text-align:center;padding-top:10px;letter-spacing:6px}
   #village.hit{animation:shake .4s}
@@ -623,6 +623,16 @@ game.addEventListener('pointerdown',gardenTarget);
 game.addEventListener('pointermove',e=>{ if(e.buttons) gardenTarget(e); });
 window.addEventListener('keydown',e=>{ if(G&&G.gd&&G.L.motion==='garden'&&e.key.startsWith('Arrow')){ e.preventDefault(); G.gd.keys[e.key]=true; } });
 window.addEventListener('keyup',e=>{ if(G&&G.gd) G.gd.keys[e.key]=false; });
+/* forgiving taps: grab the nearest item within a finger-sized circle */
+const TAP_MODES=['rise','storm','wander','pop','swim'];
+game.addEventListener('pointerdown',e=>{
+  if(!G||G.over||G.paused||!TAP_MODES.includes(G.L.motion)) return;
+  if(e.target.closest&&e.target.closest('#bar,#check')) return;
+  const r=game.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, R=G.big?55:70;
+  let best=null, bd=R;
+  for(const it of G.items){ if(it.dead) continue; const d=Math.hypot(it.x-x,it.y-y); if(d<bd){bd=d;best=it;} }
+  if(best) tapItem(best);
+});
 function stop(){ cancelAnimationFrame(raf); if(G) G.over=true; }
 function hud(){
   document.getElementById('score').textContent=`${G.score}/${G.goal}`;
@@ -643,7 +653,7 @@ function spawn(){
     case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
     case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
   }
-  place(it); el.addEventListener('pointerdown',e=>{e.stopPropagation();tapItem(it);});
+  place(it);
   area.appendChild(el); G.items.push(it);
 }
 const place=it=>{it.el.style.left=it.x+'px';it.el.style.top=it.y+'px';};
