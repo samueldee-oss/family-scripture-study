@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#fdf3e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Scripture Trail">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../../icons/icon-192.png">
+<title>Coo Comes Home — Hosea & Joel Week</title>
+<style>
+  :root{--ink:#3b2f4a;--card:#fff;--accent:#ff8a65;--accent2:#7c9cff;--gold:#ffc94d;--ok:#4caf7a;--r:22px;--sh:#f0dcc6}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#fdf3e7}
+  button{font:inherit;cursor:pointer;border:0;color:inherit}
+  .screen{display:none;min-height:100%;padding:18px 16px 32px;max-width:720px;margin:0 auto}
+  .screen.on{display:block}
+  .trailbtn{display:inline-block;background:#fff;padding:7px 14px;border-radius:999px;font-weight:800;text-decoration:none;color:#3b2f4a;box-shadow:0 2px 0 #f0dcc6;font-size:14px}
+  h1{font-size:30px;margin:6px 0 2px}
+  h2{font-size:24px;margin:4px 0 8px}
+  .hero{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+  .pip{font-size:64px;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+  .modes{display:flex;gap:8px;background:#fff;border-radius:999px;padding:5px;width:max-content;box-shadow:0 2px 0 var(--sh);margin:6px 0 16px}
+  .modes button{padding:8px 16px;border-radius:999px;background:transparent;font-weight:700}
+  .modes button.sel{background:var(--accent2);color:#fff}
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .day{background:var(--card);border-radius:var(--r);padding:14px;text-align:left;box-shadow:0 4px 0 var(--sh);position:relative}
+  .day{cursor:pointer}.day:active{transform:translateY(3px)}
+  .day.today.done::after{bottom:auto;top:34px}
+  .redo{display:flex;gap:6px;margin-top:10px}
+  .redo button{flex:1;padding:7px 4px;border-radius:10px;font-weight:800;font-size:13px;background:#eef1ff;color:#3d4fb8;box-shadow:0 2px 0 #c9d3ff}
+  .redo .rp{background:#ffe7dc;color:#b04a24;box-shadow:0 2px 0 #ffc6ad}
+  .day.locked{opacity:.5}
+  .day .dn{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.6}
+  .day .ic{font-size:36px;margin:4px 0}
+  .day .t{font-weight:800;font-size:16px;line-height:1.2}
+  .day .ref{font-size:12.5px;opacity:.7;margin-top:4px}
+  .day .badges{position:absolute;top:10px;right:12px;font-size:16px}
+  .day.today{outline:4px solid var(--gold)}
+  .day.today::after{content:"Today";position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:800;background:var(--gold);padding:2px 8px;border-radius:99px}
+  .back{background:#fff;padding:8px 14px;border-radius:999px;font-weight:700;box-shadow:0 2px 0 var(--sh)}
+  .panel{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 4px 0 var(--sh);margin-top:14px}
+  .panel h3{margin:0 0 8px;font-size:18px}
+  .panel.lock{opacity:.55}
+  .step{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#a0784d}
+  .part{border:2px solid #f3e6d6;border-radius:16px;padding:12px;margin-top:10px}
+  .part.done{border-color:#bfe6cf;background:#f3fbf6}
+  .part.wait{opacity:.45}
+  .part .pr{font-weight:800;font-size:17px}
+  .scripture{margin-top:10px;background:#fffdf7;border-left:5px solid #e7c98f;border-radius:10px;padding:6px 14px;font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.6}
+  .vs{margin:8px 0}.vs.easy{color:#3f37c9;font-weight:700}.legend{font-size:13.5px;margin-top:6px}.legend b{color:#3f37c9}.vs sup{font-family:inherit;font-weight:700;color:#b07a2a;font-size:12px}
+  .words{margin-top:8px;font-size:14px;background:#f2f6ff;border-radius:10px;padding:8px 10px;line-height:1.45}
+  .gl{display:inline-block;margin:6px 6px 0 0;padding:6px 12px;border-radius:999px;background:#eef1ff;color:#3d4fb8;text-decoration:none;font-weight:700;font-size:14px}
+  .btn{display:inline-block;margin-top:10px;padding:10px 16px;border-radius:14px;background:var(--accent2);color:#fff;font-weight:800;box-shadow:0 3px 0 #5a77d6}
+  .q{margin-top:10px;font-weight:800;font-size:16.5px}
+  .opts{display:grid;gap:8px;margin-top:8px}
+  .opt{background:#fff7ee;border:2px solid #f0dcc6;border-radius:14px;padding:11px 12px;text-align:left;font-weight:700}
+  .opt.no{background:#ffe5e0;border-color:#ff9f8a;animation:shake .4s}
+  .opt.yes{background:#dcf5e6;border-color:var(--ok)}
+  .opt:disabled{opacity:.6}
+  .look{font-size:14px;color:#b04a24;font-weight:700;margin-top:6px}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .lesson{font-size:20px;font-weight:900;background:linear-gradient(90deg,#fff3c4,#ffe0d2);padding:12px 14px;border-radius:14px}
+  .vtarget{min-height:56px;border:2px dashed #d9c3a6;border-radius:14px;padding:10px;margin-top:10px;font-family:Georgia,serif;font-size:18px;line-height:1.5}
+  .vtarget.full{border:2px solid var(--ok);background:#f3fbf6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{background:#eef1ff;border-radius:12px;padding:8px 12px;font-family:Georgia,serif;font-size:16px;box-shadow:0 2px 0 #c9d3ff}
+  .chip.no{background:#ffe5e0;animation:shake .4s}
+  .ask p{margin:6px 0}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-right:6px}
+  .tag.l{background:#ffe2d6;color:#b04a24}.tag.b{background:#dfe6ff;color:#3346a8}
+  .play{display:block;width:100%;margin-top:16px;padding:16px;border-radius:var(--r);background:var(--accent);color:#fff;font-size:22px;font-weight:800;box-shadow:0 5px 0 #d9663f}
+  .play:disabled{background:#d6c8bb;box-shadow:0 5px 0 #bfae9e}
+  .journal{display:grid;gap:8px}
+  .jl{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 2px 0 var(--sh);font-weight:700;font-size:15px}
+  .jl.no{opacity:.45}
+  .foot{font-size:12.5px;opacity:.6;margin-top:18px;text-align:center}
+  .tiny{background:none;text-decoration:underline;font-size:12.5px;opacity:.6}
+  /* game */
+  #game{padding:0;max-width:none;height:100vh;height:100dvh;position:relative;overflow:hidden;touch-action:none;user-select:none}
+  #bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:10px 12px;z-index:5}
+  #bar .pill,#quit{background:rgba(255,255,255,.88);padding:6px 12px;border-radius:999px;font-weight:800;font-size:16px}
+  #prog{flex:1;height:14px;background:rgba(255,255,255,.6);border-radius:99px;overflow:hidden;position:relative}
+  #prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  #prog b{position:absolute;left:50%;top:-3px;font-size:14px;transform:translateX(-50%)}
+  #area{position:absolute;inset:0}
+  .it{position:absolute;font-size:46px;line-height:1;transform:translate(-50%,-50%);padding:8px}
+  .boom,.plus{position:absolute;transform:translate(-50%,-50%);pointer-events:none;animation:boom .7s ease-out forwards}
+  .boom{font-size:46px}.plus{font-weight:900;font-size:22px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+  @keyframes boom{to{transform:translate(-50%,-140%) scale(1.4);opacity:0}}
+  #hint{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;padding:10px 16px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;max-width:88%;z-index:4;transition:opacity .6s}
+  #basket{position:absolute;bottom:18px;font-size:60px;transform:translateX(-50%);pointer-events:none;z-index:3;display:none}
+  #village{position:absolute;bottom:0;left:0;right:0;height:96px;display:none;z-index:2;background:linear-gradient(#c9b08a,#a88b62);border-top:8px solid #8a6d47;font-size:38px;text-align:center;padding-top:10px;letter-spacing:6px}
+  #village.hit{animation:shake .4s}
+  #wallpip{position:absolute;bottom:84px;left:12px;font-size:52px;z-index:3;display:none}
+  #river{position:absolute;left:0;right:0;top:30%;height:50%;background:linear-gradient(#7fd3ff,#3fa7e8);display:none;opacity:.85}
+  #check{position:absolute;inset:0;background:rgba(40,30,60,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  #check .panel{max-width:460px;width:100%}
+  .center{text-align:center}
+  .stars{font-size:54px;margin:8px 0}
+  .bigpip{font-size:96px;animation:bob 1.6s ease-in-out infinite}
+  .home q{display:block;font-size:20px;font-weight:800;margin:8px 0;quotes:none}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .row button{flex:1;padding:14px;border-radius:var(--r);font-weight:800;font-size:17px}
+  .ghost{background:#fff;box-shadow:0 4px 0 var(--sh)}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen on">
+  <a class="trailbtn" href="../../">🏞️ All weeks</a>
+  <div class="hero">
+    <div class="pip">🕊️</div>
+    <div><h1>Coo Comes Home</h1>
+      <p style="margin:0;opacity:.75">Read it. Learn it. Then play it. About half a chapter each morning.</p></div>
+  </div>
+  <div class="modes" id="modes">
+    <button data-m="little">🐣 Little Kids</button>
+    <button data-m="big">🦅 Big Kids</button>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="panel">
+    <h3>📓 Coo’s Journal</h3>
+    <p style="margin:0 0 10px;opacity:.75;font-size:14px">Collect each day’s lesson by reading and building the key verse.</p>
+    <div class="journal" id="journal"></div>
+  </div>
+  <p class="foot">Come, Follow Me · Nov 16–22 · Hosea 1–6; 10–14; Joel<br>
+    <button class="tiny" id="unlockAll">Parent: unlock all days</button> · <button class="tiny" id="reset">Reset progress</button></p>
+  <div id="confirmBox" class="panel" style="display:none"></div>
+</section>
+
+<section id="day" class="screen">
+  <button class="back" onclick="show('home')">← All days</button>
+  <h2 id="dTitle" style="margin-top:14px"></h2>
+  <p id="dSum" style="line-height:1.5;margin:4px 0 0"></p>
+
+  <div class="panel" id="readPanel">
+    <div class="step">Step 1</div>
+    <h3>📖 Read together</h3>
+    <div style="font-size:14px;opacity:.75">About half a chapter, in a few parts. Read each part out loud (take turns!), then answer Coo’s question to unlock the next part.</div>
+    <div id="parts"></div>
+  </div>
+
+  <div class="panel" id="lessonPanel">
+    <div class="step">Step 2</div>
+    <h3>💡 Today’s lesson</h3>
+    <div id="lessonBody"></div>
+  </div>
+
+  <div class="panel" id="playPanel">
+    <div class="step">Step 3</div>
+    <h3>🎮 Play the level</h3>
+    <div style="font-size:14px;opacity:.75">There’s a question checkpoint halfway through, so remember what you learned!</div>
+    <button class="play" id="playBtn">▶ Play Level</button>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div id="area"></div>
+  <div id="river"></div>
+  <div id="village">🏠 🏡 ⛪ 🏠 🏡</div>
+  <div id="wallpip"></div>
+  <div id="basket">🕊️🧺</div>
+  <div id="bar">
+    <button id="quit">✕</button>
+    <div id="prog"><i></i><b>❓</b></div>
+    <span class="pill" id="score">0/0</span>
+    <span class="pill" id="extra"></span>
+  </div>
+  <div id="hint"></div>
+  <div id="check"><div class="panel">
+    <div class="step">Coo’s checkpoint</div>
+    <h3>🕊️ Coo asks…</h3>
+    <div class="q" id="cQ"></div><div class="opts" id="cO"></div><div class="look" id="cL"></div>
+  </div></div>
+</section>
+
+<section id="win" class="screen center">
+  <div class="bigpip" id="wIcon">🕊️</div>
+  <h2 id="wTitle"></h2>
+  <div class="stars" id="wStars"></div>
+  <div class="panel" id="wMsg" style="font-size:18px;line-height:1.5"></div>
+  <div class="panel" style="text-align:left"><div class="step">Today’s lesson</div><div class="lesson" id="wLesson" style="margin-top:6px"></div></div>
+  <div class="panel home"><h3>🏡 Bring it home</h3><q id="wHome"></q></div>
+  <div class="row">
+    <button class="ghost" id="again">↻ Play again</button>
+    <button class="play" style="margin:0" onclick="show('home')">All days</button>
+  </div>
+</section>
+
+<script>
+const GL = c => { const [bk,n]=c.split(' '); return `https://www.churchofjesuschrist.org/study/scriptures/ot/${bk==='Joel'?'joel':'hosea'}/${n}?lang=eng`; };
+/* King James Version (public domain). TEXT['Book chapter'][verse] */
+const TEXT = {
+ 'Hosea 2':{14:'Therefore, behold, I will allure her, and bring her into the wilderness, and speak comfortably unto her.',
+  15:'And I will give her her vineyards from thence, and the valley of Achor for a door of hope: and she shall sing there, as in the days of her youth, and as in the day when she came up out of the land of Egypt.',
+  16:'And it shall be at that day, saith the LORD, that thou shalt call me Ishi; and shalt call me no more Baali.',
+  17:'For I will take away the names of Baalim out of her mouth, and they shall no more be remembered by their name.',
+  18:'And in that day will I make a covenant for them with the beasts of the field, and with the fowls of heaven, and with the creeping things of the ground: and I will break the bow and the sword and the battle out of the earth, and will make them to lie down safely.',
+  19:'And I will betroth thee unto me for ever; yea, I will betroth thee unto me in righteousness, and in judgment, and in lovingkindness, and in mercies.',
+  20:'I will even betroth thee unto me in faithfulness: and thou shalt know the LORD.',
+  21:'And it shall come to pass in that day, I will hear, saith the LORD, I will hear the heavens, and they shall hear the earth;',
+  22:'And the earth shall hear the corn, and the wine, and the oil; and they shall hear Jezreel.',
+  23:'And I will sow her unto me in the earth; and I will have mercy upon her that had not obtained mercy; and I will say to them which were not my people, Thou art my people; and they shall say, Thou art my God.'},
+ 'Hosea 6':{1:'Come, and let us return unto the LORD: for he hath torn, and he will heal us; he hath smitten, and he will bind us up.',
+  2:'After two days will he revive us: in the third day he will raise us up, and we shall live in his sight.',
+  3:'Then shall we know, if we follow on to know the LORD: his going forth is prepared as the morning; and he shall come unto us as the rain, as the latter and former rain unto the earth.',
+  4:'O Ephraim, what shall I do unto thee? O Judah, what shall I do unto thee? for your goodness is as a morning cloud, and as the early dew it goeth away.',
+  5:'Therefore have I hewed them by the prophets; I have slain them by the words of my mouth: and thy judgments are as the light that goeth forth.',
+  6:'For I desired mercy, and not sacrifice; and the knowledge of God more than burnt offerings.',
+  7:'But they like men have transgressed the covenant: there have they dealt treacherously against me.'},
+ 'Hosea 11':{1:'When Israel was a child, then I loved him, and called my son out of Egypt.',
+  2:'As they called them, so they went from them: they sacrificed unto Baalim, and burned incense to graven images.',
+  3:'I taught Ephraim also to go, taking them by their arms; but they knew not that I healed them.',
+  4:'I drew them with cords of a man, with bands of love: and I was to them as they that take off the yoke on their jaws, and I laid meat unto them.',
+  8:'How shall I give thee up, Ephraim? how shall I deliver thee, Israel? how shall I make thee as Admah? how shall I set thee as Zeboim? mine heart is turned within me, my repentings are kindled together.',
+  9:'I will not execute the fierceness of mine anger, I will not return to destroy Ephraim: for I am God, and not man; the Holy One in the midst of thee: and I will not enter into the city.',
+  10:'They shall walk after the LORD: he shall roar like a lion: when he shall roar, then the children shall tremble from the west.',
+  11:'They shall tremble as a bird out of Egypt, and as a dove out of the land of Assyria: and I will place them in their houses, saith the LORD.'},
+ 'Hosea 12':{6:'Therefore turn thou to thy God: keep mercy and judgment, and wait on thy God continually.'},
+ 'Hosea 13':{4:'Yet I am the LORD thy God from the land of Egypt, and thou shalt know no god but me: for there is no saviour beside me.',
+  5:'I did know thee in the wilderness, in the land of great drought.',
+  9:'O Israel, thou hast destroyed thyself; but in me is thine help.',
+  14:'I will ransom them from the power of the grave; I will redeem them from death: O death, I will be thy plagues; O grave, I will be thy destruction: repentance shall be hid from mine eyes.'},
+ 'Hosea 14':{1:'O Israel, return unto the LORD thy God; for thou hast fallen by thine iniquity.',
+  2:'Take with you words, and turn to the LORD: say unto him, Take away all iniquity, and receive us graciously: so will we render the calves of our lips.',
+  3:'Asshur shall not save us; we will not ride upon horses: neither will we say any more to the work of our hands, Ye are our gods: for in thee the fatherless findeth mercy.',
+  4:'I will heal their backsliding, I will love them freely: for mine anger is turned away from him.',
+  5:'I will be as the dew unto Israel: he shall grow as the lily, and cast forth his roots as Lebanon.',
+  6:'His branches shall spread, and his beauty shall be as the olive tree, and his smell as Lebanon.',
+  7:'They that dwell under his shadow shall return; they shall revive as the corn, and grow as the vine: the scent thereof shall be as the wine of Lebanon.',
+  8:'Ephraim shall say, What have I to do any more with idols? I have heard him, and observed him: I am like a green fir tree. From me is thy fruit found.',
+  9:'Who is wise, and he shall understand these things? prudent, and he shall know them? for the ways of the LORD are right, and the just shall walk in them: but the transgressors shall fall therein.'},
+ 'Joel 2':{12:'Therefore also now, saith the LORD, turn ye even to me with all your heart, and with fasting, and with weeping, and with mourning:',
+  13:'And rend your heart, and not your garments, and turn unto the LORD your God: for he is gracious and merciful, slow to anger, and of great kindness, and repenteth him of the evil.',
+  21:'Fear not, O land; be glad and rejoice: for the LORD will do great things.',
+  22:'Be not afraid, ye beasts of the field: for the pastures of the wilderness do spring, for the tree beareth her fruit, the fig tree and the vine do yield their strength.',
+  23:'Be glad then, ye children of Zion, and rejoice in the LORD your God: for he hath given you the former rain moderately, and he will cause to come down for you the rain, the former rain, and the latter rain in the first month.',
+  24:'And the floors shall be full of wheat, and the fats shall overflow with wine and oil.',
+  25:'And I will restore to you the years that the locust hath eaten, the cankerworm, and the caterpiller, and the palmerworm, my great army which I sent among you.',
+  26:'And ye shall eat in plenty, and be satisfied, and praise the name of the LORD your God, that hath dealt wondrously with you: and my people shall never be ashamed.',
+  27:'And ye shall know that I am in the midst of Israel, and that I am the LORD your God, and none else: and my people shall never be ashamed.',
+  28:'And it shall come to pass afterward, that I will pour out my spirit upon all flesh; and your sons and your daughters shall prophesy, your old men shall dream dreams, your young men shall see visions:',
+  29:'And also upon the servants and upon the handmaids in those days will I pour out my spirit.',
+  30:'And I will shew wonders in the heavens and in the earth, blood, and fire, and pillars of smoke.',
+  31:'The sun shall be turned into darkness, and the moon into blood, before the great and the terrible day of the LORD come.',
+  32:'And it shall come to pass, that whosoever shall call on the name of the LORD shall be delivered: for in mount Zion and in Jerusalem shall be deliverance, as the LORD hath said, and in the remnant whom the LORD shall call.'}
+};
+const LEVELS = [
+ { dn:'Sunday', icon:'🕊️', title:'A Door of Hope', ref:'Hosea 2:14–23', ch:['Hosea 2'],
+   sum:'Through the prophet Hosea, the Lord speaks to His people like a loving husband who wants his bride to come back. He promises to speak kindly, give hope, and make a covenant of peace.',
+   parts:[
+    {ch:'Hosea 2',a:14,b:17, w:'allure = gently invite · comfortably = kindly · Achor = a valley whose name means "trouble"',
+     q:'What did the Lord say the valley of Achor would become?', o:['A door of hope','A deep river','A city wall','A field of thorns'], look:'Look again at verse 15.'},
+    {ch:'Hosea 2',a:18,b:20, w:'covenant = a sacred promise · betroth = promise to marry · lovingkindness = gentle, faithful love',
+     q:'What will the Lord break out of the earth, so everyone can lie down safely?', o:['The bow and the sword and the battle','The mountains and hills','The trees and vines','The houses and walls'], look:'Look again at verse 18.'},
+    {ch:'Hosea 2',a:21,b:23, w:'obtained = received · Jezreel = a name meaning "God plants"',
+     q:'At the end, what will the people say to the Lord?', o:['Thou art my God','Leave us alone','We are tired','We will go away'], look:'Look again at verse 23.'}],
+   lesson:'I can faithfully keep my covenants.', keyRef:'Hosea 2:20',
+   key:['I will even betroth thee','unto me in faithfulness:','and thou shalt know','the LORD.'],
+   askL:'A covenant is a promise with Heavenly Father. What promises did you make when you were baptized (or will make)?',
+   askB:'The Lord promises to be faithful "for ever." How does knowing He keeps His promises help us keep ours?',
+   mid:{q:'What does it mean to keep a covenant faithfully?', o:['To keep my promises to Heavenly Father every day','To make a promise and then forget it','To keep promises only when it’s easy','To let someone else keep it for me'], look:'Think about Hosea 2:20.'},
+   motion:'storm', alt:['⚔️','🏹'], turn:'🕊️', village:'🐑 🦌 🐇 🐦 🐄', villageBg:'linear-gradient(#a8d88a,#7cb85a)', bad:null, goal:16, bg:'linear-gradient(#cfe9ff,#f3fbe8)',
+   hint:'Tap the swords and bows to turn them into doves before they reach the animals!',
+   win:'No more battles! Everyone can lie down safely. The Lord keeps His covenants of peace. 🕊️',
+   home:'What is one promise to Heavenly Father we can keep extra well this week?'},
+ { dn:'Monday', icon:'🌧️', title:'Come, Let Us Return', ref:'Hosea 6:1–7', ch:['Hosea 6'],
+   sum:'Hosea invites the people to come back to the Lord. But their goodness kept disappearing, like dew in the morning sun.',
+   parts:[
+    {ch:'Hosea 6',a:1,b:2, w:'torn, smitten = hurt · bind us up = bandage us · revive = bring back to life',
+     q:'What will the Lord do for people who return to Him?', o:['Heal them and bind them up','Send them away','Forget about them','Make them work harder'], look:'Look again at verse 1.'},
+    {ch:'Hosea 6',a:3,b:4, w:'latter and former rain = the fall and spring rains that make crops grow',
+     q:'The people’s goodness didn’t last. What was it like?', o:['A morning cloud and early dew that goes away','A strong rock','A tall mountain','A deep well'], look:'Look again at verse 4.'},
+    {ch:'Hosea 6',a:5,b:7, w:'hewed = cut, corrected · sacrifice, burnt offerings = animals offered on the altar · treacherously = unfaithfully',
+     q:'What did the Lord want more than sacrifice?', o:['Mercy','Gold','Big buildings','Long speeches'], look:'Look again at verse 6.'}],
+   lesson:'Heavenly Father wants my love and kindness from the heart, not just on the outside.', keyRef:'Hosea 6:6',
+   key:['For I desired mercy,','and not sacrifice;','and the knowledge of God','more than burnt offerings.'],
+   askL:'How can we show love for Heavenly Father on the inside, even when no one is watching?',
+   askB:'Dew disappears when the sun comes up. How can we make our goodness last all day instead of fading?',
+   mid:{q:'What does Heavenly Father want most from us?', o:['Our love and kindness from the heart','Only nice-looking outfits','Just saying the right words','Being better than others'], look:'Think about Hosea 6:6.'},
+   motion:'fall', alt:['💧','🌧️','💧'], bad:'☁️', goal:15, bg:'linear-gradient(#ffe3c4,#d7ecff)',
+   hint:'Slide Coo to catch the rain! "He shall come unto us as the rain." (Big kids: skip the empty clouds!)',
+   win:'You caught the rain! The Lord comes to us as surely as the morning and the rain. 🌧️',
+   home:'What is one kind thing we can do this week just because we love Heavenly Father?'},
+ { dn:'Tuesday', icon:'🏡', title:'Bands of Love', ref:'Hosea 11:1–4, 8–11', ch:['Hosea 11'],
+   sum:'The Lord remembers when Israel was a little child, and how He taught them to walk. Even when they wandered away, He would not give them up.',
+   parts:[
+    {ch:'Hosea 11',a:1,b:2, w:'Baalim, graven images = false gods and idols · incense = sweet-smelling smoke',
+     q:'When Israel was a child, what did the Lord do?', o:['Loved him and called him out of Egypt','Left him alone','Sent him to Babylon','Forgot his name'], look:'Look again at verse 1.'},
+    {ch:'Hosea 11',a:3,b:4, w:'Ephraim = another name for Israel · yoke = a heavy wooden bar for work animals',
+     q:'How did the Lord draw His people to Him?', o:['With cords of a man, with bands of love','With chains and ropes','With loud shouting','With a fence'], look:'Look again at verse 4.'},
+    {ch:'Hosea 11',a:8,b:11, w:'Admah, Zeboim = cities that were destroyed · kindled = warmed up · tremble = shake',
+     q:'Like what bird will God’s people come home?', o:['A dove','An eagle','A raven','An owl'], look:'Look again at verse 11.'}],
+   lesson:'It is time to seek the Lord.', keyRef:'Hosea 10:12',
+   key:['Sow to yourselves in righteousness,','reap in mercy;','break up your fallow ground:','for it is time','to seek the LORD'],
+   askL:'The Lord taught His people to walk, holding their arms. Who taught you to do something new?',
+   askB:'"How shall I give thee up?" What does this show about how the Lord feels when we wander?',
+   mid:{q:'What can we do right now to seek the Lord?', o:['Pray, read the scriptures, and follow Jesus','Wait until we’re grown up','Only think about it on Sunday','Nothing, He’ll find us anyway'], look:'Think about Hosea 10:12.'},
+   motion:'swim', alt:['🕊️','🕊️','🐦'], turn:'🏡', bad:null, goal:16, bg:'linear-gradient(#bfe3ff,#fff1d6)',
+   hint:'The doves are flying home! Tap each one to guide it to its house.',
+   win:'Every dove is home! "I will place them in their houses, saith the LORD." 🏡',
+   home:'This week, let’s seek the Lord by praying together every morning.'},
+ { dn:'Wednesday', icon:'🔓', title:'My Savior and Redeemer', ref:'Hosea 12:6; 13:4–5, 9, 14', ch:['Hosea 12','Hosea 13'],
+   sum:'The Lord reminds Israel who saved them from Egypt and cared for them in the desert. He promises an even greater rescue.',
+   parts:[
+    {ch:'Hosea 12',a:6,b:6, w:'judgment = doing what is fair · continually = all the time',
+     q:'What does verse 6 invite us to do?', o:['Turn to God and wait on Him all the time','Turn away from God','Wait for someone else to pray','Do whatever we want'], look:'Look again at Hosea 12:6.'},
+    {ch:'Hosea 13',a:4,b:5, w:'saviour = one who saves · drought = a long time without rain',
+     q:'Who did the Lord say is the only Saviour?', o:['The LORD; there is no saviour beside Him','A great king','A strong army','Any wise man'], look:'Look again at Hosea 13:4.'},
+    {ch:'Hosea 13',a:9,b:9, w:'thine = your',
+     q:'Even when Israel hurt themselves, where was their help?', o:['In the Lord','In Egypt','In their gold','Nowhere'], look:'Look again at Hosea 13:9.'},
+    {ch:'Hosea 13',a:14,b:14, w:'ransom = pay to set free · redeem = buy back, rescue · grave = death',
+     q:'From what will the Lord ransom and redeem His people?', o:['The power of the grave and death','A tall tower','The desert','A stormy sea'], look:'Look again at Hosea 13:14.'}],
+   lesson:'Jesus Christ is my Savior and Redeemer.', keyRef:'Hosea 13:14',
+   key:['I will ransom them','from the power of the grave;','I will redeem them','from death'],
+   askL:'Jesus rescues us from death and sin. How does it feel to know Jesus will always help you?',
+   askB:'Because of Jesus Christ, death is not the end. How does the Resurrection give us hope?',
+   mid:{q:'Who is our Savior and Redeemer?', o:['Jesus Christ','A king of Israel','Hosea','A great army'], look:'Think about Hosea 13:4 and 14.'},
+   motion:'pop', alt:['🔒','⛓️'], turn:'🔓', bad:null, goal:16, bg:'linear-gradient(#3c3a63,#7a6fb0 60%,#ffd9a0)',
+   hint:'Tap the locks and chains to set them free! Jesus Christ is our Redeemer.',
+   win:'Every lock is open! Jesus Christ ransoms us from death and sets us free. 🔓',
+   home:'Let’s each share one thing we are thankful Jesus did for us.'},
+ { dn:'Thursday', icon:'🌷', title:'I Will Love Them Freely', ref:'Hosea 14:1–9', ch:['Hosea 14'],
+   sum:'The book of Hosea ends with a beautiful invitation: come back to the Lord, and He will make you grow like a garden.',
+   parts:[
+    {ch:'Hosea 14',a:1,b:3, w:'iniquity = sin · graciously = kindly · Asshur = Assyria, a strong nation · fatherless = children without a father',
+     q:'What does verse 1 invite Israel to do?', o:['Return unto the LORD thy God','Ride horses into battle','Build bigger cities','Hide in the mountains'], look:'Look again at verse 1.'},
+    {ch:'Hosea 14',a:4,b:6, w:'backsliding = slipping away from God · Lebanon = a land famous for tall cedar trees',
+     q:'The Lord will be like dew. What will Israel grow like?', o:['The lily','A thorn bush','A weed','A stone'], look:'Look again at verse 5.'},
+    {ch:'Hosea 14',a:7,b:9, w:'revive = come back to life · idols = false gods · prudent = wise · transgressors = people who break God’s laws',
+     q:'What kind of tree does Ephraim say he is like?', o:['A green fir tree','A dry stump','A fallen log','A cactus'], look:'Look again at verse 8.'}],
+   lesson:'The Lord always invites me to return to Him, and He loves me freely.', keyRef:'Hosea 14:4',
+   key:['I will heal their backsliding,','I will love them freely:','for mine anger','is turned away from him.'],
+   askL:'"I will love them freely." What does it feel like to be loved even when you make mistakes?',
+   askB:'The Lord compares us to a lily, an olive tree, a vine and a fir tree. Which one would you want to be like, and why?',
+   mid:{q:'When we make mistakes, what does the Lord invite us to do?', o:['Come back to Him, because He loves us freely','Hide from Him','Give up','Pretend nothing happened'], look:'Think about Hosea 14:1 and 4.'},
+   motion:'garden', plants:['🌷','🫒','🍇','🌲','🌾','🌸','🌷','🫒','🍇','🌲'], bad:'🌵', goal:6, bg:'linear-gradient(#e9f7d8,#b9e19a)',
+   hint:'Tap where Coo should fly! Pick up dew 💧, then fly to a sprout 🌱 to water it and watch it grow.',
+   win:'The garden is blooming! "I will be as the dew unto Israel: he shall grow as the lily." 🌷',
+   home:'If you’ve made a mistake this week, remember: the Lord loves you freely. You can always come back.'},
+ { dn:'Friday', icon:'🌾', title:'With All Your Heart', ref:'Joel 2:12–13, 21–26', ch:['Joel 2'],
+   sum:'The prophet Joel saw a huge swarm of locusts eat up all the crops. The Lord invites the people to turn to Him, and promises to make everything good again.',
+   parts:[
+    {ch:'Joel 2',a:12,b:13, w:'fasting = going without food to pray · rend = tear · garments = clothes · gracious = kind',
+     q:'What should we "rend" (tear open), our heart or our clothes?', o:['Our heart, not our garments','Our clothes, not our heart','Both, very loudly','Neither one'], look:'Look again at verse 13.'},
+    {ch:'Joel 2',a:21,b:23, w:'pastures = grassy fields · Zion = God’s people · former and latter rain = fall and spring rains',
+     q:'What did the Lord tell the land?', o:['Fear not; be glad and rejoice','Be afraid and hide','Stop growing','Wait a hundred years'], look:'Look again at verse 21.'},
+    {ch:'Joel 2',a:24,b:26, w:'floors = places to gather grain · fats = big tubs · cankerworm, caterpiller, palmerworm = kinds of crop-eating bugs',
+     q:'What will the Lord restore?', o:['The years that the locust hath eaten','The old palace','The broken swords','The empty wells'], look:'Look again at verse 25.'}],
+   lesson:'I can turn to the Lord with all my heart.', keyRef:'Joel 2:13',
+   key:['rend your heart,','and not your garments,','and turn unto the LORD your God:','for he is gracious and merciful'],
+   askL:'What does it mean to love Jesus "with all your heart"?',
+   askB:'The Lord can "restore the years that the locust hath eaten." What hard things can He make good again?',
+   mid:{q:'What does it mean to turn to the Lord with all your heart?', o:['To really mean it inside, not just look good outside','To say sorry only out loud','To tear our clothes','To try once and stop'], look:'Think about Joel 2:12–13.'},
+   motion:'wander', alt:['🦗','🦗'], turn:'🌾', bad:null, goal:15, bg:'linear-gradient(#fff3c6,#e8d79a)',
+   hint:'The locusts ate the crops! Tap each locust to turn it back into wheat.',
+   win:'The fields are full of wheat again! The Lord restores what was lost. 🌾',
+   home:'What can our family do with all our hearts this week?'},
+ { dn:'Saturday', icon:'✨', title:'Pour Out My Spirit', ref:'Joel 2:27–32', ch:['Joel 2'],
+   sum:'Joel prophesies of a wonderful day when the Lord will pour out His Spirit on everyone: young and old, boys and girls.',
+   parts:[
+    {ch:'Joel 2',a:27,b:28, w:'in the midst = right in the middle · prophesy = speak by the Spirit · visions = things shown by God',
+     q:'What did the Lord say His people will never be?', o:['Ashamed','Happy','Hungry','Brave'], look:'Look again at verse 27.'},
+    {ch:'Joel 2',a:29,b:30, w:'handmaids = women servants · wonders = amazing signs',
+     q:'Who else will receive the Spirit in verse 29?', o:['The servants and the handmaids','Only the kings','Only the old men','Nobody else'], look:'Look again at verse 29.'},
+    {ch:'Joel 2',a:31,b:32, w:'whosoever = anyone · delivered = saved · remnant = the faithful who remain',
+     q:'Who shall be delivered (saved)?', o:['Whosoever shall call on the name of the LORD','Only the strongest','Only the richest','No one'], look:'Look again at verse 32.'}],
+   lesson:'The Holy Ghost can guide me.', keyRef:'Joel 2:28',
+   key:['I will pour out my spirit','upon all flesh;','and your sons and your daughters','shall prophesy'],
+   askL:'"Your sons and your daughters" means kids like you! How has the Holy Ghost helped you feel good or know what is right?',
+   askB:'Joel saw the Spirit poured out on everyone. How can we be ready to listen when the Holy Ghost guides us?',
+   mid:{q:'How can the Holy Ghost help you?', o:['Guide me, comfort me, and help me know what’s true','Do my homework for me','Make me famous','Only help grown-ups'], look:'Think about Joel 2:28–29.'},
+   motion:'rise', alt:['✨','⭐','💛'], turn:'💡', bad:null, goal:16, bg:'linear-gradient(#2d2f6e,#6f5fb8 55%,#ffd9a0)',
+   hint:'Tap the little lights as they rise! The Spirit is poured out on everyone.',
+   win:'The whole sky is shining! The Holy Ghost can guide you every day. ✨',
+   home:'This week, how did the Lord show He loves us freely? Which day was your favorite?'}
+];
+const EASY=new Set(['Hosea 11:1','Hosea 13:5','Hosea 13:9','Hosea 14:5','Hosea 14:6','Joel 2:21']);
+
+/* ---------- state ---------- */
+let mode='little', P={};
+try{ P=JSON.parse(localStorage.getItem('coo-2026-11-16')||'{}'); mode=localStorage.getItem('pipMode')||'little'; }catch(e){}
+function save(){ try{ localStorage.setItem('coo-2026-11-16',JSON.stringify(P)); localStorage.setItem('pipMode',mode);}catch(e){} }
+function dp(i){ return P[i]=P[i]||{read:0,verse:false}; }
+function unlocked(i){ return P.all || i===0 || (P[i-1]&&P[i-1].verse); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id)); if(id==='home') renderHome(); window.scrollTo(0,0); }
+
+/* ---------- home ---------- */
+function renderHome(){
+  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('sel',b.dataset.m===mode));
+  const today=new Date().getDay(), d=document.getElementById('days'); d.innerHTML='';
+  LEVELS.forEach((L,i)=>{
+    const p=P[i]||{}, ok=unlocked(i), b=document.createElement('div');
+    b.className='day'+(i===today?' today':'')+(ok?'':' locked')+(p.verse?' done':'');
+    b.innerHTML=`<div class="badges">${ok?'':'🔒'}${p.verse?'📓':''}${p.little?'🐣':''}${p.big?'🦅':''}</div>
+      <div class="dn">${L.dn}</div><div class="ic">${L.icon}</div><div class="t">${L.title}</div><div class="ref">${L.ref}</div>`;
+    b.onclick=()=> ok ? openDay(i) : flash(b);
+    if(p.verse){
+      const r=document.createElement('div'); r.className='redo';
+      r.innerHTML='<button class="rr">📖 Read</button><button class="rp">🎮 Play</button>';
+      r.querySelector('.rr').onclick=e=>{e.stopPropagation(); p.read=0; save(); openDay(i);};
+      r.querySelector('.rp').onclick=e=>{e.stopPropagation(); cur=i; startGame(i);};
+      b.appendChild(r);
+    }
+    d.appendChild(b);
+  });
+  document.getElementById('journal').innerHTML=LEVELS.map((L,i)=>(P[i]&&P[i].verse)
+    ? `<div class="jl">${L.icon} <b>${L.dn}:</b> ${L.lesson} <span style="opacity:.6">(${L.keyRef})</span></div>`
+    : `<div class="jl no">🔒 ${L.dn}: finish the reading to collect this lesson</div>`).join('');
+}
+function flash(el){ el.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:300}); }
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;save();renderHome();});
+function confirmBox(msg,fn){ const c=document.getElementById('confirmBox'); c.style.display='block';
+  c.innerHTML=`<b>${msg}</b><div class="row"><button class="ghost" id="cNo">Cancel</button><button class="play" style="margin:0;font-size:17px" id="cYes">Yes</button></div>`;
+  c.querySelector('#cNo').onclick=()=>c.style.display='none'; c.querySelector('#cYes').onclick=()=>{c.style.display='none';fn();}; c.scrollIntoView({behavior:'smooth'}); }
+document.getElementById('unlockAll').onclick=()=>confirmBox('Unlock every day? (Reading and verse are still required before each level.)',()=>{P.all=true;save();renderHome();});
+document.getElementById('reset').onclick=()=>confirmBox('Erase all progress and start the week over?',()=>{P={};save();renderHome();});
+
+/* ---------- day ---------- */
+let cur=0;
+function openDay(i){ cur=i; const L=LEVELS[i];
+  document.getElementById('dTitle').textContent=`${L.icon} ${L.dn}: ${L.title}`;
+  document.getElementById('dSum').textContent=L.sum;
+  renderParts(); renderLesson(); renderPlay(); show('day'); }
+
+function askQ(box,Q,onRight){
+  box.innerHTML=`<div class="q">${Q.q}</div><div class="opts"></div><div class="look"></div>`;
+  const opts=box.querySelector('.opts'), look=box.querySelector('.look');
+  shuffle(Q.o.map((t,k)=>({t,right:k===0}))).forEach(o=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o.t;
+    b.onclick=()=>{
+      if(o.right){ b.classList.add('yes'); opts.querySelectorAll('button').forEach(x=>x.disabled=true); setTimeout(onRight,500); }
+      else{ b.classList.add('no'); look.textContent='Not quite. '+Q.look+' Try again in a moment…';
+        opts.querySelectorAll('button').forEach(x=>x.disabled=true);
+        setTimeout(()=>askQ(box,Q,onRight),3000); }
+    };
+    opts.appendChild(b);
+  });
+}
+function renderParts(){
+  const L=LEVELS[cur], p=dp(cur), wrap=document.getElementById('parts'); wrap.innerHTML='';
+  L.parts.forEach((pt,k)=>{
+    const div=document.createElement('div');
+    const done=k<p.read, active=k===p.read;
+    div.className='part'+(done?' done':active?'':' wait');
+    const r=pt.a===pt.b?`${pt.ch}:${pt.a}`:`${pt.ch}:${pt.a}–${pt.b}`;
+    div.innerHTML=`<div class="pr">${done?'✅':active?'📖':'🔒'} Part ${k+1}: ${r}</div>`;
+    if(active){
+      let vs=''; for(let v=pt.a;v<=pt.b;v++) vs+=`<p class="vs${EASY.has(pt.ch+':'+v)?' easy':''}"><sup>${v}</sup> ${TEXT[pt.ch][v]}</p>`;
+      div.innerHTML+=`${vs.includes(' easy')?'<div class="legend">🐣 <b>Indigo verses</b> are great for little readers!</div>':''}<div class="scripture">${vs}</div>
+        <div class="words">🔎 <b>Word help:</b> ${pt.w}</div>
+        <a class="gl" href="${GL(pt.ch)}" target="_blank" rel="noopener">Open in Gospel Library ↗</a><br>
+        <button class="btn">✋ We read it out loud! Ask me</button><div class="qbox"></div>`;
+      div.querySelector('.btn').onclick=e=>{ e.target.remove(); askQ(div.querySelector('.qbox'),pt,()=>{ p.read++; save(); renderParts(); renderLesson(); renderPlay(); }); };
+    }
+    wrap.appendChild(div);
+  });
+}
+function renderLesson(){
+  const L=LEVELS[cur], p=dp(cur), box=document.getElementById('lessonBody'), panel=document.getElementById('lessonPanel');
+  if(p.read<L.parts.length){ panel.classList.add('lock'); box.innerHTML='🔒 Finish all three reading parts to unlock today’s lesson.'; return; }
+  panel.classList.remove('lock');
+  box.innerHTML=`<div class="lesson">${L.lesson}</div>
+    <p style="margin:12px 0 0;font-weight:800">🧩 Build the key verse: ${L.keyRef}</p>
+    <div style="font-size:14px;opacity:.75">Tap the pieces in the right order.</div>
+    <div class="vtarget"></div><div class="chips"></div><div class="vdone"></div>`;
+  const tgt=box.querySelector('.vtarget'), chips=box.querySelector('.chips');
+  if(p.verse){ tgt.textContent=L.key.join(' '); tgt.classList.add('full'); chips.remove(); showTalk(box); return; }
+  let n=0;
+  shuffle(L.key).forEach(t=>{
+    const c=document.createElement('button'); c.className='chip'; c.textContent=t;
+    c.onclick=()=>{
+      if(t===L.key[n]){ n++; c.remove(); tgt.textContent=L.key.slice(0,n).join(' ');
+        if(n===L.key.length){ tgt.classList.add('full'); p.verse=true; save(); showTalk(box); renderPlay(); } }
+      else{ c.classList.remove('no'); void c.offsetWidth; c.classList.add('no'); }
+    };
+    chips.appendChild(c);
+  });
+}
+function showTalk(box){ const L=LEVELS[cur];
+  box.querySelector('.vdone').innerHTML=`<p style="color:var(--ok);font-weight:800;margin:10px 0">📓 Lesson added to your Coo’s Journal!</p>
+   <div class="ask"><b>💬 Talk about it</b><p><span class="tag l">LITTLE</span>${L.askL}</p><p><span class="tag b">BIG</span>${L.askB}</p></div>`; }
+function renderPlay(){ const p=dp(cur), b=document.getElementById('playBtn'), panel=document.getElementById('playPanel');
+  b.disabled=!p.verse; panel.classList.toggle('lock',!p.verse); b.textContent=p.verse?'▶ Play Level':'🔒 Build the verse to unlock'; }
+document.getElementById('playBtn').onclick=()=>{ if(dp(cur).verse) startGame(cur); };
+document.getElementById('again').onclick=()=>startGame(cur);
+document.getElementById('quit').onclick=()=>{stop();openDay(cur);};
+
+/* ---------- game ---------- */
+const area=document.getElementById('area'), game=document.getElementById('game');
+const basket=document.getElementById('basket'), village=document.getElementById('village');
+let G=null, raf=0;
+const rand=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)];
+
+function startGame(i){
+  stop(); show('game');
+  const L=LEVELS[i], big=mode==='big';
+  game.style.background=L.bg; area.innerHTML='';
+  const W=game.clientWidth,H=game.clientHeight;
+  G={L,big,W,H,score:0,miss:0,items:[],spawnT:0,
+     goal:big?Math.round(L.goal*1.6):L.goal, spawnEvery:big?0.7:1.05, speed:big?1.55:1.1,
+     timeLeft:big?70:Infinity, maxMiss:big?3:Infinity, bx:W/2, last:performance.now(),
+     over:false, paused:false, checked:false};
+  basket.style.display=L.motion==='fall'?'block':'none';
+  village.style.display=L.motion==='storm'?'block':'none'; village.textContent=L.village||'🏠 🏡 ⛪ 🏠 🏡'; village.style.background=L.villageBg||'';
+  document.getElementById('wallpip').style.display=L.motion==='storm'?'block':'none';
+  document.getElementById('river').style.display=(L.motion==='swim'&&L.river)?'block':'none';
+  document.getElementById('check').style.display='none';
+  basket.style.left=G.bx+'px';
+  const hint=document.getElementById('hint'); hint.textContent=L.hint; hint.style.opacity=1; setTimeout(()=>hint.style.opacity=0,3500);
+  if(L.motion==='run') initRun();
+  if(L.motion==='garden') initGarden();
+  hud(); raf=requestAnimationFrame(loop);
+}
+/* ---------- runner (motion:'run') ---------- */
+const WIN=2400;
+function initRun(){
+  const {W,H,big}=G, gy=H-90;
+  G.goal=3; G.timeLeft=Infinity; G.maxMiss=big?3:Infinity; G.pray=0;
+  const ground=document.createElement('div'); ground.style.cssText=`position:absolute;left:0;right:0;top:${gy}px;bottom:0;background:linear-gradient(#c9b08a,#a88b62);border-top:6px solid #8a6d47`; area.appendChild(ground);
+  const pl=document.createElement('div'); pl.className='it'; pl.textContent='🦁'; pl.style.zIndex=3; area.appendChild(pl);
+  G.run={gy,px:Math.max(70,W*0.22),py:gy,vy:0,dist:0,nextWin:WIN*0.8,wins:0,obsT:1.6,prayT:0.9,inv:0,stopT:0,speed:big?250:170,pl,win:null};
+  game.style.background=G.L.skies[0];
+}
+function jump(){ const R=G&&G.run; if(!R||G.paused||G.over||R.stopT>0) return; if(R.py>=R.gy-0.5){ R.vy=-590; } }
+function runStep(dt){
+  const R=G.run, L=G.L, big=G.big;
+  if(R.stopT>0){ R.stopT-=dt;
+    if(R.stopT<=0){ document.getElementById('hint').style.opacity=0;
+      if(R.wins>=3) return finish(true);
+      if(R.wins===2&&!G.checked) return checkpoint(); }
+    return; }
+  const dx=R.speed*dt; R.dist+=dx;
+  R.vy+=1500*dt; R.py+=R.vy*dt; if(R.py>R.gy){R.py=R.gy;R.vy=0;}
+  const toWin=R.nextWin-R.dist;
+  R.decoT=(R.decoT||0)-dt; if(R.decoT<=0){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(['🌴','🏛️','🌴','☁️','🐪','🏠']); const cloud=el.textContent==='☁️'; el.style.fontSize=cloud?'40px':'58px'; el.style.opacity=cloud?.8:.55; el.style.zIndex=0; area.appendChild(el); (R.deco=R.deco||[]).push({el,x:G.W+60,y:cloud?rand(120,260):R.gy-34}); R.decoT=rand(1.2,2.4); }
+  if(R.deco){ for(const d of R.deco){ d.x-=dx*0.45; d.el.style.left=d.x+'px'; d.el.style.top=d.y+'px'; if(d.x<-80){d.el.remove();d.dead=true;} } R.deco=R.deco.filter(d=>!d.dead); }
+  R.obsT-=dt; if(R.obsT<=0){ if(toWin>420){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(L.obstacles); area.appendChild(el); G.items.push({el,x:G.W+40,y:R.gy-26,kind:'obs'}); } R.obsT=big?rand(0.85,1.45):rand(1.5,2.3); }
+  R.prayT-=dt; if(R.prayT<=0){ if(toWin>250){ const el=document.createElement('div'); el.className='it'; el.textContent=pick(L.alt); el.style.fontSize='36px'; area.appendChild(el); G.items.push({el,x:G.W+40,y:R.gy-(Math.random()<.55?120:40),kind:'pray'}); } R.prayT=rand(0.8,1.4); }
+  if(!R.win && toWin < G.W-R.px+60){ const el=document.createElement('div'); el.className='it'; el.innerHTML='🪟<div style="font-size:12px;font-weight:900;background:#fff;border-radius:8px;padding:1px 6px;margin-top:-4px">toward Jerusalem</div>'; el.style.fontSize='64px'; el.style.textAlign='center'; area.appendChild(el); R.win={el,x:R.px+toWin,y:R.gy-70}; }
+  if(R.win){ R.win.x-=dx; R.win.el.style.left=R.win.x+'px'; R.win.el.style.top=R.win.y+'px';
+    if(R.win.x<=R.px+8){ R.win.el.remove(); R.win=null; R.wins++; G.score=R.wins; R.nextWin+=WIN;
+      G.items.forEach(kill); G.items=[];
+      const hint=document.getElementById('hint'); hint.textContent=`🙏 ${L.times[R.wins-1]} prayer! Roar gave thanks to God.`; hint.style.opacity=1;
+      fx(R.px,R.py-60,'🙏','+1'); game.style.background=L.skies[R.wins]; R.stopT=1.6; hud(); return; } }
+  if(R.inv>0){ R.inv-=dt; R.pl.style.opacity=(Math.floor(R.inv*10)%2)?.35:1; } else R.pl.style.opacity=1;
+  for(const it of G.items){ if(it.dead) continue; it.x-=dx;
+    if(it.x<-60){kill(it);continue;}
+    if(it.kind==='obs' && R.inv<=0 && Math.abs(it.x-R.px)<30 && R.py>R.gy-40){
+      R.inv=1.2; R.vy=-300; fx(R.px,R.py-40,'💫'); flash(game);
+      if(big){ G.miss++; if(G.miss>=G.maxMiss){ hud(); return finish(false);} } }
+    if(it.kind==='pray' && Math.abs(it.x-R.px)<36 && Math.abs(it.y-(R.py-26))<44){ G.pray++; fx(it.x,it.y,it.el.textContent,'+1'); kill(it); continue; }
+    it.el.style.left=it.x+'px'; it.el.style.top=it.y+'px'; }
+  G.items=G.items.filter(i=>!i.dead);
+  R.pl.style.left=R.px+'px'; R.pl.style.top=(R.py-26)+'px';
+}
+game.addEventListener('pointerdown',e=>{ if(G&&G.L.motion==='run'&&!e.target.closest('#bar,#check')) jump(); });
+window.addEventListener('keydown',e=>{ if(G&&G.L.motion==='run'&&(e.code==='Space'||e.code==='ArrowUp')){ e.preventDefault(); jump(); } });
+/* ---------- garden (motion:'garden') ---------- */
+function initGarden(){
+  const {W,H,big,L}=G;
+  G.goal=big?9:6; G.timeLeft=big?100:Infinity; G.maxMiss=big?3:Infinity;
+  const top=110, bot=H-50, cols=3, rows=Math.ceil(G.goal/cols);
+  const spots=[];
+  for(let i=0;i<G.goal;i++){
+    const c=i%cols, r=Math.floor(i/cols);
+    const x=W*(0.2+0.3*c)+rand(-18,18), y=top+(bot-top)*((r+1)/(rows+1))+rand(-14,14);
+    const el=document.createElement('div'); el.className='it'; el.textContent='🌱'; el.style.fontSize='40px'; el.style.left=x+'px'; el.style.top=y+'px';
+    const ring=document.createElement('div'); ring.style.cssText=`position:absolute;left:${x}px;top:${y+16}px;width:58px;height:20px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(120,80,40,.25)`;
+    area.appendChild(ring); area.appendChild(el);
+    spots.push({x,y,el,grown:false,plant:L.plants[i%L.plants.length]});
+  }
+  for(let i=0;i<10;i++){ const d=document.createElement('div'); d.className='it'; d.textContent=pick(['🌼','🌿','🍀','🌼']); d.style.fontSize='22px'; d.style.opacity=.5; d.style.left=rand(20,W-20)+'px'; d.style.top=rand(top,bot)+'px'; area.appendChild(d); }
+  const home=document.createElement('div'); home.className='it'; home.textContent='🏡'; home.style.fontSize='44px'; home.style.left=(W-40)+'px'; home.style.top=(H-40)+'px'; home.style.opacity=.9; area.appendChild(home);
+  const pl=document.createElement('div'); pl.className='it'; pl.textContent='🕊️'; pl.style.zIndex=4; pl.style.fontSize='50px'; area.appendChild(pl);
+  const drop=document.createElement('div'); drop.className='it'; drop.textContent='💧'; drop.style.fontSize='22px'; drop.style.zIndex=5; drop.style.display='none'; area.appendChild(drop);
+  G.gd={spots,pl,drop,x:W/2,y:(top+bot)/2,tx:null,ty:null,carry:false,dewT:0.2,dews:[],thistles:[],inv:0,keys:{},top,bot,flip:false};
+  if(big){ for(let i=0;i<2;i++){ const el=document.createElement('div'); el.className='it'; el.textContent=L.bad; el.style.fontSize='40px'; area.appendChild(el);
+    G.gd.thistles.push({el,x:rand(40,W-40),y:rand(top+20,bot),vx:rand(-60,60)||40,vy:rand(-50,50)||30}); } }
+}
+function gardenStep(dt){
+  const g=G.gd, {W,H,big}=G, sp=big?250:210;
+  // movement: keys first, otherwise glide to the tapped spot
+  let vx=(g.keys.ArrowRight?1:0)-(g.keys.ArrowLeft?1:0), vy=(g.keys.ArrowDown?1:0)-(g.keys.ArrowUp?1:0);
+  if(vx||vy){ g.tx=null; const m=Math.hypot(vx,vy); g.x+=vx/m*sp*dt; g.y+=vy/m*sp*dt; if(vx) g.flip=vx>0; }
+  else if(g.tx!==null){ const dx=g.tx-g.x, dy=g.ty-g.y, d=Math.hypot(dx,dy);
+    if(d<4){ g.tx=null; } else { const st=Math.min(d,sp*dt); g.x+=dx/d*st; g.y+=dy/d*st; if(Math.abs(dx)>2) g.flip=dx>0; } }
+  g.x=Math.max(30,Math.min(W-30,g.x)); g.y=Math.max(g.top,Math.min(g.bot,g.y));
+  g.pl.style.left=g.x+'px'; g.pl.style.top=g.y+'px';
+  g.pl.style.transform=`translate(-50%,-50%) scaleX(${g.flip?-1:1})`;
+  g.drop.style.display=g.carry?'block':'none'; g.drop.style.left=(g.x+18)+'px'; g.drop.style.top=(g.y-30)+'px';
+  // dew appears around the meadow (up to 3 at once)
+  g.dewT-=dt; if(g.dewT<=0 && g.dews.length<3){ const el=document.createElement('div'); el.className='it'; el.textContent='💧'; el.style.fontSize='34px';
+    const d={el,x:rand(40,W-40),y:rand(g.top+10,g.bot),t:0}; el.style.left=d.x+'px'; el.style.top=d.y+'px'; area.appendChild(el); g.dews.push(d); g.dewT=rand(0.8,1.6); }
+  for(const d of g.dews){ d.t+=dt; d.el.style.transform=`translate(-50%,-50%) scale(${1+0.08*Math.sin(d.t*5)})`;
+    if(!g.carry && Math.hypot(d.x-g.x,d.y-g.y)<42){ g.carry=true; d.el.remove(); d.dead=true; fx(d.x,d.y,null,'💧'); } }
+  g.dews=g.dews.filter(d=>!d.dead);
+  // water a sprout
+  if(g.carry){ for(const s of g.spots){ if(!s.grown && Math.hypot(s.x-g.x,s.y-g.y)<46){
+    s.grown=true; g.carry=false; s.el.textContent=s.plant; s.el.style.fontSize='54px';
+    s.el.animate([{transform:'translate(-50%,-50%) scale(.3)'},{transform:'translate(-50%,-50%) scale(1.25)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:500});
+    G.score++; fx(s.x,s.y-20,null,'+1'); hud();
+    if(!G.checked && G.score>=Math.ceil(G.goal/2)){ checkpoint(); return; }
+    if(G.score>=G.goal){ finish(true); return; }
+    break; } } }
+  // thistles (big kids)
+  if(g.inv>0){ g.inv-=dt; g.pl.style.opacity=(Math.floor(g.inv*10)%2)?.35:1; } else g.pl.style.opacity=1;
+  for(const t of g.thistles){ t.x+=t.vx*dt; t.y+=t.vy*dt;
+    if(t.x<30||t.x>W-30) t.vx*=-1; if(t.y<g.top||t.y>g.bot) t.vy*=-1;
+    t.el.style.left=t.x+'px'; t.el.style.top=t.y+'px';
+    if(g.inv<=0 && Math.hypot(t.x-g.x,t.y-g.y)<40){ g.inv=1.3; g.carry=false; fx(g.x,g.y-30,'💫'); flash(game); G.miss++; hud(); if(G.miss>=G.maxMiss){ finish(false); return; } } }
+}
+function gardenTarget(e){ if(!G||G.L.motion!=='garden'||G.paused||G.over) return; if(e.target.closest&&e.target.closest('#bar,#check')) return;
+  const r=game.getBoundingClientRect(); G.gd.tx=e.clientX-r.left; G.gd.ty=e.clientY-r.top; }
+game.addEventListener('pointerdown',gardenTarget);
+game.addEventListener('pointermove',e=>{ if(e.buttons) gardenTarget(e); });
+window.addEventListener('keydown',e=>{ if(G&&G.gd&&G.L.motion==='garden'&&e.key.startsWith('Arrow')){ e.preventDefault(); G.gd.keys[e.key]=true; } });
+window.addEventListener('keyup',e=>{ if(G&&G.gd) G.gd.keys[e.key]=false; });
+function stop(){ cancelAnimationFrame(raf); if(G) G.over=true; }
+function hud(){
+  document.getElementById('score').textContent=`${G.score}/${G.goal}`;
+  document.querySelector('#prog i').style.width=Math.min(100,G.score/G.goal*100)+'%';
+  document.querySelector('#prog b').textContent=G.checked?'✅':'❓';
+  if(G.L.motion==='run'){ document.getElementById('extra').textContent='🙏'+(G.pray||0)+(G.big?' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):''); return; }
+  document.getElementById('extra').textContent=G.big?'⏱'+Math.ceil(G.timeLeft)+' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):'🐣';
+}
+function spawn(){
+  const {L,W,H,big,speed}=G, isBad=L.bad&&big&&Math.random()<0.3;
+  const el=document.createElement('div'); el.className='it'; el.textContent=isBad?L.bad:pick(L.alt);
+  const it={el,bad:isBad,life:Infinity,x:0,y:0,vx:0,vy:0};
+  switch(L.motion){
+    case 'rise': it.x=rand(40,W-40); it.y=H+30; it.vy=-rand(60,100)*speed; it.vx=rand(-15,15); break;
+    case 'fall': it.x=rand(40,W-40); it.y=40; it.vy=rand(95,145)*speed; break;
+    case 'storm': it.x=rand(50,W-50); it.y=60; it.vy=rand(38,58)*speed; it.vx=rand(-10,10); break;
+    case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
+    case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
+    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+  }
+  place(it); el.addEventListener('pointerdown',e=>{e.stopPropagation();tapItem(it);});
+  area.appendChild(el); G.items.push(it);
+}
+const place=it=>{it.el.style.left=it.x+'px';it.el.style.top=it.y+'px';};
+const kill=it=>{it.dead=true;it.el.remove();};
+function fx(x,y,e,t){
+  if(e){const b=document.createElement('div');b.className='boom';if(e[0]==='<')b.innerHTML=e;else b.textContent=e;b.style.left=x+'px';b.style.top=y+'px';area.appendChild(b);setTimeout(()=>b.remove(),700);}
+  if(t){const p=document.createElement('div');p.className='plus';p.textContent=t;p.style.left=x+'px';p.style.top=(y-30)+'px';area.appendChild(p);setTimeout(()=>p.remove(),700);}
+}
+function good(it,e){ G.score++; fx(it.x,it.y,e||it.el.textContent,'+1'); kill(it); hud();
+  if(!G.checked && G.score>=Math.ceil(G.goal/2)) return checkpoint();
+  if(G.score>=G.goal) finish(true); }
+function bad(it){ fx(it.x,it.y,'💥'); kill(it); if(G.big){G.miss++;G.score=Math.max(0,G.score-1);} hud(); flash(game); if(G.miss>=G.maxMiss) finish(false); }
+function tapItem(it){ if(G.over||G.paused||it.dead||G.L.motion==='fall') return; if(it.bad) return bad(it);
+  const m=G.L.motion; good(it, G.L.turn || (m==='storm'?'🎺':m==='wander'?'💛':null)); }
+function checkpoint(){
+  G.paused=true; G.items.forEach(kill); G.items=[];
+  const c=document.getElementById('check'); c.style.display='flex';
+  const box=c.querySelector('.panel'); const Q=G.L.mid;
+  const qb=document.createElement('div'); box.querySelectorAll('.q,.opts,.look').forEach(x=>x.remove()); box.appendChild(qb);
+  askQ(qb,Q,()=>{ c.style.display='none'; G.checked=true; G.paused=false; G.last=performance.now(); fx(G.W/2,G.H/2,'✅','Keep going!'); hud(); raf=requestAnimationFrame(loop); });
+}
+function loop(now){
+  if(!G||G.over||G.paused) return;
+  const dt=Math.min(.05,(now-G.last)/1000); G.last=now; G.spawnT+=dt;
+  if(G.L.motion==='run'){ runStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
+  if(G.L.motion==='garden'){ if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} } gardenStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
+  if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} }
+  if(G.spawnT>=G.spawnEvery){ G.spawnT=0; spawn(); }
+  const {W,H,L}=G;
+  for(const it of G.items){
+    if(it.dead) continue;
+    it.x+=it.vx*dt; it.y+=it.vy*dt;
+    if(L.motion==='wander'){ if(it.x<40||it.x>W-40) it.vx*=-1; if(it.y<100||it.y>H-50) it.vy*=-1; }
+    if(it.life!==Infinity){ it.life-=dt; it.el.style.opacity=Math.min(1,it.life); if(it.life<=0){kill(it);continue;} }
+    if(L.motion==='fall'&&it.y>H-95&&it.y<H-20&&Math.abs(it.x-G.bx)<60){ it.bad?bad(it):good(it); if(G.paused||G.over) return; continue; }
+    if(L.motion==='storm'&&it.y>H-110){ kill(it); fx(it.x,H-110,'💦'); village.classList.remove('hit'); void village.offsetWidth; village.classList.add('hit');
+      if(G.big){G.miss++;hud(); if(G.miss>=G.maxMiss) return finish(false);} continue; }
+    if(it.y<-60||it.y>H+60||it.x<-60||it.x>W+60){kill(it);continue;}
+    place(it);
+  }
+  G.items=G.items.filter(i=>!i.dead); hud();
+  if(!G.over&&!G.paused) raf=requestAnimationFrame(loop);
+}
+function moveBasket(e){ if(!G||G.L.motion!=='fall'||G.paused) return; G.bx=Math.max(40,Math.min(G.W-40,e.clientX)); basket.style.left=G.bx+'px'; }
+game.addEventListener('pointermove',moveBasket); game.addEventListener('pointerdown',moveBasket);
+window.addEventListener('resize',()=>{ if(G){G.W=game.clientWidth;G.H=game.clientHeight;} });
+
+function finish(won){
+  if(G.over) return; stop(); const L=G.L;
+  document.getElementById('wIcon').textContent=won?L.icon:'🕊️';
+  document.getElementById('wTitle').textContent=won?'You did it!':'So close! Try again!';
+  let stars=0;
+  if(won){ stars=!G.big?3:(G.miss===0?3:G.miss===1?2:1); dp(cur)[mode]=true; save(); }
+  document.getElementById('wStars').textContent=won?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'💪';
+  document.getElementById('wMsg').textContent=won?L.win:'Coo believes in you! Keep trying. Tap "Play again."';
+  document.getElementById('wLesson').textContent=`${L.lesson} (${L.keyRef})`;
+  document.getElementById('wHome').textContent=L.home;
+  setTimeout(()=>show('win'),300);
+}
+renderHome();
+</script>
+<script>
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('../../sw.js').catch(function(){}); } catch (e) {} }
+</script>
+</body>
+</html>
