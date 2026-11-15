@@ -315,9 +315,13 @@ const LEVELS = [
    askL:'How can we show love for Heavenly Father on the inside, even when no one is watching?',
    askB:'Dew disappears when the sun comes up. How can we make our goodness last all day instead of fading?',
    mid:{q:'What does Heavenly Father want most from us?', o:['Our love and kindness from the heart','Only nice-looking outfits','Just saying the right words','Being better than others'], look:'Think about Hosea 6:6.'},
-   motion:'fall', alt:['💧','🌧️','💧'], bad:'☁️', goal:15, bg:'linear-gradient(#ffe3c4,#d7ecff)',
-   hint:'Slide Coo to catch the rain! "He shall come unto us as the rain." (Big kids: skip the empty clouds!)',
-   win:'You caught the rain! The Lord comes to us as surely as the morning and the rain. 🌧️',
+   motion:'talk', icon2:'🐑', goal:6,
+   kindOptions:[{e:'🙏',t:'Pray for them'},{e:'💬',t:'Call them gently'},{e:'🤗',t:'Show mercy'}],
+   harshOpt:{e:'⚡',t:'Give up on them'},
+   bg:'linear-gradient(#ffe3c4,#d7ecff)',
+   hint:'Coo wandered far away. Choose a kind way to call them home — not force!',
+   hint2:'Tap a kind choice to bring Coo a little closer.',
+   win:'Coo came home! "I desired mercy, and not sacrifice." The Lord wants our hearts, not just our actions. 🐑',
    home:'What is one kind thing we can do this week just because we love Heavenly Father?'},
  
  { dn:'Tuesday', icon:'🏡', title:'Bands of Love', ref:'Hosea 11:1–4, 8–11', ch:['Hosea 11'],
@@ -355,8 +359,8 @@ const LEVELS = [
    askL:'Jesus rescues us from death and sin. How does it feel to know Jesus will always help you?',
    askB:'Because of Jesus Christ, death is not the end. How does the Resurrection give us hope?',
    mid:{q:'Who is our Savior and Redeemer?', o:['Jesus Christ','A king of Israel','Hosea','A great army'], look:'Think about Hosea 13:4 and 14.'},
-   motion:'pop', alt:['🔒','⛓️'], turn:'🔓', bad:null, goal:16, bg:'linear-gradient(#3c3a63,#7a6fb0 60%,#ffd9a0)',
-   hint:'Tap the locks and chains to set them free! Jesus Christ is our Redeemer.',
+   motion:'fetch', plants:['🔓'], spotIcon:'🔒', carryIcon:'🔑', bad:'⛓️', goal:6, bg:'linear-gradient(#3c3a63,#7a6fb0 60%,#ffd9a0)',
+   hint:'Tap where Coo should fly! Pick up a key 🔑, then carry it to a lock 🔒 to set a captive free.',
    win:'Every lock is open! Jesus Christ ransoms us from death and sets us free. 🔓',
    home:'Let’s each share one thing we are thankful Jesus did for us.'},
  
@@ -374,8 +378,17 @@ const LEVELS = [
    askL:'"I will love them freely." What does it feel like to be loved even when you make mistakes?',
    askB:'The Lord compares us to a lily, an olive tree, a vine and a fir tree. Which one would you want to be like, and why?',
    mid:{q:'When we make mistakes, what does the Lord invite us to do?', o:['Come back to Him, because He loves us freely','Hide from Him','Give up','Pretend nothing happened'], look:'Think about Hosea 14:1 and 4.'},
-   motion:'garden', plants:['🌷','🫒','🍇','🌲','🌾','🌸','🌷','🫒','🍇','🌲'], bad:'🌵', goal:6, bg:'linear-gradient(#e9f7d8,#b9e19a)',
-   hint:'Tap where Coo should fly! Pick up dew 💧, then fly to a sprout 🌱 to water it and watch it grow.',
+   motion:'craft',
+   base:[{id:'seed',e:'🌱'},{id:'water',e:'💧'},{id:'sun',e:'☀️'},{id:'prayer',e:'🙏'}],
+   recipes:[
+     {a:'seed',b:'water',result:'lily',emoji:'🌷',name:'Lily'},
+     {a:'seed',b:'sun',result:'olive',emoji:'🫒',name:'Olive tree'},
+     {a:'water',b:'sun',result:'vine',emoji:'🍇',name:'Vine'},
+     {a:'seed',b:'prayer',result:'fir',emoji:'🌲',name:'Fir tree'}
+   ],
+   bg:'linear-gradient(#e9f7d8,#b9e19a)',
+   hint:'Tap two things in the tray to combine them and grow something new!',
+   hint2:'Tap two tray items to combine them.',
    win:'The garden is blooming! "I will be as the dew unto Israel: he shall grow as the lily." 🌷',
    home:'If you’ve made a mistake this week, remember: the Lord loves you freely. You can always come back.'},
  
@@ -393,8 +406,8 @@ const LEVELS = [
    askL:'What does it mean to love Jesus "with all your heart"?',
    askB:'The Lord can "restore the years that the locust hath eaten." What hard things can He make good again?',
    mid:{q:'What does it mean to turn to the Lord with all your heart?', o:['To really mean it inside, not just look good outside','To say sorry only out loud','To tear our clothes','To try once and stop'], look:'Think about Joel 2:12–13.'},
-   motion:'wander', alt:['🦗','🦗'], turn:'🌾', bad:null, goal:15, bg:'linear-gradient(#fff3c6,#e8d79a)',
-   hint:'The locusts ate the crops! Tap each locust to turn it back into wheat.',
+   motion:'lane', alt:['🦗'], goal:14, bg:'linear-gradient(#fff3c6,#e8d79a)',
+   hint:'Locusts are marching across the fields! Tap 🌾 in a lane to protect it before they get through.',
    win:'The fields are full of wheat again! The Lord restores what was lost. 🌾',
    home:'What can our family do with all our hearts this week?'},
  
@@ -570,8 +583,12 @@ function startGame(i){
   basket.style.left=G.bx+'px';
   const hint=document.getElementById('hint'); hint.textContent=L.hint; hint.style.opacity=1; setTimeout(()=>hint.style.opacity=0,3500);
   if(L.motion==='run') initRun();
-  if(L.motion==='garden') initGarden();
-  hud(); raf=requestAnimationFrame(loop);
+  if(L.motion==='garden'||L.motion==='fetch') initGarden();
+  if(L.motion==='lane') initLane();
+  if(L.motion==='craft') initCraft();
+  if(L.motion==='talk') initTalk();
+  hud();
+  if(L.motion!=='craft'&&L.motion!=='talk') raf=requestAnimationFrame(loop);
 }
 /* ---------- runner (motion:'run') ---------- */
 const WIN=2400;
@@ -626,15 +643,15 @@ function initGarden(){
   for(let i=0;i<G.goal;i++){
     const c=i%cols, r=Math.floor(i/cols);
     const x=W*(0.2+0.3*c)+rand(-18,18), y=top+(bot-top)*((r+1)/(rows+1))+rand(-14,14);
-    const el=document.createElement('div'); el.className='it'; el.textContent='🌱'; el.style.fontSize='40px'; el.style.left=x+'px'; el.style.top=y+'px';
+    const el=document.createElement('div'); el.className='it'; el.textContent=L.spotIcon||'🌱'; el.style.fontSize='40px'; el.style.left=x+'px'; el.style.top=y+'px';
     const ring=document.createElement('div'); ring.style.cssText=`position:absolute;left:${x}px;top:${y+16}px;width:58px;height:20px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(120,80,40,.25)`;
     area.appendChild(ring); area.appendChild(el);
     spots.push({x,y,el,grown:false,plant:L.plants[i%L.plants.length]});
   }
   for(let i=0;i<10;i++){ const d=document.createElement('div'); d.className='it'; d.textContent=pick(['🌼','🌿','🍀','🌼']); d.style.fontSize='22px'; d.style.opacity=.5; d.style.left=rand(20,W-20)+'px'; d.style.top=rand(top,bot)+'px'; area.appendChild(d); }
-  const home=document.createElement('div'); home.className='it'; home.textContent='🏡'; home.style.fontSize='44px'; home.style.left=(W-40)+'px'; home.style.top=(H-40)+'px'; home.style.opacity=.9; area.appendChild(home);
+  if(L.motion==='garden'){ const home=document.createElement('div'); home.className='it'; home.textContent='🏡'; home.style.fontSize='44px'; home.style.left=(W-40)+'px'; home.style.top=(H-40)+'px'; home.style.opacity=.9; area.appendChild(home); }
   const pl=document.createElement('div'); pl.className='it'; pl.textContent='🕊️'; pl.style.zIndex=4; pl.style.fontSize='50px'; area.appendChild(pl);
-  const drop=document.createElement('div'); drop.className='it'; drop.textContent='💧'; drop.style.fontSize='22px'; drop.style.zIndex=5; drop.style.display='none'; area.appendChild(drop);
+  const drop=document.createElement('div'); drop.className='it'; drop.textContent=L.carryIcon||'💧'; drop.style.fontSize='22px'; drop.style.zIndex=5; drop.style.display='none'; area.appendChild(drop);
   G.gd={spots,pl,drop,x:W/2,y:(top+bot)/2,tx:null,ty:null,carry:false,dewT:0.2,dews:[],thistles:[],inv:0,keys:{},top,bot,flip:false};
   if(big){ for(let i=0;i<2;i++){ const el=document.createElement('div'); el.className='it'; el.textContent=L.bad; el.style.fontSize='40px'; area.appendChild(el);
     G.gd.thistles.push({el,x:rand(40,W-40),y:rand(top+20,bot),vx:rand(-60,60)||40,vy:rand(-50,50)||30}); } }
@@ -651,7 +668,7 @@ function gardenStep(dt){
   g.pl.style.transform=`translate(-50%,-50%) scaleX(${g.flip?-1:1})`;
   g.drop.style.display=g.carry?'block':'none'; g.drop.style.left=(g.x+18)+'px'; g.drop.style.top=(g.y-30)+'px';
   // dew appears around the meadow (up to 3 at once)
-  g.dewT-=dt; if(g.dewT<=0 && g.dews.length<3){ const el=document.createElement('div'); el.className='it'; el.textContent='💧'; el.style.fontSize='34px';
+  g.dewT-=dt; if(g.dewT<=0 && g.dews.length<3){ const el=document.createElement('div'); el.className='it'; el.textContent=G.L.carryIcon||'💧'; el.style.fontSize='34px';
     const d={el,x:rand(40,W-40),y:rand(g.top+10,g.bot),t:0}; el.style.left=d.x+'px'; el.style.top=d.y+'px'; area.appendChild(el); g.dews.push(d); g.dewT=rand(0.8,1.6); }
   for(const d of g.dews){ d.t+=dt; d.el.style.transform=`translate(-50%,-50%) scale(${1+0.08*Math.sin(d.t*5)})`;
     if(!g.carry && Math.hypot(d.x-g.x,d.y-g.y)<42){ g.carry=true; d.el.remove(); d.dead=true; fx(d.x,d.y,null,'💧'); } }
@@ -671,12 +688,118 @@ function gardenStep(dt){
     t.el.style.left=t.x+'px'; t.el.style.top=t.y+'px';
     if(g.inv<=0 && Math.hypot(t.x-g.x,t.y-g.y)<40){ g.inv=1.3; g.carry=false; fx(g.x,g.y-30,'💫'); flash(game); G.miss++; hud(); if(G.miss>=G.maxMiss){ finish(false); return; } } }
 }
-function gardenTarget(e){ if(!G||G.L.motion!=='garden'||G.paused||G.over) return; if(e.target.closest&&e.target.closest('#bar,#check')) return;
+function gardenTarget(e){ if(!G||(G.L.motion!=='garden'&&G.L.motion!=='fetch')||G.paused||G.over) return; if(e.target.closest&&e.target.closest('#bar,#check')) return;
   const r=game.getBoundingClientRect(); G.gd.tx=e.clientX-r.left; G.gd.ty=e.clientY-r.top; }
 game.addEventListener('pointerdown',gardenTarget);
 game.addEventListener('pointermove',e=>{ if(e.buttons) gardenTarget(e); });
-window.addEventListener('keydown',e=>{ if(G&&G.gd&&G.L.motion==='garden'&&e.key.startsWith('Arrow')){ e.preventDefault(); G.gd.keys[e.key]=true; } });
+window.addEventListener('keydown',e=>{ if(G&&G.gd&&(G.L.motion==='garden'||G.L.motion==='fetch')&&e.key.startsWith('Arrow')){ e.preventDefault(); G.gd.keys[e.key]=true; } });
 window.addEventListener('keyup',e=>{ if(G&&G.gd) G.gd.keys[e.key]=false; });
+
+/* ---------- lane defense (motion:'lane') ---------- */
+function initLane(){
+  const {W,H,big,L}=G;
+  G.maxMiss=big?3:Infinity;
+  G.lane={ys:[H*0.32,H*0.58,H*0.84], cd:[0,0,0], cdMax:big?0.8:1.2};
+  G.lane.btns=G.lane.ys.map((y,i)=>{
+    const b=document.createElement('div'); b.textContent='🌾';
+    b.style.cssText=`position:absolute;left:44px;top:${y}px;font-size:44px;transform:translate(-50%,-50%);cursor:pointer;z-index:4;pointer-events:auto`;
+    const ln=document.createElement('div'); ln.style.cssText=`position:absolute;left:0;right:0;top:${y}px;height:2px;background:rgba(0,0,0,.08)`;
+    area.appendChild(ln); area.appendChild(b);
+    b.onclick=()=>zapLane(i);
+    return b;
+  });
+}
+function zapLane(i){
+  if(!G||G.paused||G.over||G.L.motion!=='lane') return;
+  if(G.lane.cd[i]>0) return;
+  G.lane.cd[i]=G.lane.cdMax;
+  G.lane.btns[i].animate([{transform:'translate(-50%,-50%) scale(1.35)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:200});
+  let best=null, bd=Infinity;
+  for(const it of G.items){ if(it.dead||it.lane!==i) continue; const d=it.x-70; if(d>-30 && d<150 && d<bd){bd=d;best=it;} }
+  if(best) good(best); else fx(G.lane.btns[i].offsetLeft,G.lane.ys[i],'💨');
+}
+
+/* ---------- crafting (motion:'craft') ---------- */
+function initCraft(){
+  const {L}=G;
+  G.goal=L.recipes.length; G.timeLeft=Infinity; G.maxMiss=Infinity;
+  const msg=document.createElement('div'); msg.style.cssText='position:absolute;left:0;right:0;top:14px;text-align:center;font-weight:800;padding:0 16px;opacity:.8';
+  msg.textContent=L.hint2||'Tap two things to combine them!'; area.appendChild(msg);
+  const board=document.createElement('div'); board.style.cssText='position:absolute;left:0;right:0;top:64px;bottom:140px;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;padding:0 14px;overflow:auto';
+  area.appendChild(board);
+  const tray=document.createElement('div'); tray.style.cssText='position:absolute;left:0;right:0;bottom:24px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:0 10px';
+  area.appendChild(tray);
+  G.craft={sel:null, found:new Set(), msg, board};
+  L.base.forEach(ing=>{
+    const b=document.createElement('div'); b.textContent=ing.e;
+    b.style.cssText='font-size:44px;cursor:pointer;background:rgba(255,255,255,.7);border-radius:16px;padding:8px 12px;box-shadow:0 3px 0 rgba(0,0,0,.15);pointer-events:auto';
+    b.onclick=()=>craftTap(ing,b);
+    tray.appendChild(b);
+  });
+}
+function craftTap(ing,el){
+  if(!G||G.paused||G.over||G.L.motion!=='craft') return;
+  const c=G.craft;
+  if(!c.sel){ c.sel={ing,el}; el.style.outline='3px solid #7c9cff'; return; }
+  if(c.sel.el===el){ c.sel.el.style.outline=''; c.sel=null; return; }
+  const a=c.sel.ing.id, b=ing.id, prevEl=c.sel.el; prevEl.style.outline=''; c.sel=null;
+  const recipe=G.L.recipes.find(r=>(r.a===a&&r.b===b)||(r.a===b&&r.b===a));
+  if(recipe && !c.found.has(recipe.result)){
+    c.found.add(recipe.result);
+    const r=document.createElement('div'); r.style.cssText='font-size:48px;text-align:center;line-height:1.1';
+    r.innerHTML=`${recipe.emoji}<div style="font-size:13px;font-weight:800">${recipe.name}</div>`;
+    c.board.appendChild(r);
+    r.animate([{transform:'scale(.2)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:450});
+    G.score=c.found.size; hud();
+    c.msg.textContent='✨ You grew a '+recipe.name+'!';
+    if(!G.checked && G.score>=Math.ceil(G.goal/2)) return checkpoint();
+    if(G.score>=G.goal) return finish(true);
+  } else {
+    c.msg.textContent= recipe? 'You already grew that one! Try another pair.' : 'Hmm, nothing happens yet — try a different pair!';
+    [prevEl,el].forEach(x=>x.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:260}));
+  }
+}
+
+/* ---------- talk-it-down (motion:'talk') ---------- */
+function initTalk(){
+  const {L}=G;
+  G.goal=L.goal||6; G.timeLeft=Infinity; G.maxMiss=Infinity;
+  const target=document.createElement('div'); target.textContent='🏡'; target.style.cssText='position:absolute;right:6%;top:70px;font-size:54px;opacity:.9';
+  area.appendChild(target);
+  const scene=document.createElement('div'); scene.textContent=L.icon2||'🐑';
+  scene.style.cssText='position:absolute;left:6%;top:70px;font-size:60px;transition:left 1s ease';
+  area.appendChild(scene);
+  const msg=document.createElement('div'); msg.style.cssText='position:absolute;left:0;right:0;top:150px;text-align:center;font-weight:800;padding:0 16px';
+  msg.textContent=L.hint2||'Choose a kind way to call them home.'; area.appendChild(msg);
+  const row=document.createElement('div'); row.style.cssText='position:absolute;left:0;right:0;bottom:28px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:0 10px';
+  area.appendChild(row);
+  G.talk={scene,msg,progress:0};
+  (L.kindOptions||[{e:'🙏',t:'Pray'},{e:'💬',t:'Call gently'},{e:'🤗',t:'Show mercy'}]).forEach(o=>{
+    const b=document.createElement('button'); b.className='btn'; b.style.cssText='margin:0;font-size:15px;pointer-events:auto';
+    b.innerHTML=`${o.e} ${o.t}`; b.onclick=()=>talkChoice(true,b);
+    row.appendChild(b);
+  });
+  if(G.big){ const o=L.harshOpt||{e:'⚡',t:'Give up on them'};
+    const b=document.createElement('button'); b.className='btn'; b.style.cssText='margin:0;font-size:15px;background:#e57373;pointer-events:auto';
+    b.innerHTML=`${o.e} ${o.t}`; b.onclick=()=>talkChoice(false,b);
+    row.appendChild(b);
+  }
+}
+function talkChoice(kind,btn){
+  if(!G||G.paused||G.over||G.L.motion!=='talk') return;
+  btn.animate([{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:150});
+  if(kind){
+    G.talk.progress++; G.score=G.talk.progress;
+    G.talk.scene.style.left=Math.min(78,6+G.talk.progress/G.goal*72)+'%';
+    fx(G.W/2,190,null,'+1'); hud();
+    if(!G.checked && G.score>=Math.ceil(G.goal/2)) return checkpoint();
+    if(G.score>=G.goal) return finish(true);
+  } else {
+    G.talk.msg.textContent='Kindness, not force, brings them home. Try a gentle choice!';
+    btn.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:260});
+  }
+}
+
 /* forgiving taps: grab the nearest item within a finger-sized circle */
 const TAP_MODES=['rise','storm','wander','pop','swim'];
 game.addEventListener('pointerdown',e=>{
@@ -693,6 +816,7 @@ function hud(){
   document.querySelector('#prog i').style.width=Math.min(100,G.score/G.goal*100)+'%';
   document.querySelector('#prog b').textContent=G.checked?'✅':'❓';
   if(G.L.motion==='run'){ document.getElementById('extra').textContent='🙏'+(G.pray||0)+(G.big?' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):''); return; }
+  if(G.L.motion==='craft'||G.L.motion==='talk'){ document.getElementById('extra').textContent='🐣'; return; }
   document.getElementById('extra').textContent=G.big?'⏱'+Math.ceil(G.timeLeft)+' '+'💛'.repeat(Math.max(0,G.maxMiss-G.miss)):'🐣';
 }
 function spawn(){
@@ -706,6 +830,7 @@ function spawn(){
     case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
     case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
     case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+    case 'lane': {const laneI=Math.floor(Math.random()*3); it.lane=laneI; it.x=W+30; it.y=G.lane.ys[laneI]; it.vx=-rand(55,85)*speed; break;}
   }
   place(it);
   area.appendChild(el); G.items.push(it);
@@ -727,14 +852,17 @@ function checkpoint(){
   const c=document.getElementById('check'); c.style.display='flex';
   const box=c.querySelector('.panel'); const Q=G.L.mid;
   const qb=document.createElement('div'); box.querySelectorAll('.q,.opts,.look').forEach(x=>x.remove()); box.appendChild(qb);
-  askQ(qb,Q,()=>{ c.style.display='none'; G.checked=true; G.paused=false; G.last=performance.now(); fx(G.W/2,G.H/2,'✅','Keep going!'); hud(); raf=requestAnimationFrame(loop); });
+  askQ(qb,Q,()=>{ c.style.display='none'; G.checked=true; G.paused=false; G.last=performance.now(); fx(G.W/2,G.H/2,'✅','Keep going!'); hud();
+    if(G.L.motion!=='craft'&&G.L.motion!=='talk') raf=requestAnimationFrame(loop); });
 }
 function loop(now){
   if(!G||G.over||G.paused) return;
+  if(G.L.motion==='craft'||G.L.motion==='talk') return;
   const dt=Math.min(.05,(now-G.last)/1000); G.last=now; G.spawnT+=dt;
   if(G.L.motion==='run'){ runStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
-  if(G.L.motion==='garden'){ if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} } gardenStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
+  if(G.L.motion==='garden'||G.L.motion==='fetch'){ if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} } gardenStep(dt); hud(); if(!G.over&&!G.paused) raf=requestAnimationFrame(loop); return; }
   if(G.big){ G.timeLeft-=dt; if(G.timeLeft<=0){ hud(); return finish(false);} }
+  if(G.L.motion==='lane'){ for(let i=0;i<3;i++){ if(G.lane.cd[i]>0){ G.lane.cd[i]=Math.max(0,G.lane.cd[i]-dt); G.lane.btns[i].style.opacity=G.lane.cd[i]>0?.45:1; } } }
   if(G.spawnT>=G.spawnEvery){ G.spawnT=0; spawn(); }
   const {W,H,L}=G;
   for(const it of G.items){
@@ -745,6 +873,7 @@ function loop(now){
     if(L.motion==='fall'&&it.y>H-95&&it.y<H-20&&Math.abs(it.x-G.bx)<60){ it.bad?bad(it):good(it); if(G.paused||G.over) return; continue; }
     if(L.motion==='storm'&&it.y>H-110){ kill(it); fx(it.x,H-110,'💦'); village.classList.remove('hit'); void village.offsetWidth; village.classList.add('hit');
       if(G.big){G.miss++;hud(); if(G.miss>=G.maxMiss) return finish(false);} continue; }
+    if(L.motion==='lane'&&it.x<40){ bad(it); if(G.paused||G.over) return; continue; }
     if(it.y<-60||it.y>H+60||it.x<-60||it.x>W+60){kill(it);continue;}
     place(it);
   }
