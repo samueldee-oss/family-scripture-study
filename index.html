@@ -12,6 +12,54 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <title>Scripture Trail — Our Come, Follow Me Games</title>
+<!-- DARK MODE (shared block; same in hub + every week). color-scheme tells Opera/Chrome "Force dark" to leave our colors alone. -->
+<meta name="color-scheme" content="light dark">
+<style id="dmStyle">
+  #dmToggle{position:fixed;top:10px;right:10px;z-index:50;display:flex;align-items:center;gap:6px;background:#fff;color:#3b2f4a;padding:6px 12px;border-radius:999px;font:800 13px "Nunito","Trebuchet MS",system-ui,sans-serif;box-shadow:0 2px 0 #f0dcc6;cursor:pointer;user-select:none}
+  #dmToggle input{width:18px;height:18px;margin:0;accent-color:#7c9cff;cursor:pointer}
+  body:has(#game.on) #dmToggle{display:none}
+  html.dark{color-scheme:dark;--ink:#ece6f5;--card:#2a2438;--sh:#15111d}
+  html.dark,html.dark body{background:#1b1726}
+  html.dark #dmToggle{background:#2a2438;color:#ece6f5;box-shadow:0 2px 0 #15111d}
+  html.dark .panel,html.dark .modes,html.dark .back,html.dark .ghost,html.dark .jl,html.dark .wk,html.dark .trailbtn,html.dark #hint{background:#2a2438;color:#ece6f5}
+  html.dark .trailbtn{box-shadow:0 2px 0 #15111d}
+  html.dark .part{border-color:#3e3552}
+  html.dark .part.done,html.dark .vtarget.full{background:#1f3328;border-color:#3f8a5f}
+  html.dark .scripture{background:#241f31;border-left-color:#a8884f;color:#f1ecf8}
+  html.dark .vs.easy,html.dark .legend b{color:#a9a4ff}
+  html.dark .vs sup{color:#e0b46a}
+  html.dark .words{background:#232a40;color:#dfe5ff}
+  html.dark .gl,html.dark .redo button,html.dark .chip{background:#2f3757;color:#c8d2ff;box-shadow:0 2px 0 #1a1f33}
+  html.dark .redo .rp,html.dark .tag.l{background:#4a2c22;color:#ffc2a8;box-shadow:0 2px 0 #2b1912}
+  html.dark .tag.b{background:#2b335a;color:#c3ceff}
+  html.dark .opt{background:#2f2840;border-color:#4a3f60;color:#ece6f5}
+  html.dark .opt.no,html.dark .chip.no{background:#55282a;border-color:#c0645a}
+  html.dark .opt.yes{background:#1f3d2c;border-color:#4caf7a}
+  html.dark .look{color:#ffab8a}
+  html.dark .step{color:#d8b07e}
+  html.dark .lesson{background:linear-gradient(90deg,#4a3f1e,#4a2d24);color:#fff3dc}
+  html.dark .vtarget{border-color:#6b5a45}
+  html.dark .play:disabled{background:#4a4150;box-shadow:0 5px 0 #2e2833;color:#a99fb3}
+  html.dark .wk.now::after,html.dark .day.today::after{color:#3b2f4a}
+  html.dark a{color:inherit}
+</style>
+<script>
+(function(){
+  var K='scripture-trail-dark', on=false;
+  try{ on=localStorage.getItem(K)==='1'; }catch(e){}
+  if(on) document.documentElement.classList.add('dark');
+  function setDark(v){ document.documentElement.classList.toggle('dark',v);
+    try{ localStorage.setItem(K,v?'1':'0'); }catch(e){}
+    var m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=v?'#1b1726':'#fdf3e7'; }
+  document.addEventListener('DOMContentLoaded',function(){
+    var l=document.createElement('label'); l.id='dmToggle';
+    l.innerHTML='<input type="checkbox" id="dmBox"> 🌙 Dark mode';
+    document.body.appendChild(l);
+    var b=l.querySelector('input'); b.checked=on; setDark(on);
+    b.addEventListener('change',function(){ setDark(b.checked); });
+  });
+})();
+</script>
 <style>
   :root{--ink:#3b2f4a;--sh:#e9d6bf;--r:20px}
   *{box-sizing:border-box}
