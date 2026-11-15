@@ -26,3 +26,8 @@ Progress in the app is saved separately from progress in Safari.
 3. Add the folder to `PAGES` in `sw.js` and bump `VERSION`.
 
 Memory and plans from the original chat are still to come.
+
+## Double-check before going live
+`node tools/check-week.js weeks/<folder>/index.html` compares every verse in `TEXT` word-for-word
+with the KJV (fetched from GitHub), flags non-English characters anywhere in the week's data, and
+prints the week's dates/weekday to compare against the manual. It must say ✅ before a week goes live.
