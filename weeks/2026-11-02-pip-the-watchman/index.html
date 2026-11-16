@@ -626,7 +626,7 @@ function spawn(){
     case 'storm': it.x=rand(50,W-50); it.y=60; it.vy=rand(38,58)*speed; it.vx=rand(-10,10); break;
     case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
     case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
-    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
   }
   place(it); el.addEventListener('pointerdown',e=>{e.stopPropagation();tapItem(it);});
   area.appendChild(el); G.items.push(it);

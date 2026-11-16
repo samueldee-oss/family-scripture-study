@@ -698,8 +698,8 @@ window.addEventListener('keyup',e=>{ if(G&&G.gd) G.gd.keys[e.key]=false; });
 /* ---------- lane defense (motion:'lane') ---------- */
 function initLane(){
   const {W,H,big,L}=G;
-  G.maxMiss=big?3:Infinity;
-  G.lane={ys:[H*0.32,H*0.58,H*0.84], cd:[0,0,0], cdMax:big?0.8:1.2};
+  G.maxMiss=big?5:Infinity;
+  G.lane={ys:[H*0.32,H*0.58,H*0.84], cd:[0,0,0], cdMax:big?0.6:0.9};
   G.lane.btns=G.lane.ys.map((y,i)=>{
     const b=document.createElement('div'); b.textContent='🌾';
     b.style.cssText=`position:absolute;left:44px;top:${y}px;font-size:44px;transform:translate(-50%,-50%);cursor:pointer;z-index:4;pointer-events:auto`;
@@ -712,11 +712,15 @@ function initLane(){
 function zapLane(i){
   if(!G||G.paused||G.over||G.L.motion!=='lane') return;
   if(G.lane.cd[i]>0) return;
-  G.lane.cd[i]=G.lane.cdMax;
-  G.lane.btns[i].animate([{transform:'translate(-50%,-50%) scale(1.35)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:200});
   let best=null, bd=Infinity;
-  for(const it of G.items){ if(it.dead||it.lane!==i) continue; const d=it.x-70; if(d>-30 && d<150 && d<bd){bd=d;best=it;} }
-  if(best) good(best); else fx(G.lane.btns[i].offsetLeft,G.lane.ys[i],'💨');
+  for(const it of G.items){ if(it.dead||it.lane!==i) continue; const d=it.x-70; if(d>-40 && d<280 && d<bd){bd=d;best=it;} }
+  if(best){
+    G.lane.cd[i]=G.lane.cdMax;
+    G.lane.btns[i].animate([{transform:'translate(-50%,-50%) scale(1.35)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:200});
+    good(best);
+  } else {
+    fx(G.lane.btns[i].offsetLeft,G.lane.ys[i],'💨');
+  }
 }
 
 /* ---------- crafting (motion:'craft') ---------- */
@@ -829,8 +833,8 @@ function spawn(){
     case 'storm': it.x=rand(50,W-50); it.y=60; it.vy=rand(38,58)*speed; it.vx=rand(-10,10); break;
     case 'wander': it.x=rand(50,W-50); it.y=rand(110,H-60); it.vx=rand(-70,70)*speed; it.vy=rand(-45,45)*speed; it.life=big?3.2:5; break;
     case 'pop': it.x=rand(50,W-50); it.y=rand(120,H-60); it.life=big?1.9:3.2; break;
-    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(!l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
-    case 'lane': {const laneI=Math.floor(Math.random()*3); it.lane=laneI; it.x=W+30; it.y=G.lane.ys[laneI]; it.vx=-rand(55,85)*speed; break;}
+    case 'swim': {const l=Math.random()<.5; it.x=l?-30:W+30; it.y=rand(H*.33,H*.77); it.vx=(l?1:-1)*rand(75,125)*speed; if(l) el.style.transform='translate(-50%,-50%) scaleX(-1)'; break;}
+    case 'lane': {const laneI=Math.floor(Math.random()*3); it.lane=laneI; it.x=W+30; it.y=G.lane.ys[laneI]; it.vx=-rand(40,60)*Math.min(speed,1.25); break;}
   }
   place(it);
   area.appendChild(el); G.items.push(it);
