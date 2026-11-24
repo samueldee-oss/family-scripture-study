@@ -1,12 +1,13 @@
 // Offline support. Pages load from the network when online (so new weeks show up
 // right away) and fall back to the saved copy when offline.
 // When you add a week, add its folder to PAGES and bump VERSION.
-const VERSION = 'trail-v4';
+const VERSION = 'trail-v5';
 const PAGES = [
   './',
   'weeks/2026-11-02-pip-the-watchman/',
   'weeks/2026-11-09-sunny-the-lion/',
   'weeks/2026-11-16-coo-comes-home/',
+  'weeks/2026-11-23-wally-the-whale/',
 ];
 const CORE = [...PAGES, 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
