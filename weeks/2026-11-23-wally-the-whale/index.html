@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Wally the Whale — Nov 23–29, 2026</title>
+<link rel="manifest" href="../../manifest.webmanifest">
+<meta name="theme-color" content="#0077b6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wally the Whale">
+<link rel="apple-touch-icon" href="../../icons/icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,sans-serif;background:#0077b6;min-height:100dvh;color:#1a1a2e;overflow-x:hidden}
+#hub{display:flex;flex-direction:column;align-items:center;padding:16px;min-height:100dvh;gap:12px}
+h1{color:#fff;font-size:1.4rem;text-align:center;text-shadow:0 2px 4px rgba(0,0,0,.3)}
+.week-ref{color:#caf0f8;font-size:.85rem;text-align:center}
+.mascot{font-size:4rem;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.mode-row{display:flex;gap:10px}
+.mode-btn{padding:10px 20px;border:3px solid #fff;border-radius:20px;background:transparent;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+.mode-btn.active{background:#fff;color:#0077b6}
+.days-grid{display:flex;flex-direction:column;gap:10px;width:100%;max-width:500px}
+.day-card{border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.day-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative}
+.day-num{font-size:.8rem;font-weight:700;color:#666;min-width:28px}
+.day-title{flex:1;font-weight:700;font-size:1rem}
+.day-ref{font-size:.75rem;color:#666}
+.badge-row{display:flex;gap:4px;margin-left:auto}
+.badge{font-size:.8rem}
+.today-chip{background:#0077b6;color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;position:absolute;top:6px;right:8px}
+.day-body{display:none;padding:12px 16px;border-top:1px solid #eee;flex-direction:column;gap:8px}
+.day-body.open{display:flex}
+.day-body button{width:100%;padding:10px;border-radius:12px;border:none;font-size:.95rem;font-weight:700;cursor:pointer}
+.btn-read{background:#e0f4ff;color:#0077b6}
+.btn-play{background:#d4edda;color:#155724}
+.btn-locked{background:#eee;color:#999;cursor:not-allowed}
+.lock-msg{font-size:.8rem;color:#999;text-align:center}
+/* Screen system */
+#screen{display:none;flex-direction:column;align-items:center;min-height:100dvh;width:100%;max-width:500px;margin:0 auto;padding:16px;gap:12px}
+#screen.active{display:flex}
+.scr-header{display:flex;align-items:center;gap:10px;width:100%}
+.back-btn{background:rgba(255,255,255,.2);border:2px solid #fff;color:#fff;border-radius:50%;width:36px;height:36px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scr-title{color:#fff;font-size:1.1rem;font-weight:700;flex:1;text-align:center}
+/* Reading screen */
+.read-card{background:#fff;border-radius:16px;padding:16px;width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px}
+.part-header{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:#0077b6}
+.verse-block{font-size:.9rem;line-height:1.6;color:#222}
+.verse-block .en{font-weight:700;color:#3f37c9}
+.word-help{font-size:.78rem;color:#555;font-style:italic;padding:4px 8px;background:#f0f0f0;border-radius:6px}
+.gl-link{font-size:.78rem;color:#0077b6;text-decoration:none}
+.easy-legend{font-size:.75rem;color:#3f37c9;font-weight:700}
+.ask-btn{background:#0077b6;color:#fff;border:none;border-radius:12px;padding:10px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%}
+/* Quiz overlay */
+.quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.quiz-box{background:#fff;border-radius:20px;padding:20px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px}
+.quiz-q{font-weight:700;font-size:1rem;line-height:1.4}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:10px 14px;border:2px solid #ddd;border-radius:10px;cursor:pointer;font-size:.9rem;text-align:left;background:#fff}
+.quiz-opt:hover{border-color:#0077b6;background:#e0f4ff}
+.quiz-feedback{font-size:.85rem;padding:8px;border-radius:8px;text-align:center}
+.quiz-feedback.wrong{background:#fde;color:#c00}
+.quiz-feedback.right{background:#d4edda;color:#155724}
+.quiz-next{background:#0077b6;color:#fff;border:none;border-radius:12px;padding:10px;font-size:.9rem;font-weight:700;cursor:pointer}
+/* Key verse builder */
+.verse-build-area{background:#fff;border-radius:16px;padding:16px;width:100%;display:flex;flex-direction:column;gap:10px}
+.lesson-box{background:#fff3cd;border-radius:10px;padding:10px;font-size:.9rem;font-weight:700;text-align:center}
+.keyref{font-size:.8rem;color:#666;text-align:center}
+.slots{display:flex;flex-wrap:wrap;gap:6px;min-height:50px;background:#f0f8ff;border-radius:10px;padding:8px;border:2px dashed #0077b6}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 12px;border-radius:16px;font-size:.82rem;cursor:pointer;user-select:none;font-weight:600;border:2px solid transparent;transition:all .15s}
+.chip.pool{background:#e0f4ff;color:#0077b6;border-color:#90e0ef}
+.chip.placed{background:#0077b6;color:#fff}
+.chip.wrong-flash{background:#fcc;border-color:#c00}
+.chip.right-flash{background:#d4edda;border-color:#155724}
+.build-feedback{font-size:.85rem;text-align:center;min-height:20px}
+/* Journal */
+.journal-btn{background:#fff;border:3px solid #90e0ef;color:#0077b6;border-radius:16px;padding:10px 20px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%}
+/* Game area */
+.game-wrap{position:relative;width:100%;max-width:500px;border-radius:20px;overflow:hidden;background:#caf0f8;aspect-ratio:9/14;touch-action:none}
+.game-canvas{width:100%;height:100%;position:relative;overflow:hidden}
+.info-bar{display:flex;justify-content:space-between;padding:6px 12px;background:rgba(255,255,255,.85);font-size:.85rem;font-weight:700;position:absolute;top:0;left:0;right:0;z-index:5}
+.lives-row{display:flex;gap:2px}
+.timer-txt{color:#c00}
+.item{position:absolute;font-size:2rem;cursor:pointer;user-select:none;transition:transform .1s;z-index:4;line-height:1}
+.item:hover{transform:scale(1.15)}
+.burst{position:absolute;pointer-events:none;z-index:6;animation:burst-anim .6s ease-out forwards;font-size:1.5rem}
+@keyframes burst-anim{0%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(1.8) translateY(-40px)}}
+.ground-bar{position:absolute;bottom:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;letter-spacing:4px;background:rgba(255,255,255,.5);z-index:3}
+.basket{position:absolute;bottom:52px;font-size:2.4rem;transition:left .08s;z-index:4;cursor:ew-resize;user-select:none}
+.progress-bar-wrap{width:100%;height:8px;background:#ddd;border-radius:4px;overflow:hidden;margin:4px 0}
+.progress-bar-fill{height:100%;background:#0077b6;transition:width .3s;border-radius:4px}
+.win-overlay,.mid-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
+.win-box{background:#fff;border-radius:20px;padding:20px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.win-emoji{font-size:3.5rem}
+.win-title{font-size:1.3rem;font-weight:800;color:#0077b6}
+.win-lesson{background:#fff3cd;border-radius:10px;padding:10px;font-size:.9rem;font-weight:700}
+.win-q{font-size:.9rem;font-weight:700;line-height:1.4}
+.win-btn{background:#0077b6;color:#fff;border:none;border-radius:12px;padding:12px;font-size:1rem;font-weight:700;cursor:pointer}
+/* Lane defense game */
+.grid-wrap{display:grid;width:100%;height:100%;position:relative}
+.lane{border-bottom:1px solid rgba(0,0,0,.05);position:relative;overflow:hidden}
+.defender{position:absolute;font-size:1.6rem;z-index:3}
+.enemy-unit{position:absolute;font-size:1.6rem;z-index:3}
+.proj{position:absolute;font-size:.9rem;z-index:4}
+.plant-btn{position:absolute;right:4px;font-size:1.3rem;cursor:pointer;z-index:5;padding:4px}
+.base{position:absolute;top:0;bottom:0;width:6px;border-radius:3px;z-index:2}
+.base-player{left:30px;background:#0077b6}
+.base-enemy{right:30px;background:#c00}
+.hp-bar{position:absolute;height:4px;border-radius:2px;bottom:-5px}
+.currency-bar{position:absolute;bottom:60px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:4px;background:rgba(255,255,255,.8);z-index:5}
+.buy-btn{padding:6px 14px;border-radius:14px;border:2px solid #0077b6;background:#e0f4ff;color:#0077b6;font-size:.8rem;font-weight:700;cursor:pointer}
+/* Fetch-boss game */
+.arena{position:relative;width:100%;height:100%}
+.player-sprite{position:absolute;font-size:2rem;z-index:4;transition:all .08s}
+.boss-sprite{position:absolute;font-size:3rem;z-index:3}
+.pickup-item{position:absolute;font-size:1.8rem;z-index:4;animation:glow 1s ease-in-out infinite}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.thorn{position:absolute;font-size:1.4rem;z-index:3}
+.boss-hp-bar{position:absolute;top:40px;left:10%;right:10%;height:14px;background:#eee;border-radius:7px;z-index:5;overflow:hidden}
+.boss-hp-fill{height:100%;background:#c00;border-radius:7px;transition:width .3s}
+/* Incremental game */
+.incr-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px;width:100%;height:100%;justify-content:center}
+.word-counter{font-size:2.5rem;font-weight:800;color:#0077b6;text-align:center}
+.word-label{font-size:.85rem;color:#555;text-align:center}
+.tap-btn{font-size:3rem;padding:14px 28px;border-radius:50%;border:4px solid #0077b6;background:#e0f4ff;cursor:pointer;line-height:1;transition:transform .1s}
+.tap-btn:active{transform:scale(.92)}
+.upgrades-col{display:flex;flex-direction:column;gap:8px;width:100%}
+.upg-btn{padding:8px 12px;border-radius:12px;border:2px solid #aaa;background:#f8f8f8;font-size:.82rem;cursor:pointer;text-align:left;display:flex;justify-content:space-between}
+.upg-btn.unlocked{border-color:#0077b6;background:#e0f4ff;color:#0077b6}
+.upg-btn:disabled{opacity:.4;cursor:not-allowed}
+.famine-overlay{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 3s;z-index:6;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:rgba(255,255,255,0);transition:all 3s}
+.famine-overlay.active{background:rgba(10,10,30,.85);color:#fff}
+/* Jonah whale game (talk-it-down / prayer) */
+.whale-bg{background:linear-gradient(#003566,#0077b6);position:relative;overflow:hidden}
+.wave-anim{position:absolute;width:200%;height:60px;bottom:0;background:rgba(0,100,200,.4);border-radius:50% 50% 0 0;animation:wave 3s ease-in-out infinite}
+.jonah-sprite{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);font-size:2.5rem;z-index:5}
+.prayer-meter{position:absolute;top:40px;left:10%;right:10%;height:20px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden;z-index:5}
+.prayer-fill{height:100%;background:#90e0ef;border-radius:10px;transition:width .4s}
+.despair-wave{position:absolute;font-size:2rem;z-index:4}
+.pray-action-btn{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:20px;border:3px solid #90e0ef;background:rgba(255,255,255,.15);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;z-index:6}
+/* Storm/catch game (Obadiah/Sunday) */
+.storm-bg{background:linear-gradient(#1a1a2e,#0077b6)}
+.falling-item{position:absolute;font-size:2rem;z-index:4}
+/* Admin panel */
+.admin-panel{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);padding:8px 16px;display:flex;gap:10px;justify-content:center;font-size:.75rem;z-index:30;border-top:1px solid #ddd}
+.admin-link{color:#999;text-decoration:underline;cursor:pointer}
+/* Journal overlay */
+.journal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:45;display:flex;align-items:center;justify-content:center;padding:16px}
+.journal-box{background:#fff;border-radius:20px;padding:20px;width:100%;max-width:400px;max-height:80dvh;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.journal-entry{background:#f0f8ff;border-radius:10px;padding:10px;font-size:.85rem;border-left:4px solid #0077b6}
+.journal-ref{font-size:.75rem;color:#0077b6;font-weight:700}
+.journal-close{background:#0077b6;color:#fff;border:none;border-radius:12px;padding:10px;font-size:.9rem;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="hub">
+  <div class="mascot">🐋</div>
+  <h1>Wally the Whale</h1>
+  <p class="week-ref">Amos · Obadiah · Jonah &nbsp;·&nbsp; Nov 23–29, 2026</p>
+  <div class="mode-row">
+    <button class="mode-btn" id="btnLittle" onclick="setMode('little')">🐣 Little Kids</button>
+    <button class="mode-btn" id="btnBig" onclick="setMode('big')">🦅 Big Kids</button>
+  </div>
+  <div style="display:flex;gap:10px;width:100%;max-width:500px">
+    <button class="journal-btn" onclick="showJournal()">📓 Watchman's Journal</button>
+    <button class="journal-btn" style="background:#0077b6;color:#fff;border-color:#0077b6" onclick="location.href='../../'">🏞️ All weeks</button>
+  </div>
+  <div class="days-grid" id="daysGrid"></div>
+  <div class="admin-panel">
+    <span class="admin-link" onclick="confirmUnlockAll()">Parent: unlock all days</span>
+    <span class="admin-link" onclick="confirmReset()">Reset progress</span>
+  </div>
+</div>
+
+<div id="screen"></div>
+
+<div id="journalOverlay" style="display:none" class="journal-overlay">
+  <div class="journal-box">
+    <h2 style="font-size:1.1rem;color:#0077b6">📓 Watchman's Journal</h2>
+    <div id="journalEntries"></div>
+    <button class="journal-close" onclick="document.getElementById('journalOverlay').style.display='none'">Close</button>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'wally-2026-11-23';
+const HUB_URL = '../../';
+
+const TEXT = {
+  'Amos 1': {
+    1: 'The words of Amos, who was among the herdmen of Tekoa, which he saw concerning Israel in the days of Uzziah king of Judah, and in the days of Jeroboam the son of Joash king of Israel, two years before the earthquake.',
+    2: 'And he said, The LORD will roar from Zion, and utter his voice from Jerusalem; and the habitations of the shepherds shall mourn, and the top of Carmel shall wither.',
+    3: 'Thus saith the LORD ; For three transgressions of Damascus, and for four, I will not turn away the punishment thereof; because they have threshed Gilead with threshing instruments of iron:',
+    4: 'But I will send a fire into the house of Hazael, which shall devour the palaces of Ben-hadad.',
+    5: 'I will break also the bar of Damascus, and cut off the inhabitant from the plain of Aven, and him that holdeth the sceptre from the house of Eden: and the people of Syria shall go into captivity unto Kir, saith the LORD .',
+    6: 'Thus saith the LORD ; For three transgressions of Gaza, and for four, I will not turn away the punishment thereof; because they carried away captive the whole captivity, to deliver them up to Edom:',
+    7: 'But I will send a fire on the wall of Gaza, which shall devour the palaces thereof:',
+    8: 'And I will cut off the inhabitant from Ashdod, and him that holdeth the sceptre from Ashkelon, and I will turn mine hand against Ekron: and the remnant of the Philistines shall perish, saith the Lord GOD .',
+    9: 'Thus saith the LORD ; For three transgressions of Tyrus, and for four, I will not turn away the punishment thereof; because they delivered up the whole captivity to Edom, and remembered not the brotherly covenant:',
+    10: 'But I will send a fire on the wall of Tyrus, which shall devour the palaces thereof.',
+    11: 'Thus saith the LORD ; For three transgressions of Edom, and for four, I will not turn away the punishment thereof; because he did pursue his brother with the sword, and did cast off all pity, and his anger did tear perpetually, and he kept his wrath for ever:',
+    12: 'But I will send a fire upon Teman, which shall devour the palaces of Bozrah.',
+    13: 'Thus saith the LORD ; For three transgressions of the children of Ammon, and for four, I will not turn away the punishment thereof; because they have ripped up the women with child of Gilead, that they might enlarge their border:',
+    14: 'But I will kindle a fire in the wall of Rabbah, and it shall devour the palaces thereof, with shouting in the day of battle, with a tempest in the day of the whirlwind:',
+    15: 'And their king shall go into captivity, he and his princes together, saith the LORD .',
+  },
+  'Amos 2': {
+    1: 'Thus saith the LORD ; For three transgressions of Moab, and for four, I will not turn away the punishment thereof; because he burned the bones of the king of Edom into lime:',
+    2: 'But I will send a fire upon Moab, and it shall devour the palaces of Kerioth: and Moab shall die with tumult, with shouting, and with the sound of the trumpet:',
+    3: 'And I will cut off the judge from the midst thereof, and will slay all the princes thereof with him, saith the LORD .',
+    4: 'Thus saith the LORD ; For three transgressions of Judah, and for four, I will not turn away the punishment thereof; because they have despised the law of the LORD , and have not kept his commandments, and their lies caused them to err, after the which their fathers have walked:',
+    5: 'But I will send a fire upon Judah, and it shall devour the palaces of Jerusalem.',
+    6: 'Thus saith the LORD ; For three transgressions of Israel, and for four, I will not turn away the punishment thereof; because they sold the righteous for silver, and the poor for a pair of shoes;',
+    7: 'That pant after the dust of the earth on the head of the poor, and turn aside the way of the meek: and a man and his father will go in unto the same maid, to profane my holy name:',
+    8: 'And they lay themselves down upon clothes laid to pledge by every altar, and they drink the wine of the condemned in the house of their god.',
+    9: 'Yet destroyed I the Amorite before them, whose height was like the height of the cedars, and he was strong as the oaks; yet I destroyed his fruit from above, and his roots from beneath.',
+    10: 'Also I brought you up from the land of Egypt, and led you forty years through the wilderness, to possess the land of the Amorite.',
+    11: 'And I raised up of your sons for prophets, and of your young men for Nazarites. Is it not even thus, O ye children of Israel? saith the LORD .',
+    12: 'But ye gave the Nazarites wine to drink; and commanded the prophets, saying, Prophesy not.',
+    13: 'Behold, I am pressed under you, as a cart is pressed that is full of sheaves.',
+    14: 'Therefore the flight shall perish from the swift, and the strong shall not strengthen his force, neither shall the mighty deliver himself:',
+    15: 'Neither shall he stand that handleth the bow; and he that is swift of foot shall not deliver himself: neither shall he that rideth the horse deliver himself.',
+    16: 'And he that is courageous among the mighty shall flee away naked in that day, saith the LORD .',
+  },
+  'Amos 3': {
+    1: 'Hear this word that the LORD hath spoken against you, O children of Israel, against the whole family which I brought up from the land of Egypt, saying,',
+    2: 'You only have I known of all the families of the earth: therefore I will punish you for all your iniquities.',
+    3: 'Can two walk together, except they be agreed?',
+    4: 'Will a lion roar in the forest, when he hath no prey? will a young lion cry out of his den, if he have taken nothing?',
+    5: 'Can a bird fall in a snare upon the earth, where no gin is for him? shall one take up a snare from the earth, and have taken nothing at all?',
+    6: 'Shall a trumpet be blown in the city, and the people not be afraid? shall there be evil in a city, and the LORD hath not done it ? …: or, shall not the LORD do somewhat?',
+    7: 'Surely the Lord GOD will do nothing, but he revealeth his secret unto his servants the prophets.',
+    8: 'The lion hath roared, who will not fear? the Lord GOD hath spoken, who can but prophesy?',
+    9: 'Publish in the palaces at Ashdod, and in the palaces in the land of Egypt, and say, Assemble yourselves upon the mountains of Samaria, and behold the great tumults in the midst thereof, and the oppressed in the midst thereof.',
+    10: 'For they know not to do right, saith the LORD , who store up violence and robbery in their palaces.',
+    11: 'Therefore thus saith the Lord GOD ; An adversary there shall be even round about the land; and he shall bring down thy strength from thee, and thy palaces shall be spoiled.',
+    12: 'Thus saith the LORD ; As the shepherd taketh out of the mouth of the lion two legs, or a piece of an ear; so shall the children of Israel be taken out that dwell in Samaria in the corner of a bed, and in Damascus in a couch.',
+    13: 'Hear ye, and testify in the house of Jacob, saith the Lord GOD , the God of hosts,',
+    14: 'That in the day that I shall visit the transgressions of Israel upon him I will also visit the altars of Beth-el: and the horns of the altar shall be cut off, and fall to the ground.',
+    15: 'And I will smite the winter house with the summer house; and the houses of ivory shall perish, and the great houses shall have an end, saith the LORD .',
+  },
+  'Amos 4': {
+    1: 'Hear this word, ye kine of Bashan, that are in the mountain of Samaria, which oppress the poor, which crush the needy, which say to their masters, Bring, and let us drink.',
+    2: 'The Lord GOD hath sworn by his holiness, that, lo, the days shall come upon you, that he will take you away with hooks, and your posterity with fishhooks.',
+    3: 'And ye shall go out at the breaches, every cow at that which is before her; and ye shall cast them into the palace, saith the LORD .',
+    4: 'Come to Beth-el, and transgress; at Gilgal multiply transgression; and bring your sacrifices every morning, and your tithes after three years:',
+    5: 'And offer a sacrifice of thanksgiving with leaven, and proclaim and publish the free offerings: for this liketh you, O ye children of Israel, saith the Lord GOD .',
+    6: 'And I also have given you cleanness of teeth in all your cities, and want of bread in all your places: yet have ye not returned unto me, saith the LORD .',
+    7: 'And also I have withholden the rain from you, when there were yet three months to the harvest: and I caused it to rain upon one city, and caused it not to rain upon another city: one piece was rained upon, and the piece whereupon it rained not withered.',
+    8: 'So two or three cities wandered unto one city, to drink water; but they were not satisfied: yet have ye not returned unto me, saith the LORD .',
+    9: 'I have smitten you with blasting and mildew: when your gardens and your vineyards and your fig trees and your olive trees increased, the palmerworm devoured them: yet have ye not returned unto me, saith the LORD .',
+    10: 'I have sent among you the pestilence after the manner of Egypt: your young men have I slain with the sword, and have taken away your horses; and I have made the stink of your camps to come up unto your nostrils: yet have ye not returned unto me, saith the LORD .',
+    11: 'I have overthrown some of you, as God overthrew Sodom and Gomorrah, and ye were as a firebrand plucked out of the burning: yet have ye not returned unto me, saith the LORD .',
+    12: 'Therefore thus will I do unto thee, O Israel: and because I will do this unto thee, prepare to meet thy God, O Israel.',
+    13: 'For, lo, he that formeth the mountains, and createth the wind, and declareth unto man what is his thought, that maketh the morning darkness, and treadeth upon the high places of the earth, The LORD , The God of hosts, is his name.',
+  },
+  'Amos 5': {
+    1: 'Hear ye this word which I take up against you, even a lamentation, O house of Israel.',
+    2: 'The virgin of Israel is fallen; she shall no more rise: she is forsaken upon her land; there is none to raise her up.',
+    3: 'For thus saith the Lord GOD ; The city that went out by a thousand shall leave an hundred, and that which went forth by an hundred shall leave ten, to the house of Israel.',
+    4: 'For thus saith the LORD unto the house of Israel, Seek ye me, and ye shall live:',
+    5: 'But seek not Beth-el, nor enter into Gilgal, and pass not to Beer-sheba: for Gilgal shall surely go into captivity, and Beth-el shall come to nought.',
+    6: 'Seek the LORD , and ye shall live; lest he break out like fire in the house of Joseph, and devour it , and there be none to quench it in Beth-el.',
+    7: 'Ye who turn judgment to wormwood, and leave off righteousness in the earth,',
+    8: 'Seek him that maketh the seven stars and Orion, and turneth the shadow of death into the morning, and maketh the day dark with night: that calleth for the waters of the sea, and poureth them out upon the face of the earth: The LORD is his name:',
+    9: 'That strengtheneth the spoiled against the strong, so that the spoiled shall come against the fortress.',
+    10: 'They hate him that rebuketh in the gate, and they abhor him that speaketh uprightly.',
+    11: 'Forasmuch therefore as your treading is upon the poor, and ye take from him burdens of wheat: ye have built houses of hewn stone, but ye shall not dwell in them; ye have planted pleasant vineyards, but ye shall not drink wine of them.',
+    12: 'For I know your manifold transgressions and your mighty sins: they afflict the just, they take a bribe, and they turn aside the poor in the gate from their right .',
+    13: 'Therefore the prudent shall keep silence in that time; for it is an evil time.',
+    14: 'Seek good, and not evil, that ye may live: and so the LORD , the God of hosts, shall be with you, as ye have spoken.',
+    15: 'Hate the evil, and love the good, and establish judgment in the gate: it may be that the LORD God of hosts will be gracious unto the remnant of Joseph.',
+    16: 'Therefore the LORD , the God of hosts, the Lord, saith thus; Wailing shall be in all streets; and they shall say in all the highways, Alas! alas! and they shall call the husbandman to mourning, and such as are skilful of lamentation to wailing.',
+    17: 'And in all vineyards shall be wailing: for I will pass through thee, saith the LORD .',
+    18: 'Woe unto you that desire the day of the LORD ! to what end is it for you? the day of the LORD is darkness, and not light.',
+    19: 'As if a man did flee from a lion, and a bear met him; or went into the house, and leaned his hand on the wall, and a serpent bit him.',
+    20: 'Shall not the day of the LORD be darkness, and not light? even very dark, and no brightness in it?',
+    21: 'I hate, I despise your feast days, and I will not smell in your solemn assemblies.',
+    22: 'Though ye offer me burnt offerings and your meat offerings, I will not accept them: neither will I regard the peace offerings of your fat beasts.',
+    23: 'Take thou away from me the noise of thy songs; for I will not hear the melody of thy viols.',
+    24: 'But let judgment run down as waters, and righteousness as a mighty stream.',
+    25: 'Have ye offered unto me sacrifices and offerings in the wilderness forty years, O house of Israel?',
+    26: 'But ye have borne the tabernacle of your Moloch and Chiun your images, the star of your god, which ye made to yourselves.',
+    27: 'Therefore will I cause you to go into captivity beyond Damascus, saith the LORD , whose name is The God of hosts.',
+  },
+  'Amos 7': {
+    1: 'Thus hath the Lord GOD shewed unto me; and, behold, he formed grasshoppers in the beginning of the shooting up of the latter growth; and, lo, it was the latter growth after the king’s mowings.',
+    2: 'And it came to pass, that when they had made an end of eating the grass of the land, then I said, O Lord GOD , forgive, I beseech thee: by whom shall Jacob arise? for he is small.',
+    3: 'The LORD repented for this: It shall not be, saith the LORD .',
+    4: 'Thus hath the Lord GOD shewed unto me: and, behold, the Lord GOD called to contend by fire, and it devoured the great deep, and did eat up a part.',
+    5: 'Then said I, O Lord GOD , cease, I beseech thee: by whom shall Jacob arise? for he is small.',
+    6: 'The LORD repented for this: This also shall not be, saith the Lord GOD .',
+    7: 'Thus he shewed me: and, behold, the Lord stood upon a wall made by a plumbline, with a plumbline in his hand.',
+    8: 'And the LORD said unto me, Amos, what seest thou? And I said, A plumbline. Then said the Lord, Behold, I will set a plumbline in the midst of my people Israel: I will not again pass by them any more:',
+    9: 'And the high places of Isaac shall be desolate, and the sanctuaries of Israel shall be laid waste; and I will rise against the house of Jeroboam with the sword.',
+    10: 'Then Amaziah the priest of Beth-el sent to Jeroboam king of Israel, saying, Amos hath conspired against thee in the midst of the house of Israel: the land is not able to bear all his words.',
+    11: 'For thus Amos saith, Jeroboam shall die by the sword, and Israel shall surely be led away captive out of their own land.',
+    12: 'Also Amaziah said unto Amos, O thou seer, go, flee thee away into the land of Judah, and there eat bread, and prophesy there:',
+    13: 'But prophesy not again any more at Beth-el: for it is the king’s chapel, and it is the king’s court.',
+    14: 'Then answered Amos, and said to Amaziah, I was no prophet, neither was I a prophet’s son; but I was an herdman, and a gatherer of sycomore fruit:',
+    15: 'And the LORD took me as I followed the flock, and the LORD said unto me, Go, prophesy unto my people Israel.',
+    16: 'Now therefore hear thou the word of the LORD : Thou sayest, Prophesy not against Israel, and drop not thy word against the house of Isaac.',
+    17: 'Therefore thus saith the LORD ; Thy wife shall be an harlot in the city, and thy sons and thy daughters shall fall by the sword, and thy land shall be divided by line; and thou shalt die in a polluted land: and Israel shall surely go into captivity forth of his land.',
+  },
+  'Amos 8': {
+    1: 'Thus hath the Lord GOD shewed unto me: and behold a basket of summer fruit.',
+    2: 'And he said, Amos, what seest thou? And I said, A basket of summer fruit. Then said the LORD unto me, The end is come upon my people of Israel; I will not again pass by them any more.',
+    3: 'And the songs of the temple shall be howlings in that day, saith the Lord GOD : there shall be many dead bodies in every place; they shall cast them forth with silence.',
+    4: 'Hear this, O ye that swallow up the needy, even to make the poor of the land to fail,',
+    5: 'Saying, When will the new moon be gone, that we may sell corn? and the sabbath, that we may set forth wheat, making the ephah small, and the shekel great, and falsifying the balances by deceit?',
+    6: 'That we may buy the poor for silver, and the needy for a pair of shoes; yea , and sell the refuse of the wheat?',
+    7: 'The LORD hath sworn by the excellency of Jacob, Surely I will never forget any of their works.',
+    8: 'Shall not the land tremble for this, and every one mourn that dwelleth therein? and it shall rise up wholly as a flood; and it shall be cast out and drowned, as by the flood of Egypt.',
+    9: 'And it shall come to pass in that day, saith the Lord GOD , that I will cause the sun to go down at noon, and I will darken the earth in the clear day:',
+    10: 'And I will turn your feasts into mourning, and all your songs into lamentation; and I will bring up sackcloth upon all loins, and baldness upon every head; and I will make it as the mourning of an only son , and the end thereof as a bitter day.',
+    11: 'Behold, the days come, saith the Lord GOD , that I will send a famine in the land, not a famine of bread, nor a thirst for water, but of hearing the words of the LORD :',
+    12: 'And they shall wander from sea to sea, and from the north even to the east, they shall run to and fro to seek the word of the LORD , and shall not find it .',
+    13: 'In that day shall the fair virgins and young men faint for thirst.',
+    14: 'They that swear by the sin of Samaria, and say, Thy god, O Dan, liveth; and, The manner of Beer-sheba liveth; even they shall fall, and never rise up again.',
+  },
+  'Obadiah 1': {
+    1: 'The vision of Obadiah. Thus saith the Lord GOD concerning Edom; We have heard a rumour from the LORD , and an ambassador is sent among the heathen, Arise ye, and let us rise up against her in battle.',
+    2: 'Behold, I have made thee small among the heathen: thou art greatly despised.',
+    3: 'The pride of thine heart hath deceived thee, thou that dwellest in the clefts of the rock, whose habitation is high; that saith in his heart, Who shall bring me down to the ground?',
+    4: 'Though thou exalt thyself as the eagle, and though thou set thy nest among the stars, thence will I bring thee down, saith the LORD .',
+    5: 'If thieves came to thee, if robbers by night, (how art thou cut off!) would they not have stolen till they had enough? if the grapegatherers came to thee, would they not leave some grapes?',
+    6: 'How are the things of Esau searched out! how are his hidden things sought up!',
+    7: 'All the men of thy confederacy have brought thee even to the border: the men that were at peace with thee have deceived thee, and prevailed against thee; they that eat thy bread have laid a wound under thee: there is none understanding in him.',
+    8: 'Shall I not in that day, saith the LORD , even destroy the wise men out of Edom, and understanding out of the mount of Esau?',
+    9: 'And thy mighty men , O Teman, shall be dismayed, to the end that every one of the mount of Esau may be cut off by slaughter.',
+    10: 'For thy violence against thy brother Jacob shame shall cover thee, and thou shalt be cut off for ever.',
+    11: 'In the day that thou stoodest on the other side, in the day that the strangers carried away captive his forces, and foreigners entered into his gates, and cast lots upon Jerusalem, even thou wast as one of them.',
+    12: 'But thou shouldest not have looked on the day of thy brother in the day that he became a stranger; neither shouldest thou have rejoiced over the children of Judah in the day of their destruction; neither shouldest thou have spoken proudly in the day of distress.',
+    13: 'Thou shouldest not have entered into the gate of my people in the day of their calamity; yea, thou shouldest not have looked on their affliction in the day of their calamity, nor have laid hands on their substance in the day of their calamity;',
+    14: 'Neither shouldest thou have stood in the crossway, to cut off those of his that did escape; neither shouldest thou have delivered up those of his that did remain in the day of distress.',
+    15: 'For the day of the LORD is near upon all the heathen: as thou hast done, it shall be done unto thee: thy reward shall return upon thine own head.',
+    16: 'For as ye have drunk upon my holy mountain, so shall all the heathen drink continually, yea, they shall drink, and they shall swallow down, and they shall be as though they had not been.',
+    17: 'But upon mount Zion shall be deliverance, and there shall be holiness; and the house of Jacob shall possess their possessions.',
+    18: 'And the house of Jacob shall be a fire, and the house of Joseph a flame, and the house of Esau for stubble, and they shall kindle in them, and devour them; and there shall not be any remaining of the house of Esau; for the LORD hath spoken it .',
+    19: 'And they of the south shall possess the mount of Esau; and they of the plain the Philistines: and they shall possess the fields of Ephraim, and the fields of Samaria: and Benjamin shall possess Gilead.',
+    20: 'And the captivity of this host of the children of Israel shall possess that of the Canaanites, even unto Zarephath; and the captivity of Jerusalem, which is in Sepharad, shall possess the cities of the south.',
+    21: 'And saviours shall come up on mount Zion to judge the mount of Esau; and the kingdom shall be the LORD’s .',
+  },
+  'Jonah 1': {
+    1: 'Now the word of the LORD came unto Jonah the son of Amittai, saying,',
+    2: 'Arise, go to Nineveh, that great city, and cry against it; for their wickedness is come up before me.',
+    3: 'But Jonah rose up to flee unto Tarshish from the presence of the LORD , and went down to Joppa; and he found a ship going to Tarshish: so he paid the fare thereof, and went down into it, to go with them unto Tarshish from the presence of the LORD .',
+    4: 'But the LORD sent out a great wind into the sea, and there was a mighty tempest in the sea, so that the ship was like to be broken.',
+    5: 'Then the mariners were afraid, and cried every man unto his god, and cast forth the wares that were in the ship into the sea, to lighten it of them. But Jonah was gone down into the sides of the ship; and he lay, and was fast asleep.',
+    6: 'So the shipmaster came to him, and said unto him, What meanest thou, O sleeper? arise, call upon thy God, if so be that God will think upon us, that we perish not.',
+    7: 'And they said every one to his fellow, Come, and let us cast lots, that we may know for whose cause this evil is upon us. So they cast lots, and the lot fell upon Jonah.',
+    8: 'Then said they unto him, Tell us, we pray thee, for whose cause this evil is upon us; What is thine occupation? and whence comest thou? what is thy country? and of what people art thou?',
+    9: 'And he said unto them, I am an Hebrew; and I fear the LORD , the God of heaven, which hath made the sea and the dry land . : or, JEHOVAH',
+    10: 'Then were the men exceedingly afraid, and said unto him, Why hast thou done this? For the men knew that he fled from the presence of the LORD , because he had told them.',
+    11: 'Then said they unto him, What shall we do unto thee, that the sea may be calm unto us? for the sea wrought, and was tempestuous.',
+    12: 'And he said unto them, Take me up, and cast me forth into the sea; so shall the sea be calm unto you: for I know that for my sake this great tempest is upon you.',
+    13: 'Nevertheless the men rowed hard to bring it to the land; but they could not: for the sea wrought, and was tempestuous against them.',
+    14: 'Wherefore they cried unto the LORD , and said, We beseech thee, O LORD , we beseech thee, let us not perish for this man’s life, and lay not upon us innocent blood: for thou, O LORD , hast done as it pleased thee.',
+    15: 'So they took up Jonah, and cast him forth into the sea: and the sea ceased from her raging.',
+    16: 'Then the men feared the LORD exceedingly, and offered a sacrifice unto the LORD , and made vows. , and vowed vows',
+    17: 'Now the LORD had prepared a great fish to swallow up Jonah. And Jonah was in the belly of the fish three days and three nights.',
+  },
+  'Jonah 2': {
+    1: 'Then Jonah prayed unto the LORD his God out of the fish’s belly,',
+    2: 'And said, I cried by reason of mine affliction unto the LORD , and he heard me; out of the belly of hell cried I, and thou heardest my voice.',
+    3: 'For thou hadst cast me into the deep, in the midst of the seas; and the floods compassed me about: all thy billows and thy waves passed over me.',
+    4: 'Then I said, I am cast out of thy sight; yet I will look again toward thy holy temple.',
+    5: 'The waters compassed me about, even to the soul: the depth closed me round about, the weeds were wrapped about my head.',
+    6: 'I went down to the bottoms of the mountains; the earth with her bars was about me for ever: yet hast thou brought up my life from corruption, O LORD my God.',
+    7: 'When my soul fainted within me I remembered the LORD : and my prayer came in unto thee, into thine holy temple.',
+    8: 'They that observe lying vanities forsake their own mercy.',
+    9: 'But I will sacrifice unto thee with the voice of thanksgiving; I will pay that that I have vowed. Salvation is of the LORD .',
+    10: 'And the LORD spake unto the fish, and it vomited out Jonah upon the dry land .',
+  },
+  'Jonah 3': {
+    1: 'And the word of the LORD came unto Jonah the second time, saying,',
+    2: 'Arise, go unto Nineveh, that great city, and preach unto it the preaching that I bid thee.',
+    3: 'So Jonah arose, and went unto Nineveh, according to the word of the LORD . Now Nineveh was an exceeding great city of three days’ journey.',
+    4: 'And Jonah began to enter into the city a day’s journey, and he cried, and said, Yet forty days, and Nineveh shall be overthrown.',
+    5: 'So the people of Nineveh believed God, and proclaimed a fast, and put on sackcloth, from the greatest of them even to the least of them.',
+    6: 'For word came unto the king of Nineveh, and he arose from his throne, and he laid his robe from him, and covered him with sackcloth, and sat in ashes.',
+    7: 'And he caused it to be proclaimed and published through Nineveh by the decree of the king and his nobles, saying, Let neither man nor beast, herd nor flock, taste any thing: let them not feed, nor drink water:',
+    8: 'But let man and beast be covered with sackcloth, and cry mightily unto God: yea, let them turn every one from his evil way, and from the violence that is in their hands.',
+    9: 'Who can tell if God will turn and repent, and turn away from his fierce anger, that we perish not?',
+    10: 'And God saw their works, that they turned from their evil way; and God repented of the evil, that he had said that he would do unto them; and he did it not.',
+  },
+  'Jonah 4': {
+    1: 'But it displeased Jonah exceedingly, and he was very angry.',
+    2: 'And he prayed unto the LORD , and said, I pray thee, O LORD , was not this my saying, when I was yet in my country? Therefore I fled before unto Tarshish: for I knew that thou art a gracious God, and merciful, slow to anger, and of great kindness, and repentest thee of the evil.',
+    3: 'Therefore now, O LORD , take, I beseech thee, my life from me; for it is better for me to die than to live.',
+    4: 'Then said the LORD , Doest thou well to be angry?',
+    5: 'So Jonah went out of the city, and sat on the east side of the city, and there made him a booth, and sat under it in the shadow, till he might see what would become of the city.',
+    6: 'And the LORD God prepared a gourd, and made it to come up over Jonah, that it might be a shadow over his head, to deliver him from his grief. So Jonah was exceeding glad of the gourd.',
+    7: 'But God prepared a worm when the morning rose the next day, and it smote the gourd that it withered.',
+    8: 'And it came to pass, when the sun did arise, that God prepared a vehement east wind; and the sun beat upon the head of Jonah, that he fainted, and wished in himself to die, and said, It is better for me to die than to live.',
+    9: 'And God said to Jonah, Doest thou well to be angry for the gourd? And he said, I do well to be angry, even unto death.',
+    10: 'Then said the LORD , Thou hast had pity on the gourd, for the which thou hast not laboured, neither madest it grow; which came up in a night, and perished in a night:',
+    11: 'And should not I spare Nineveh, that great city, wherein are more than sixscore thousand persons that cannot discern between their right hand and their left hand; and also much cattle?',
+  },
+};
+
+// Easy verses (short, sight-word friendly, no hard names/words)
+const EASY = new Set([
+  'Amos 3:3', 'Amos 3:7', 'Amos 3:8', 'Amos 5:4',
+  'Jonah 1:1', 'Jonah 2:1', 'Jonah 3:1', 'Jonah 3:5',
+  'Jonah 4:1', 'Jonah 4:4', 'Obadiah 1:21'
+]);
+
+const LEVELS = [
+  // 0 — Monday Nov 23: Amos 1–2 — Prophets warn nations (Explore-and-Find)
+  {
+    day: 'Monday, Nov 23',
+    dayLabel: 'Mon',
+    title: 'The Watchman Speaks',
+    icon: '📜',
+    lesson: 'The Lord speaks through ordinary people called as prophets.',
+    keyRef: 'Amos 3:7',
+    key: ['Surely the Lord GOD', 'will do nothing,', 'but he revealeth his secret', 'unto his servants the prophets.'],
+    askL: 'Amos was just a shepherd before God called him. What does this teach us about who God can call?',
+    askB: 'Why do you think the Lord always warns His people through prophets before big things happen?',
+    parts: [
+      {
+        ref: 'Amos 1:1–8',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/1?lang=eng',
+        wordHelp: 'transgression = sin · herdmen = shepherds · saith = says',
+        verses: [{b:'Amos 1',s:1,e:8}],
+        q: 'What was Amos\'s job before he was a prophet?',
+        opts: ['He was a shepherd (herdman) of Tekoa','He was a priest in the temple','He was a king\'s helper','He was a sailor on the sea'],
+        hint: 'Look at verse 1.'
+      },
+      {
+        ref: 'Amos 1:9–15',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/1?lang=eng&verse=9',
+        wordHelp: 'captivity = being taken far away as prisoners · devour = destroy by fire',
+        verses: [{b:'Amos 1',s:9,e:15}],
+        q: 'What did the LORD say He would send on the cities that sinned?',
+        opts: ['A fire','A flood','A great wind','Darkness'],
+        hint: 'Look at verses 10 and 12.'
+      },
+      {
+        ref: 'Amos 2:1–8',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/2?lang=eng',
+        wordHelp: 'iniquities = sins · commandments = God\'s rules · silver = money',
+        verses: [{b:'Amos 2',s:1,e:8}],
+        q: 'What did Israel do wrong that the LORD warned them about?',
+        opts: ['They sold the righteous for silver and ignored the poor','They refused to build a temple','They stopped farming the land','They lost their king'],
+        hint: 'Look at verse 6.'
+      }
+    ],
+    game: 'explore',
+    gameConfig: {
+      items: ['📜','📜','📜','📜','📜','📜'],
+      bad: '🪤',
+      goal: 6,
+      bg: 'linear-gradient(#1a3a4a,#0a5080)',
+      hint: 'Swim Wally around and tap every glowing scroll before the snare appears!',
+      win: 'You found all the prophecy scrolls! Amos warned many nations.',
+      mid: {q:'In Amos chapter 1, Amos warned many nations. What was he BEFORE the Lord called him?', o:['A shepherd','A king','A priest','A sailor'], look:'Think about Amos 1:1.'}
+    }
+  },
+  // 1 — Tuesday Nov 24: Amos 3 — Lord reveals through prophets (Lane Defense ⭐)
+  {
+    day: 'Tuesday, Nov 24',
+    dayLabel: 'Tue',
+    title: 'Two Walk Together',
+    icon: '🗼',
+    lesson: 'God warns us because He loves us and wants us to come back to Him.',
+    keyRef: 'Amos 3:7',
+    key: ['Surely the Lord GOD', 'will do nothing,', 'but he revealeth his secret', 'unto his servants the prophets.'],
+    askL: 'The Lord sent prophets to warn Israel. Who are our prophets today?',
+    askB: 'Why does the Lord always warn His people before important things happen? What does that show about Him?',
+    parts: [
+      {
+        ref: 'Amos 3:1–5',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/3?lang=eng',
+        wordHelp: 'iniquities = sins · gin = a trap for birds · snare = trap',
+        verses: [{b:'Amos 3',s:1,e:5}],
+        q: 'What question does Amos ask about two people walking together?',
+        opts: ['Can two walk together, except they be agreed?','Will they find the right road?','Can two carry one burden?','Will the LORD walk with sinners?'],
+        hint: 'Look at verse 3.'
+      },
+      {
+        ref: 'Amos 3:6–10',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/3?lang=eng&verse=6',
+        wordHelp: 'revealeth = shows · prophets = men called by God to speak His words · palaces = big fancy buildings',
+        verses: [{b:'Amos 3',s:6,e:10}],
+        q: 'Who does the Lord reveal His secrets to?',
+        opts: ['His servants the prophets','The kings of the nations','The richest people in the land','The temple priests only'],
+        hint: 'Look at verse 7.'
+      },
+      {
+        ref: 'Amos 3:11–15',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/3?lang=eng&verse=11',
+        wordHelp: 'adversary = an enemy · spoiled = robbed · altars of Beth-el = a place Israel used for wrong worship',
+        verses: [{b:'Amos 3',s:11,e:15}],
+        q: 'What would happen to the altars at Beth-el because of Israel\'s sins?',
+        opts: ['The horns of the altar shall be cut off and fall','They would be filled with new offerings','They would grow bigger','Nothing — the Lord would protect them'],
+        hint: 'Look at verse 14.'
+      }
+    ],
+    game: 'laneDefense',
+    gameConfig: {
+      lanes: 3,
+      enemies: ['😤','🤑','😈'],
+      defender: '🦅',
+      bullet: '📢',
+      goal: 20,
+      bg: 'linear-gradient(#1a2a1a,#2d5a27)',
+      hint: 'Tap a lane to place a watchman prophet! They shout warnings to push sin back.',
+      win: 'The watchmen held the city! When we listen to prophets, we are safe.',
+      mid: {q:'In Amos 3, what does God always do before He acts?', o:['He reveals His plan to the prophets','He sends a flood first','He stays silent','He sends angels directly to the people'], look:'Think about Amos 3:7.'}
+    }
+  },
+  // 2 — Wednesday Nov 25: Amos 4–5 — Seek the Lord and live (Fetch Boss)
+  {
+    day: 'Wednesday, Nov 25',
+    dayLabel: 'Wed',
+    title: 'Seek the Lord',
+    icon: '🌟',
+    lesson: 'Seek the Lord and ye shall live — He is always ready to be found.',
+    keyRef: 'Amos 5:4',
+    key: ['For thus saith the LORD', 'unto the house of Israel,', 'Seek ye me,', 'and ye shall live:'],
+    askL: 'The Lord says "Seek ME." What is one thing you can do today to seek the Lord?',
+    askB: 'What is the difference between seeking "good" and seeking "God"? Why does Amos say both?',
+    parts: [
+      {
+        ref: 'Amos 4:11–13',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/4?lang=eng&verse=11',
+        wordHelp: 'firebrand = a burning stick · returned = came back · formeth = made · treadeth = walks',
+        verses: [{b:'Amos 4',s:11,e:13}],
+        q: 'What does Amos 4:12 tell Israel to do?',
+        opts: ['Prepare to meet thy God','Run away from the city','Build new altars','Send a message to the king'],
+        hint: 'Look at verse 12.'
+      },
+      {
+        ref: 'Amos 5:1–8',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/5?lang=eng',
+        wordHelp: 'seek = look for and follow · lest = or else · Orion = stars in the sky · Beth-el = place of wrong worship',
+        verses: [{b:'Amos 5',s:1,e:8}],
+        q: 'What does the LORD promise if Israel seeks Him?',
+        opts: ['They shall live','They shall have riches','They shall become a great army','They shall find gold'],
+        hint: 'Look at verses 4 and 6.'
+      },
+      {
+        ref: 'Amos 5:9–15',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/5?lang=eng&verse=9',
+        wordHelp: 'rebuketh = corrects or warns · uprightly = doing what is right · bribe = secret money to do wrong things',
+        verses: [{b:'Amos 5',s:9,e:15}],
+        q: 'What two things does Amos 5:14 tell us to seek and hate?',
+        opts: ['Seek good, hate evil','Seek gold, hate poverty','Seek friends, hate enemies','Seek rest, hate work'],
+        hint: 'Look at verse 14.'
+      }
+    ],
+    game: 'fetchBoss',
+    gameConfig: {
+      pickup: '✨',
+      player: '🌟',
+      boss: '🕷️',
+      bossHp: 5,
+      bg: 'linear-gradient(#2d1b4e,#4a2080)',
+      hint: 'Grab the glowing light and carry it to the dark thorn-spider to push it back! Avoid the thorns.',
+      win: 'The light won! When we seek the Lord, the darkness has to give way.',
+      mid: {q:'In Amos 5:4, the Lord says "Seek ye me." What does He promise will happen?', o:['Ye shall live','Ye shall have silver','Ye shall be a prophet','Ye shall find Beth-el'], look:'Think about Amos 5:4.'}
+    }
+  },
+  // 3 — Thursday Nov 26: Amos 7–8 — Famine of the word (Incremental)
+  {
+    day: 'Thursday, Nov 26',
+    dayLabel: 'Thu',
+    title: 'A Famine of the Word',
+    icon: '📖',
+    lesson: 'We need God\'s word every day — without it, our hearts grow hungry.',
+    keyRef: 'Amos 8:11',
+    key: ['Behold, the days come,', 'saith the Lord GOD ,', 'that I will send a famine', 'in the land,', 'not a famine of bread,', 'but of hearing the words of the LORD :'],
+    askL: 'Have you ever felt happier after reading the scriptures? What do you think that feeling is?',
+    askB: 'Amos said there would be a famine of "hearing God\'s words." How can we make sure that never happens in our family?',
+    parts: [
+      {
+        ref: 'Amos 7:10–15',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/7?lang=eng&verse=10',
+        wordHelp: 'conspired = planned against the king · seer = prophet who sees visions · herdman = shepherd · sycomore = a type of fig tree',
+        verses: [{b:'Amos 7',s:10,e:15}],
+        q: 'What was Amos doing BEFORE the Lord called him to be a prophet?',
+        opts: ['He was a herdman and a gatherer of sycomore fruit','He was a priest at Beth-el','He was a soldier in Jeroboam\'s army','He was a teacher in Judah'],
+        hint: 'Look at verse 14.'
+      },
+      {
+        ref: 'Amos 7:16–17; 8:1–6',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/8?lang=eng',
+        wordHelp: 'polluted = not clean · ephah = a measuring basket · shekel = a coin · deceit = lying to cheat',
+        verses: [{b:'Amos 7',s:16,e:17},{b:'Amos 8',s:1,e:6}],
+        q: 'In Amos 8, what did the dishonest people want to do on the Sabbath?',
+        opts: ['Sell wheat and cheat the poor with false weights','Pray at the temple','Rest and be with their families','Read the scriptures together'],
+        hint: 'Look at Amos 8:5–6.'
+      },
+      {
+        ref: 'Amos 8:7–12',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/amos/8?lang=eng&verse=7',
+        wordHelp: 'famine = running out of something · wander = walk around lost looking for something',
+        verses: [{b:'Amos 8',s:7,e:12}],
+        q: 'What kind of famine did the Lord say was coming in Amos 8:11?',
+        opts: ['A famine of hearing the words of the LORD','A famine of bread and water','A famine of silver and gold','A famine of rain and sunshine'],
+        hint: 'Look at verse 11.'
+      }
+    ],
+    game: 'incremental',
+    gameConfig: {
+      tapItem: '📖',
+      upgrades: [
+        {name:'Pray daily 🙏', cost:10, rate:1, label:'Prayer'},
+        {name:'Read together 👨‍👩‍👧', cost:30, rate:3, label:'Family study'},
+        {name:'Church each Sunday ⛪', cost:80, rate:8, label:'Sunday worship'},
+        {name:'Ponder the scriptures 💭', cost:200, rate:20, label:'Deep study'}
+      ],
+      goal: 100,
+      bg: 'linear-gradient(#2a1a0a,#5a3a10)',
+      hint: 'Tap the scriptures to gather God\'s words! Buy ways to keep them flowing.',
+      win: 'Your heart is full of God\'s word! That is the best kind of feast.',
+      mid: {q:'What kind of famine did Amos warn about in Amos 8:11?', o:['A famine of hearing God\'s word','A famine of bread','A famine of water','A famine of sunshine'], look:'Think about Amos 8:11.'}
+    }
+  },
+  // 4 — Friday Nov 27: Obadiah — Pride brings us down (Wander tap/catch)
+  {
+    day: 'Friday, Nov 27',
+    dayLabel: 'Fri',
+    title: 'Pride Brings You Down',
+    icon: '🦅',
+    lesson: 'Pride is dangerous — but humility brings the Lord\'s help.',
+    keyRef: 'Obadiah 1:4',
+    key: ['Though thou exalt thyself as the eagle,', 'and though thou set thy nest among the stars,', 'thence will I bring thee down,', 'saith the LORD .'],
+    askL: 'Edom was too proud to ask for help. When is it hard for you to ask for help?',
+    askB: 'What is the difference between being proud of doing something good and having a "proud heart" like Edom did?',
+    parts: [
+      {
+        ref: 'Obadiah 1:1–7',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/obad/1?lang=eng',
+        wordHelp: 'Edom = a nation south of Israel · clefts of the rock = high rocky places · habitation = home · heathen = other nations',
+        verses: [{b:'Obadiah 1',s:1,e:7}],
+        q: 'What sin of the heart did Obadiah say deceived Edom?',
+        opts: ['The pride of thine heart','The love of silver','The fear of battle','The worship of idols'],
+        hint: 'Look at verse 3.'
+      },
+      {
+        ref: 'Obadiah 1:8–16',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/obad/1?lang=eng&verse=8',
+        wordHelp: 'dismayed = frightened · shame = feeling bad for doing wrong · violence = hurting others · captivity = being taken far away as prisoners',
+        verses: [{b:'Obadiah 1',s:8,e:16}],
+        q: 'What did Obadiah say should return on Edom\'s head?',
+        opts: ['Their reward for what they did to others','A crown of glory','Riches from Zion','A message from Israel'],
+        hint: 'Look at verse 15.'
+      },
+      {
+        ref: 'Obadiah 1:17–21',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/obad/1?lang=eng&verse=17',
+        wordHelp: 'deliverance = being saved · saviours = people who help save others · Zion = a holy place with the Lord',
+        verses: [{b:'Obadiah 1',s:17,e:21}],
+        q: 'What shall saviours do on mount Zion?',
+        opts: ['Come up on mount Zion to judge — and the kingdom shall be the LORD\'s','Build a great wall around it','Bring riches from Edom','Fight the last battle alone'],
+        hint: 'Look at verse 21.'
+      }
+    ],
+    game: 'wander',
+    gameConfig: {
+      alt: ['🕊️','🕊️','🕊️','🕊️','✨'],
+      turn: '🌸',
+      bad: '👑',
+      goal: 15,
+      bg: 'linear-gradient(#4a3010,#8a6020)',
+      ground: '🪨 🪨 🪨',
+      guardLabel: '🦅',
+      reach: '🕊️',
+      hint: 'Tap the doves of humility 🕊️ — dodge the proud crowns 👑!',
+      win: 'Humble hearts are strong! The Lord helps those who are not too proud to ask.',
+      mid: {q:'In Obadiah 1:4, even if Edom set his nest among the stars, what did the LORD say?', o:['Thence will I bring thee down','Thou shalt rule the nations','I will make thee great','The stars shall be thy home'], look:'Think about Obadiah 1:4.'}
+    }
+  },
+  // 5 — Saturday Nov 28: Jonah 1–2 — Second chances, prayer from anywhere (Talk-it-down / Prayer)
+  {
+    day: 'Saturday, Nov 28',
+    dayLabel: 'Sat',
+    title: 'Inside the Whale',
+    icon: '🐋',
+    lesson: 'God hears our prayers from anywhere — even the belly of a whale.',
+    keyRef: 'Jonah 2:1',
+    key: ['Then Jonah prayed', 'unto the LORD his God', 'out of the fish\'s belly,'],
+    askL: 'Jonah prayed even when things were very dark. When do you like to pray?',
+    askB: 'Why do you think Jonah tried to run away? What finally brought him back to the Lord?',
+    parts: [
+      {
+        ref: 'Jonah 1:1–6',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/1?lang=eng',
+        wordHelp: 'Nineveh = a big city far away · Tarshish = a city in the opposite direction · mariners = sailors · tempest = a great storm',
+        verses: [{b:'Jonah 1',s:1,e:6}],
+        q: 'When God told Jonah to go to Nineveh, what did Jonah do?',
+        opts: ['He fled toward Tarshish — the other way','He went straight to Nineveh','He prayed in the temple','He asked another prophet to go for him'],
+        hint: 'Look at verse 3.'
+      },
+      {
+        ref: 'Jonah 1:7–17',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/1?lang=eng&verse=7',
+        wordHelp: 'cast lots = a way to choose who is responsible · tempestuous = wild and stormy · vomited = spit out',
+        verses: [{b:'Jonah 1',s:7,e:17}],
+        q: 'What did the LORD prepare to swallow Jonah?',
+        opts: ['A great fish','A giant wave','A whirlpool','A sea monster'],
+        hint: 'Look at verse 17.'
+      },
+      {
+        ref: 'Jonah 2:1–10',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/2?lang=eng',
+        wordHelp: 'affliction = suffering · corruption = being lost · fainted = felt hopeless · salvation = being saved',
+        verses: [{b:'Jonah 2',s:1,e:10}],
+        q: 'Where did Jonah pray to the Lord?',
+        opts: ['Out of the fish\'s belly','On the shore of Tarshish','In the temple at Jerusalem','On the ship\'s deck'],
+        hint: 'Look at verse 1.'
+      }
+    ],
+    game: 'jonah',
+    gameConfig: {
+      bg: 'linear-gradient(#003566,#0077b6)',
+      despairItems: ['🌊','🌊','⚡','🌊','🌊'],
+      prayerGoal: 10,
+      hint: 'Tap PRAY to build your faith meter and push back the waves! Keep going — the Lord hears you!',
+      win: 'Jonah prayed and the Lord answered! The whale brought him safely to shore.',
+      mid: {q:'In Jonah 2:2, Jonah said "I cried unto the LORD." What happened when he prayed?', o:['The LORD heard him','Nothing happened','The whale swam away','The storm got worse'], look:'Think about Jonah 2:2.'}
+    }
+  },
+  // 6 — Sunday Nov 29: Jonah 3–4 — The Lord is merciful to all (Storm tap)
+  {
+    day: 'Sunday, Nov 29',
+    dayLabel: 'Sun',
+    title: 'God\'s Mercy for Everyone',
+    icon: '🌈',
+    lesson: 'The Lord is gracious and merciful — His love reaches everyone who turns to Him.',
+    keyRef: 'Jonah 4:2',
+    key: ['for I knew that thou art a gracious God,', 'and merciful,', 'slow to anger,', 'and of great kindness,'],
+    askL: 'Nineveh changed! God forgave them. What can we do if we make a mistake?',
+    askB: 'Jonah was upset that God forgave Nineveh. Why do you think it can be hard to want mercy for others too?',
+    parts: [
+      {
+        ref: 'Jonah 3:1–5',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/3?lang=eng',
+        wordHelp: 'preach = tell people a message · sackcloth = rough cloth worn to show sadness for sins · fast = go without eating as a prayer',
+        verses: [{b:'Jonah 3',s:1,e:5}],
+        q: 'When Jonah finally warned Nineveh, what did the people do?',
+        opts: ['They believed God, fasted, and put on sackcloth','They laughed at Jonah','They sent him back to the sea','They asked him to stay as their king'],
+        hint: 'Look at verse 5.'
+      },
+      {
+        ref: 'Jonah 3:6–10',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/3?lang=eng&verse=6',
+        wordHelp: 'decree = official order from the king · sackcloth = rough cloth to show sadness for sins · repented = felt sorry and stopped',
+        verses: [{b:'Jonah 3',s:6,e:10}],
+        q: 'When God saw that Nineveh turned from their evil ways, what did He do?',
+        opts: ['He repented of the evil He planned and did it not','He still destroyed the city','He sent another prophet','He rewarded them with gold'],
+        hint: 'Look at verse 10.'
+      },
+      {
+        ref: 'Jonah 4:1–11',
+        glUrl: 'https://www.churchofjesuschrist.org/study/scriptures/ot/jonah/4?lang=eng',
+        wordHelp: 'displeased = made very unhappy · gourd = a shade plant that grew fast · worm = a small creature · sixscore = 120 · discern = tell the difference',
+        verses: [{b:'Jonah 4',s:1,e:11}],
+        q: 'In Jonah 4:2, what did Jonah say he knew about God from the beginning?',
+        opts: ['That God is gracious, merciful, slow to anger, and of great kindness','That God only saves Israel, not other nations','That God would destroy Nineveh no matter what','That God would punish Jonah for running away'],
+        hint: 'Look at verse 2.'
+      }
+    ],
+    game: 'storm',
+    gameConfig: {
+      alt: ['🧥','🙏','🕊️'],
+      turn: '💙',
+      bad: '💢',
+      goal: 16,
+      bg: 'linear-gradient(#1a3a1a,#2d8020)',
+      ground: '🏙️ 🏙️ 🏙️',
+      guardLabel: '🐋',
+      reach: '🧥',
+      hint: 'Tap repentance 🧥 and prayer 🙏 before they hit the ground! Avoid angry thoughts 💢.',
+      win: 'Nineveh repented and God showed mercy! He loves everyone who turns to Him.',
+      mid: {q:'In Jonah 3:5, what did the people of Nineveh do when they heard Jonah\'s warning?', o:['They believed God and put on sackcloth','They sent Jonah away','They laughed and kept sinning','They waited to see if Jonah was right'], look:'Think about Jonah 3:5.'}
+    }
+  }
+];
+
+// ═══ STATE ═══════════════════════════════════════════════════════════════════
+let G = {
+  mode: 'little',
+  progress: {},  // {dayIdx: {readDone, verseDone}}
+  journal: []    // [{lesson, keyRef}]
+};
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    G.mode = s.mode || 'little';
+    G.progress = s.progress || {};
+    G.journal = s.journal || [];
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({mode:G.mode, progress:G.progress, journal:G.journal})); } catch(e) {}
+}
+
+// ═══ HUB ═════════════════════════════════════════════════════════════════════
+function setMode(m) {
+  G.mode = m;
+  document.getElementById('btnLittle').classList.toggle('active', m==='little');
+  document.getElementById('btnBig').classList.toggle('active', m==='big');
+  saveState();
+  renderHub();
+}
+
+function renderHub() {
+  const today = (new Date().getDay() + 6) % 7; // 0=Mon..6=Sun
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  LEVELS.forEach((lv, idx) => {
+    const prog = G.progress[idx] || {};
+    const prevDone = idx === 0 || (G.progress[idx-1] || {}).verseDone;
+    const locked = !prevDone;
+    const isToday = idx === today;
+    const readDone = prog.readDone;
+    const verseDone = prog.verseDone;
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-header" onclick="toggleCard(${idx})">
+        <span class="day-num">${lv.dayLabel}</span>
+        <span class="day-title">${lv.icon} ${lv.title}</span>
+        <div class="badge-row">
+          ${readDone ? '<span class="badge">📖</span>' : ''}
+          ${verseDone && G.mode==='little' ? '<span class="badge">🐣</span>' : ''}
+          ${verseDone && G.mode==='big' ? '<span class="badge">🦅</span>' : ''}
+        </div>
+        ${isToday ? '<span class="today-chip">TODAY</span>' : ''}
+      </div>
+      <div class="day-body" id="body-${idx}">
+        ${locked
+          ? `<p class="lock-msg">🔒 Finish day ${idx} first to unlock</p>`
+          : `
+          <div style="font-size:.8rem;color:#555">${lv.day}</div>
+          ${readDone
+            ? `<button class="btn-read" onclick="startRead(${idx})">📖 Read again</button>`
+            : `<button class="btn-read" onclick="startRead(${idx})">📖 Read & Answer</button>`}
+          ${verseDone
+            ? `<button class="btn-play" onclick="startGame(${idx})">🎮 Play again</button>`
+            : (readDone
+                ? `<button class="btn-read" onclick="startLesson(${idx})">📝 Build key verse</button>`
+                : `<button class="btn-locked" disabled>🔒 Read first</button>`)}
+          `}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleCard(idx) {
+  const body = document.getElementById('body-'+idx);
+  const wasOpen = body.classList.contains('open');
+  document.querySelectorAll('.day-body').forEach(b => b.classList.remove('open'));
+  if (!wasOpen) body.classList.add('open');
+}
+
+function showJournal() {
+  const el = document.getElementById('journalEntries');
+  if (!G.journal.length) {
+    el.innerHTML = '<p style="color:#999;font-size:.85rem">No lessons yet — complete a day to add one!</p>';
+  } else {
+    el.innerHTML = G.journal.map(e =>
+      `<div class="journal-entry"><div class="journal-ref">${e.keyRef}</div>${e.lesson}</div>`
+    ).join('');
+  }
+  document.getElementById('journalOverlay').style.display = 'flex';
+}
+
+function confirmUnlockAll() {
+  if (confirm('Unlock all days? (Parent action)')) {
+    LEVELS.forEach((_,i) => { G.progress[i] = G.progress[i] || {}; G.progress[i].readDone = true; });
+    saveState(); renderHub();
+  }
+}
+function confirmReset() {
+  if (confirm('Reset all progress for this week?')) {
+    G.progress = {}; G.journal = []; saveState(); renderHub();
+  }
+}
+
+// ═══ SCREEN SYSTEM ═══════════════════════════════════════════════════════════
+function showScreen(html) {
+  document.getElementById('hub').style.display = 'none';
+  const sc = document.getElementById('screen');
+  sc.className = 'active';
+  sc.innerHTML = html;
+}
+function goHub() {
+  document.getElementById('hub').style.display = 'flex';
+  document.getElementById('screen').className = '';
+  document.getElementById('screen').innerHTML = '';
+  renderHub();
+}
+
+// ═══ READING SCREEN ══════════════════════════════════════════════════════════
+let R = {}; // reading state
+function startRead(dayIdx) {
+  R = {dayIdx, partIdx:0, partsDone:0};
+  renderReadPart();
+}
+
+function renderReadPart() {
+  const lv = LEVELS[R.dayIdx];
+  const part = lv.parts[R.partIdx];
+  const hasEasy = part.verses.some(vr => {
+    for (let i = vr.s; i <= vr.e; i++) {
+      const key = vr.b.replace('Amos ','Amos ').replace(' ','').replace('Amos','Amos ')
+                      .replace('Obadiah','Obadiah ').replace('Jonah','Jonah ');
+      // Check EASY set
+    }
+    return false;
+  });
+  // Build verse HTML
+  let verseHtml = '';
+  part.verses.forEach(vr => {
+    for (let n = vr.s; n <= vr.e; n++) {
+      const book = vr.b;
+      const key = `${book} ${n}`;
+      // e.g. 'Amos 3:7'
+      const bookShort = book.split(' ').slice(0,-1).join(' ') || book;
+      const chapter = parseInt(book.split(' ').pop());
+      const easyKey = `${book.replace(' ','')}_${n}`;
+      // Build easy lookup key like "Amos 3:7"
+      const bookName = book.replace(/\s+\d+$/, '');
+      const ch = parseInt(book.match(/\d+$/)[0]);
+      const easyRef = `${bookName} ${ch}:${n}`;
+      const isEasy = EASY.has(easyRef);
+      const txt = TEXT[book] ? TEXT[book][n] || '' : '';
+      if (!txt) continue;
+      verseHtml += `<span style="${isEasy?'font-weight:700;color:#3f37c9':''}">${n} ${txt}</span> `;
+    }
+  });
+
+  // Check if any verse in this part is easy
+  let hasEasyVerse = false;
+  part.verses.forEach(vr => {
+    const bookName = vr.b.replace(/\s+\d+$/, '');
+    const ch = parseInt(vr.b.match(/\d+$/)[0]);
+    for (let n = vr.s; n <= vr.e; n++) {
+      if (EASY.has(`${bookName} ${ch}:${n}`)) hasEasyVerse = true;
+    }
+  });
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="goHub()">←</button>
+      <span class="scr-title">${LEVELS[R.dayIdx].icon} ${LEVELS[R.dayIdx].title}</span>
+    </div>
+    <div class="read-card">
+      <div class="part-header">📖 Part ${R.partIdx+1} of 3 &nbsp;·&nbsp; ${part.ref}</div>
+      ${hasEasyVerse ? '<div class="easy-legend">Bold blue = easy verse for little readers</div>' : ''}
+      <div class="verse-block">${verseHtml}</div>
+      <div class="word-help">💬 Word help: ${part.wordHelp}</div>
+      <a class="gl-link" href="${part.glUrl}" target="_blank">📗 Open in Gospel Library</a>
+      <button class="ask-btn" onclick="showPartQ(${R.dayIdx},${R.partIdx})">✅ We read it out loud! Ask me →</button>
+    </div>
+  `);
+}
+
+function showPartQ(dayIdx, partIdx) {
+  const lv = LEVELS[dayIdx];
+  const part = lv.parts[partIdx];
+  const shuffled = [...part.opts];
+  for (let i = shuffled.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [shuffled[i],shuffled[j]] = [shuffled[j],shuffled[i]];
+  }
+  const correct = part.opts[0];
+  const qHtml = `
+    <div class="quiz-overlay" id="qOverlay">
+      <div class="quiz-box">
+        <div class="quiz-q">${part.q}</div>
+        <div class="quiz-opts" id="qOpts">
+          ${shuffled.map(o => `<button class="quiz-opt" onclick="checkPartQ(this,'${o.replace(/'/g,"\\'")}','${correct.replace(/'/g,"\\'")}',${dayIdx},${partIdx})">${o}</button>`).join('')}
+        </div>
+        <div class="quiz-feedback" id="qFeedback"></div>
+      </div>
+    </div>`;
+  document.getElementById('screen').insertAdjacentHTML('beforeend', qHtml);
+}
+
+function checkPartQ(btn, chosen, correct, dayIdx, partIdx) {
+  const fb = document.getElementById('qFeedback');
+  if (chosen === correct) {
+    fb.className = 'quiz-feedback right';
+    fb.textContent = '✅ That\'s right!';
+    document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    setTimeout(() => {
+      document.getElementById('qOverlay').remove();
+      R.partIdx++;
+      if (R.partIdx < 3) {
+        renderReadPart();
+      } else {
+        G.progress[dayIdx] = G.progress[dayIdx] || {};
+        G.progress[dayIdx].readDone = true;
+        saveState();
+        startLesson(dayIdx);
+      }
+    }, 900);
+  } else {
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = `❌ Look again: ${LEVELS[dayIdx].parts[partIdx].hint}`;
+    document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    setTimeout(() => {
+      document.getElementById('qOverlay').remove();
+      showPartQ(dayIdx, partIdx);
+    }, 2800);
+  }
+}
+
+// ═══ LESSON / VERSE BUILDER ═══════════════════════════════════════════════════
+let VB = {};
+function startLesson(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  VB = {dayIdx, chips: [...lv.key], placed: [], done: false};
+  // Shuffle chips
+  for (let i = VB.chips.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [VB.chips[i],VB.chips[j]] = [VB.chips[j],VB.chips[i]];
+  }
+  renderLesson();
+}
+
+function renderLesson() {
+  const lv = LEVELS[VB.dayIdx];
+  const modeLabel = G.mode === 'little' ? 'Little' : 'Big';
+  const ask = G.mode === 'little' ? lv.askL : lv.askB;
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="goHub()">←</button>
+      <span class="scr-title">📝 Today's Lesson</span>
+    </div>
+    <div class="verse-build-area">
+      <div class="lesson-box">💡 ${lv.lesson}</div>
+      <div class="keyref">🧩 Build the key verse: ${lv.keyRef}</div>
+      <div class="slots" id="slotArea">
+        ${VB.placed.map(p => `<span class="chip placed" onclick="removeChip('${p.replace(/'/g,"\\'")}')">  ${p}</span>`).join('')}
+      </div>
+      <div class="chips" id="chipPool">
+        ${VB.chips.map(c => `<span class="chip pool" onclick="placeChip('${c.replace(/'/g,"\\'")}')">  ${c}</span>`).join('')}
+      </div>
+      <div class="build-feedback" id="buildFeedback"></div>
+      <div style="font-size:.85rem;color:#555;margin-top:4px">💬 ${modeLabel}: ${ask}</div>
+    </div>
+  `);
+}
+
+function placeChip(chip) {
+  if (VB.done) return;
+  const lv = LEVELS[VB.dayIdx];
+  const nextExpected = lv.key[VB.placed.length];
+  if (chip === nextExpected) {
+    VB.placed.push(chip);
+    VB.chips = VB.chips.filter(c => c !== chip);
+    if (VB.placed.length === lv.key.length) {
+      VB.done = true;
+      G.progress[VB.dayIdx] = G.progress[VB.dayIdx] || {};
+      G.progress[VB.dayIdx].verseDone = true;
+      if (!G.journal.find(e => e.keyRef === lv.keyRef)) {
+        G.journal.push({lesson: lv.lesson, keyRef: lv.keyRef});
+      }
+      saveState();
+      showVerseWin(VB.dayIdx);
+      return;
+    }
+    renderLesson();
+  } else {
+    // Flash wrong
+    const chips = document.querySelectorAll('#chipPool .chip');
+    chips.forEach(el => { if (el.textContent.trim() === chip.trim()) el.classList.add('wrong-flash'); });
+    setTimeout(() => chips.forEach(el => el.classList.remove('wrong-flash')), 500);
+  }
+}
+
+function removeChip(chip) {
+  if (VB.done) return;
+  VB.placed = VB.placed.filter(c => c !== chip);
+  VB.chips.unshift(chip);
+  renderLesson();
+}
+
+function showVerseWin(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const modeLabel = G.mode === 'little' ? 'Little' : 'Big';
+  const ask = G.mode === 'little' ? lv.askL : lv.askB;
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="goHub()">←</button>
+      <span class="scr-title">✅ Verse Built!</span>
+    </div>
+    <div class="verse-build-area">
+      <div class="lesson-box">💡 ${lv.lesson}</div>
+      <div class="keyref">${lv.keyRef}</div>
+      <div class="slots">${lv.key.map(p => `<span class="chip placed">${p}</span>`).join('')}</div>
+      <div style="color:#155724;font-weight:700;text-align:center;padding:8px">🎉 Added to Watchman's Journal!</div>
+      <div style="font-size:.85rem;color:#555">💬 ${modeLabel}: ${ask}</div>
+      <button onclick="startGame(${dayIdx})" style="background:#0077b6;color:#fff;border:none;border-radius:12px;padding:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px">🎮 Play today's game →</button>
+      <button onclick="goHub()" style="background:#eee;color:#333;border:none;border-radius:12px;padding:10px;font-size:.9rem;cursor:pointer">← Back to all days</button>
+    </div>
+  `);
+}
+
+// ═══ GAMES ══════════════════════════════════════════════════════════════════
+function startGame(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  switch(lv.game) {
+    case 'explore': startExplore(dayIdx); break;
+    case 'laneDefense': startLaneDefense(dayIdx); break;
+    case 'fetchBoss': startFetchBoss(dayIdx); break;
+    case 'incremental': startIncremental(dayIdx); break;
+    case 'wander': startWander(dayIdx); break;
+    case 'jonah': startJonah(dayIdx); break;
+    case 'storm': startStorm(dayIdx); break;
+  }
+}
+
+// ── Shared game utilities ────────────────────────────────────────────────────
+function gameHeader(dayIdx, score, goal, lives, timerLeft) {
+  const lv = LEVELS[dayIdx];
+  const bigKids = G.mode === 'big';
+  return `
+    <div class="info-bar">
+      <span>${lv.icon} ${score}/${goal}</span>
+      ${bigKids && lives !== null ? `<span class="lives-row">${'❤️'.repeat(Math.max(0,lives))}</span>` : ''}
+      ${bigKids && timerLeft !== null ? `<span class="timer-txt">⏱ ${timerLeft}s</span>` : ''}
+    </div>
+    <div class="progress-bar-wrap" style="position:absolute;top:34px;left:4px;right:4px;z-index:5">
+      <div class="progress-bar-fill" id="progBar" style="width:${Math.min(100,score/goal*100)}%"></div>
+    </div>`;
+}
+
+function burst(wrap, x, y, emoji) {
+  const b = document.createElement('div');
+  b.className = 'burst';
+  b.textContent = emoji;
+  b.style.left = x + 'px';
+  b.style.top = y + 'px';
+  wrap.appendChild(b);
+  setTimeout(() => b.remove(), 700);
+}
+
+function showMidQ(cfg, onCorrect) {
+  const q = cfg;
+  const shuffled = [...q.o];
+  for (let i = shuffled.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [shuffled[i],shuffled[j]] = [shuffled[j],shuffled[i]];
+  }
+  const correct = q.o[0];
+  const ov = document.createElement('div');
+  ov.className = 'mid-overlay';
+  ov.innerHTML = `
+    <div class="quiz-box">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:4px">🏁 Checkpoint!</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts" id="midOpts">
+        ${shuffled.map(o => `<button class="quiz-opt" data-val="${o.replace(/"/g,'&quot;')}">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="midFb"></div>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.querySelectorAll('.quiz-opt').forEach(btn => {
+    btn.onclick = () => {
+      const val = btn.getAttribute('data-val');
+      if (val === correct) {
+        document.getElementById('midFb').className = 'quiz-feedback right';
+        document.getElementById('midFb').textContent = '✅ Correct! Keep going!';
+        btn.style.background = '#d4edda';
+        ov.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+        setTimeout(() => { ov.remove(); onCorrect(); }, 900);
+      } else {
+        document.getElementById('midFb').className = 'quiz-feedback wrong';
+        document.getElementById('midFb').textContent = `❌ ${q.look}`;
+        ov.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+        setTimeout(() => {
+          ov.remove();
+          showMidQ(cfg, onCorrect);
+        }, 2800);
+      }
+    };
+  });
+}
+
+function showWin(dayIdx, onReplay) {
+  const lv = LEVELS[dayIdx];
+  const modeLabel = G.mode === 'little' ? 'Little' : 'Big';
+  const ask = G.mode === 'little' ? lv.askL : lv.askB;
+  G.progress[dayIdx] = G.progress[dayIdx] || {};
+  G.progress[dayIdx].verseDone = true;
+  saveState();
+  const ov = document.createElement('div');
+  ov.className = 'win-overlay';
+  ov.innerHTML = `
+    <div class="win-box">
+      <div class="win-emoji">🐋</div>
+      <div class="win-title">Great job!</div>
+      <div class="win-lesson">💡 ${lv.lesson}</div>
+      <div class="win-q">🏠 Bring it home (${modeLabel}): ${ask}</div>
+      <button class="win-btn" onclick="this.closest('.win-overlay').remove();goHub()">← All days</button>
+      <button class="win-btn" style="background:#eee;color:#333" onclick="this.closest('.win-overlay').remove();${onReplay}">🔄 Play again</button>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+// ── EXPLORE GAME (Mon) ─────────────────────────────────────────────────────
+function startExplore(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const goal = bigKids ? Math.ceil(cfg.goal * 1.6) : cfg.goal;
+  let score = 0, lives = 3, timer = 70, midDone = false, gameOver = false;
+  let items = [];
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver_=true;goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap" id="gWrap" style="background:${cfg.bg}">
+      ${gameHeader(dayIdx, score, goal, lives, timer)}
+      <div class="game-canvas" id="gCanvas"></div>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const canvas = document.getElementById('gCanvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+
+  // Wally (player)
+  const wally = document.createElement('div');
+  wally.style.cssText = `position:absolute;font-size:2.4rem;z-index:5;transition:all .15s;cursor:pointer;`;
+  wally.textContent = '🐋';
+  wally.style.left = (W/2-20)+'px';
+  wally.style.top = (H/2-20)+'px';
+  canvas.appendChild(wally);
+
+  // Touch/click to move Wally
+  wrap.addEventListener('click', e => {
+    if (gameOver) return;
+    const r = wrap.getBoundingClientRect();
+    wally.style.left = (e.clientX - r.left - 24) + 'px';
+    wally.style.top = (e.clientY - r.top - 24) + 'px';
+  });
+  wrap.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (gameOver) return;
+    const t = e.touches[0];
+    const r = wrap.getBoundingClientRect();
+    wally.style.left = (t.clientX - r.left - 24) + 'px';
+    wally.style.top = (t.clientY - r.top - 24) + 'px';
+  }, {passive:false});
+
+  function spawnItem() {
+    if (gameOver) return;
+    const isScroll = Math.random() < 0.7;
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.textContent = isScroll ? '📜' : '🪤';
+    el.style.left = (20 + Math.random() * (W - 60)) + 'px';
+    el.style.top = (60 + Math.random() * (H - 120)) + 'px';
+    canvas.appendChild(el);
+    items.push({el, isScroll});
+    el.addEventListener('click', () => {
+      if (gameOver) return;
+      const r = el.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+      burst(canvas, parseFloat(el.style.left), parseFloat(el.style.top), isScroll ? '✨' : '💥');
+      el.remove();
+      items = items.filter(it => it.el !== el);
+      if (isScroll) {
+        score++;
+        document.querySelector('.info-bar span').textContent = `${lv.icon} ${score}/${goal}`;
+        document.getElementById('progBar').style.width = Math.min(100, score/goal*100)+'%';
+        if (!midDone && score >= Math.floor(goal/2)) {
+          midDone = true;
+          pauseGame = true;
+          showMidQ(lv.gameConfig.mid, () => { pauseGame = false; });
+        }
+        if (score >= goal) { gameOver = true; showWin(dayIdx, `startExplore(${dayIdx})`); }
+      } else {
+        if (bigKids) {
+          lives--;
+          document.querySelector('.lives-row').textContent = '❤️'.repeat(Math.max(0,lives));
+          if (lives <= 0) { gameOver = true; showGameOver(dayIdx); }
+        }
+      }
+    });
+    setTimeout(() => { if (!gameOver) el.remove(); items = items.filter(it=>it.el!==el); }, 3500);
+  }
+
+  let pauseGame = false;
+  const spawnInt = setInterval(() => { if (!gameOver && !pauseGame) spawnItem(); }, 900);
+  if (bigKids) {
+    const timerInt = setInterval(() => {
+      if (gameOver) { clearInterval(timerInt); return; }
+      if (!pauseGame) {
+        timer--;
+        const tt = document.querySelector('.timer-txt');
+        if (tt) tt.textContent = `⏱ ${timer}s`;
+        if (timer <= 0) { gameOver = true; clearInterval(timerInt); clearInterval(spawnInt); showGameOver(dayIdx); }
+      }
+    }, 1000);
+  }
+  // Cleanup on nav
+  wrap._cleanup = () => { gameOver = true; clearInterval(spawnInt); };
+}
+
+function showGameOver(dayIdx) {
+  const ov = document.createElement('div');
+  ov.className = 'win-overlay';
+  ov.innerHTML = `<div class="win-box">
+    <div class="win-emoji">😤</div>
+    <div class="win-title" style="color:#c00">Time's up!</div>
+    <button class="win-btn" onclick="this.closest('.win-overlay').remove();startGame(${dayIdx})">Try again</button>
+    <button class="win-btn" style="background:#eee;color:#333" onclick="this.closest('.win-overlay').remove();goHub()">← All days</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+// ── LANE DEFENSE (Tue) ────────────────────────────────────────────────────────
+function startLaneDefense(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const goal = bigKids ? Math.ceil(cfg.goal * 1.6) : cfg.goal;
+  let score = 0, midDone = false, gameOver = false, currency = 30;
+  let defenders = []; // {lane, x, el}
+  let enemies = [];   // {lane, x, hp, el}
+  let projs = [];
+  let raf;
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver=true;cancelAnimationFrame(raf);goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap" id="gWrap" style="background:${cfg.bg}">
+      ${gameHeader(dayIdx, score, goal, bigKids ? 3 : null, null)}
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;z-index:2" id="lanesWrap"></div>
+      <div class="currency-bar">
+        <span>✨ <span id="currVal">${currency}</span></span>
+        <button class="buy-btn" onclick="buyDefender(0)">Row 1 (10)</button>
+        <button class="buy-btn" onclick="buyDefender(1)">Row 2 (10)</button>
+        <button class="buy-btn" onclick="buyDefender(2)">Row 3 (10)</button>
+      </div>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+  const laneH = (H - 70) / cfg.lanes;
+  const lanesWrap = document.getElementById('lanesWrap');
+  lanesWrap.style.bottom = '70px';
+  lanesWrap.style.top = '50px';
+
+  // Draw lane dividers
+  for (let i = 0; i < cfg.lanes; i++) {
+    const lane = document.createElement('div');
+    lane.className = 'lane';
+    lane.style.cssText = `flex:1;border-bottom:1px solid rgba(255,255,255,.1);position:relative;`;
+    lanesWrap.appendChild(lane);
+  }
+
+  window.buyDefender = (lane) => {
+    if (currency < 10 || gameOver) return;
+    currency -= 10;
+    document.getElementById('currVal').textContent = currency;
+    // Place at a good spot
+    const x = 60 + Math.random() * (W * 0.3);
+    const laneEl = lanesWrap.children[lane];
+    const def = document.createElement('div');
+    def.style.cssText = `position:absolute;font-size:1.6rem;bottom:4px;left:${x}px;z-index:3`;
+    def.textContent = cfg.defender;
+    laneEl.appendChild(def);
+    defenders.push({lane, x, el:def, laneEl, lastShot:0});
+  };
+
+  // Spawn enemies
+  let spawnTimer = 0;
+  const ENEMY_SPEED = bigKids ? 55 : 40;
+
+  function spawnEnemy() {
+    const lane = Math.floor(Math.random() * cfg.lanes);
+    const laneEl = lanesWrap.children[lane];
+    const en = document.createElement('div');
+    en.style.cssText = `position:absolute;font-size:1.6rem;bottom:4px;right:0;z-index:3`;
+    en.textContent = cfg.enemies[Math.floor(Math.random()*cfg.enemies.length)];
+    laneEl.appendChild(en);
+    enemies.push({lane, x:W+10, hp:3, el:en, laneEl});
+  }
+
+  // Currency trickle
+  const currInt = setInterval(() => {
+    if (gameOver) return;
+    currency += bigKids ? 2 : 3;
+    document.getElementById('currVal').textContent = currency;
+  }, 1500);
+
+  let last = 0;
+  function loop(ts) {
+    if (gameOver) return;
+    const dt = Math.min(0.05, (ts - last) / 1000);
+    last = ts;
+    spawnTimer += dt;
+    if (spawnTimer > (bigKids ? 2.5 : 3.5)) {
+      spawnTimer = 0;
+      spawnEnemy();
+    }
+
+    // Move enemies
+    enemies = enemies.filter(en => {
+      en.x -= ENEMY_SPEED * dt;
+      en.el.style.right = '';
+      en.el.style.left = en.x + 'px';
+      if (en.x < 20) {
+        en.el.remove();
+        return false;
+      }
+      return true;
+    });
+
+    // Defenders shoot
+    defenders.forEach(def => {
+      const now = ts;
+      if (now - def.lastShot > 1200) {
+        // Find closest enemy in same lane
+        const target = enemies.filter(e => e.lane === def.lane && e.x > def.x).sort((a,b)=>a.x-b.x)[0];
+        if (target) {
+          def.lastShot = now;
+          // Create projectile
+          const pr = document.createElement('div');
+          pr.style.cssText = `position:absolute;font-size:1.1rem;bottom:14px;left:${def.x+20}px;z-index:4`;
+          pr.textContent = cfg.bullet;
+          def.laneEl.appendChild(pr);
+          let px = def.x + 20;
+          const prInt = setInterval(() => {
+            px += 220 * 0.03;
+            pr.style.left = px+'px';
+            if (px >= target.x) {
+              pr.remove();
+              clearInterval(prInt);
+              target.hp--;
+              if (target.hp <= 0) {
+                target.el.remove();
+                enemies = enemies.filter(e => e !== target);
+                score++;
+                document.querySelector('.info-bar span').textContent = `${lv.icon} ${score}/${goal}`;
+                document.getElementById('progBar').style.width = Math.min(100,score/goal*100)+'%';
+                if (!midDone && score >= Math.floor(goal/2)) {
+                  midDone = true;
+                  gameOver = true;
+                  cancelAnimationFrame(raf);
+                  showMidQ(lv.gameConfig.mid, () => { gameOver = false; raf = requestAnimationFrame(loop); });
+                }
+                if (score >= goal) {
+                  gameOver = true;
+                  cancelAnimationFrame(raf);
+                  clearInterval(currInt);
+                  showWin(dayIdx, `startLaneDefense(${dayIdx})`);
+                }
+              }
+            }
+          }, 30);
+        }
+      }
+    });
+
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+}
+
+// ── FETCH BOSS (Wed) ──────────────────────────────────────────────────────────
+function startFetchBoss(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  let bossHp = cfg.bossHp, score = 0, midDone = false, gameOver = false;
+  let carrying = false, px = 100, py = 200, raf;
+  let thorns = [];
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver=true;cancelAnimationFrame(raf);goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap" id="gWrap" style="background:${cfg.bg}">
+      <div class="boss-hp-bar"><div class="boss-hp-fill" id="bossHpBar" style="width:100%"></div></div>
+      <div style="position:absolute;top:28px;left:0;right:0;text-align:center;color:#fff;font-size:.75rem;font-weight:700;z-index:5">Boss HP</div>
+      <div class="game-canvas" id="gCanvas"></div>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const canvas = document.getElementById('gCanvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+
+  // Boss
+  const bossEl = document.createElement('div');
+  bossEl.className = 'boss-sprite';
+  bossEl.textContent = cfg.boss;
+  bossEl.style.cssText = `position:absolute;font-size:3.5rem;right:20px;top:80px;z-index:3;transition:transform .2s`;
+  canvas.appendChild(bossEl);
+
+  // Pickup
+  let pickupX = W/2 - 20, pickupY = H/2;
+  const pickEl = document.createElement('div');
+  pickEl.textContent = cfg.pickup;
+  pickEl.style.cssText = `position:absolute;font-size:2rem;z-index:4;animation:glow 1s ease-in-out infinite`;
+  pickEl.style.left = pickupX+'px'; pickEl.style.top = pickupY+'px';
+  canvas.appendChild(pickEl);
+
+  // Player
+  const playerEl = document.createElement('div');
+  playerEl.textContent = cfg.player;
+  playerEl.style.cssText = `position:absolute;font-size:2rem;z-index:5;left:${px}px;top:${py}px`;
+  canvas.appendChild(playerEl);
+
+  // Info
+  const infoEl = document.createElement('div');
+  infoEl.style.cssText = `position:absolute;top:5px;left:0;right:0;text-align:center;color:#fff;font-weight:700;font-size:.85rem;z-index:6`;
+  infoEl.textContent = carrying ? `🌟 Carry it to the ${cfg.boss}!` : `Grab ${cfg.pickup}`;
+  canvas.appendChild(infoEl);
+
+  // Touch/move
+  wrap.addEventListener('click', e => moveTo(e.clientX, e.clientY));
+  wrap.addEventListener('touchmove', e => { e.preventDefault(); moveTo(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+  function moveTo(cx,cy) {
+    const r = wrap.getBoundingClientRect();
+    px = Math.max(0, Math.min(W-40, cx - r.left - 20));
+    py = Math.max(50, Math.min(H-40, cy - r.top - 20));
+  }
+
+  // Spawn thorns
+  function spawnThorn() {
+    if (gameOver) return;
+    const tEl = document.createElement('div');
+    tEl.textContent = '🌵';
+    const tx = Math.random()*(W-40)+10, ty = 60+Math.random()*(H-120);
+    tEl.style.cssText = `position:absolute;font-size:1.3rem;left:${tx}px;top:${ty}px;z-index:3`;
+    canvas.appendChild(tEl);
+    thorns.push({el:tEl,x:tx,y:ty});
+    setTimeout(() => { if (!gameOver) { tEl.remove(); thorns=thorns.filter(t=>t.el!==tEl); } }, 3000);
+  }
+  const thornInt = setInterval(() => { if (!gameOver) spawnThorn(); }, bigKids ? 1800 : 2500);
+
+  let last = 0;
+  function loop(ts) {
+    if (gameOver) return;
+    const dt = Math.min(0.05, (ts-last)/1000);
+    last = ts;
+
+    playerEl.style.left = px+'px'; playerEl.style.top = py+'px';
+
+    if (!carrying) {
+      // Check pickup collision
+      const dx = px - pickupX, dy = py - pickupY;
+      if (Math.sqrt(dx*dx+dy*dy) < 36) {
+        carrying = true;
+        pickEl.style.display = 'none';
+        infoEl.textContent = `🌟 Carry it to the ${cfg.boss}!`;
+        playerEl.textContent = cfg.player + cfg.pickup;
+      }
+    } else {
+      // Check boss collision
+      const br = bossEl.getBoundingClientRect(), pr = playerEl.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+      const bx = parseFloat(bossEl.style.right || '20'), by = parseFloat(bossEl.style.top || '80');
+      const dist = Math.sqrt((px-(W-70))*(px-(W-70))+(py-90)*(py-90));
+      if (dist < 55) {
+        carrying = false;
+        bossHp--;
+        document.getElementById('bossHpBar').style.width = Math.max(0,bossHp/cfg.bossHp*100)+'%';
+        bossEl.style.transform = 'scale(1.4)';
+        setTimeout(()=>bossEl.style.transform='',300);
+        playerEl.textContent = cfg.player;
+        score++;
+        // Respawn pickup
+        pickupX = 20+Math.random()*(W/2-40); pickupY = 60+Math.random()*(H-120);
+        pickEl.style.left=pickupX+'px'; pickEl.style.top=pickupY+'px';
+        pickEl.style.display='';
+        infoEl.textContent = `Grab ${cfg.pickup}`;
+        if (!midDone && score >= Math.ceil(cfg.bossHp/2)) {
+          midDone = true;
+          gameOver = true;
+          cancelAnimationFrame(raf);
+          showMidQ(lv.gameConfig.mid, ()=>{ gameOver=false; raf=requestAnimationFrame(loop); });
+        }
+        if (bossHp <= 0) {
+          gameOver = true;
+          cancelAnimationFrame(raf);
+          clearInterval(thornInt);
+          showWin(dayIdx, `startFetchBoss(${dayIdx})`);
+          return;
+        }
+      }
+    }
+
+    // Check thorn collision (big kids)
+    if (bigKids && carrying) {
+      thorns.forEach(t => {
+        const dist = Math.sqrt((px-t.x)*(px-t.y)+(py-t.y)*(py-t.y));
+        if (dist < 28) {
+          carrying = false;
+          playerEl.textContent = cfg.player;
+          pickEl.style.display='';
+          infoEl.textContent = `Grab ${cfg.pickup}`;
+        }
+      });
+    }
+
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+}
+
+// ── INCREMENTAL (Thu) ────────────────────────────────────────────────────────
+function startIncremental(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const goal = bigKids ? Math.ceil(cfg.goal * 1.5) : cfg.goal;
+  let words = 0, midDone = false, gameOver = false;
+  let upgrades = cfg.upgrades.map((u,i) => ({...u, owned:false}));
+  let autoRate = 0;
+  let autoInt;
+
+  function render() {
+    showScreen(`
+      <div class="scr-header">
+        <button class="back-btn" onclick="clearInterval(autoInt);goHub()">←</button>
+        <span class="scr-title">${lv.icon} ${lv.title}</span>
+      </div>
+      <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+      <div class="game-wrap" id="gWrap" style="background:${cfg.bg};overflow:visible">
+        <div class="incr-wrap">
+          <div class="word-counter">${Math.floor(words)}</div>
+          <div class="word-label">Words of God gathered (goal: ${goal})</div>
+          <div class="progress-bar-wrap" style="width:90%"><div class="progress-bar-fill" style="width:${Math.min(100,words/goal*100)}%"></div></div>
+          <button class="tap-btn" id="tapBtn" onclick="tapWord()">${cfg.tapItem}</button>
+          <div class="upgrades-col">
+            ${upgrades.map((u,i) => `
+              <button class="upg-btn ${words>=u.cost&&!u.owned?'unlocked':''}" id="upg-${i}"
+                ${u.owned?'disabled':''} onclick="buyUpgrade(${i})">
+                <span>${u.owned?'✅':''} ${u.name}</span>
+                <span>${u.owned?'active':'Cost: '+u.cost}</span>
+              </button>`).join('')}
+          </div>
+        </div>
+      </div>
+    `);
+    document.getElementById('tapBtn').addEventListener('click', tapWord);
+  }
+
+  window.tapWord = () => {
+    if (gameOver) return;
+    words++;
+    checkProgress();
+    updateDisplay();
+  };
+
+  window.buyUpgrade = (i) => {
+    if (words < upgrades[i].cost || upgrades[i].owned || gameOver) return;
+    words -= upgrades[i].cost;
+    upgrades[i].owned = true;
+    autoRate += upgrades[i].rate;
+    checkProgress();
+    render();
+    // Restart autoInt
+    clearInterval(autoInt);
+    autoInt = setInterval(() => {
+      if (gameOver) return;
+      words += autoRate * 0.5;
+      checkProgress();
+      updateDisplay();
+    }, 500);
+  };
+
+  function updateDisplay() {
+    const wc = document.querySelector('.word-counter');
+    const pb = document.querySelector('.progress-bar-fill');
+    if (wc) wc.textContent = Math.floor(words);
+    if (pb) pb.style.width = Math.min(100,words/goal*100)+'%';
+    upgrades.forEach((u,i) => {
+      const btn = document.getElementById('upg-'+i);
+      if (btn && !u.owned) btn.className = `upg-btn ${words>=u.cost?'unlocked':''}`;
+    });
+  }
+
+  function checkProgress() {
+    if (!midDone && words >= Math.floor(goal/2)) {
+      midDone = true;
+      gameOver = true;
+      clearInterval(autoInt);
+      showMidQ(lv.gameConfig.mid, () => {
+        gameOver = false;
+        autoInt = setInterval(() => {
+          if (gameOver) return;
+          words += autoRate * 0.5;
+          checkProgress();
+          updateDisplay();
+        }, 500);
+      });
+    }
+    if (words >= goal && !gameOver) {
+      gameOver = true;
+      clearInterval(autoInt);
+      showWin(dayIdx, `clearInterval(autoInt);startIncremental(${dayIdx})`);
+    }
+  }
+
+  render();
+}
+
+// ── WANDER (Fri - Obadiah) ────────────────────────────────────────────────────
+function startWander(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const goal = bigKids ? Math.ceil(cfg.goal * 1.6) : cfg.goal;
+  let score = 0, lives = 3, timer = 70, midDone = false, gameOver = false;
+  let items = [], raf;
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver=true;cancelAnimationFrame(raf);goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap" id="gWrap" style="background:${cfg.bg}">
+      ${gameHeader(dayIdx, score, goal, bigKids?lives:null, bigKids?timer:null)}
+      <div class="game-canvas" id="gCanvas"></div>
+      <div class="ground-bar">${cfg.ground}</div>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const canvas = document.getElementById('gCanvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight - 52;
+
+  function spawnItem() {
+    if (gameOver) return;
+    const isBad = bigKids && Math.random() < 0.25;
+    const emoji = isBad ? cfg.bad : cfg.alt[Math.floor(Math.random()*cfg.alt.length)];
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.textContent = emoji;
+    let x = 20 + Math.random()*(W-50), y = 60 + Math.random()*(H-120);
+    let vx = (Math.random()-0.5)*60, vy = (Math.random()-0.5)*60;
+    el.style.left = x+'px'; el.style.top = y+'px';
+    canvas.appendChild(el);
+    const item = {el, x, y, vx, vy, isBad};
+    items.push(item);
+    el.addEventListener('click', () => {
+      if (gameOver) return;
+      burst(canvas, x, y, isBad ? '💥' : cfg.turn);
+      el.remove(); items = items.filter(it=>it.el!==el);
+      if (!isBad) {
+        score++;
+        document.querySelector('.info-bar span').textContent = `${lv.icon} ${score}/${goal}`;
+        document.getElementById('progBar').style.width = Math.min(100,score/goal*100)+'%';
+        if (!midDone && score >= Math.floor(goal/2)) {
+          midDone = true; gameOver = true;
+          cancelAnimationFrame(raf);
+          showMidQ(lv.gameConfig.mid, ()=>{ gameOver=false; raf=requestAnimationFrame(loop); });
+        }
+        if (score >= goal) { gameOver=true; cancelAnimationFrame(raf); showWin(dayIdx,`startWander(${dayIdx})`); }
+      } else if (bigKids) {
+        lives--; document.querySelector('.lives-row').textContent='❤️'.repeat(Math.max(0,lives));
+        if (lives<=0) { gameOver=true; cancelAnimationFrame(raf); showGameOver(dayIdx); }
+      }
+    });
+  }
+
+  let last = 0;
+  function loop(ts) {
+    if (gameOver) return;
+    const dt = Math.min(0.05,(ts-last)/1000); last=ts;
+    items.forEach(it => {
+      it.x += it.vx*dt; it.y += it.vy*dt;
+      if (it.x<10||it.x>W-40) it.vx*=-1;
+      if (it.y<50||it.y>H-40) it.vy*=-1;
+      it.x=Math.max(10,Math.min(W-40,it.x)); it.y=Math.max(50,Math.min(H-40,it.y));
+      it.el.style.left=it.x+'px'; it.el.style.top=it.y+'px';
+    });
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+
+  const spawnInt = setInterval(()=>{ if (!gameOver) spawnItem(); }, 1200);
+  if (bigKids) {
+    const tInt = setInterval(()=>{
+      if (gameOver){clearInterval(tInt);return;}
+      timer--; const tt=document.querySelector('.timer-txt'); if(tt) tt.textContent=`⏱ ${timer}s`;
+      if (timer<=0){gameOver=true;clearInterval(tInt);clearInterval(spawnInt);cancelAnimationFrame(raf);showGameOver(dayIdx);}
+    },1000);
+  }
+}
+
+// ── JONAH PRAYER GAME (Sat) ───────────────────────────────────────────────────
+function startJonah(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const prayGoal = bigKids ? 15 : cfg.prayerGoal;
+  let prayCount = 0, midDone = false, gameOver = false, despairs = [];
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver=true;goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap whale-bg" id="gWrap">
+      <div class="prayer-meter"><div class="prayer-fill" id="pFill" style="width:0%"></div></div>
+      <div style="position:absolute;top:16px;left:0;right:0;text-align:center;color:#90e0ef;font-size:.75rem;font-weight:700;z-index:5">Faith meter ${prayCount}/${prayGoal}</div>
+      <div class="jonah-sprite">🧑</div>
+      <div class="wave-anim"></div>
+      <div class="game-canvas" id="gCanvas"></div>
+      <button class="pray-action-btn" id="prayBtn" onclick="doPray()">🙏 Pray</button>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const canvas = document.getElementById('gCanvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+
+  function spawnDespair() {
+    if (gameOver) return;
+    const em = cfg.despairItems[Math.floor(Math.random()*cfg.despairItems.length)];
+    const el = document.createElement('div');
+    el.className = 'despair-wave';
+    el.textContent = em;
+    el.style.left = (Math.random()*(W-40))+'px';
+    el.style.top = '-40px';
+    canvas.appendChild(el);
+    despairs.push({el, y:-40, speed: 40+Math.random()*30});
+  }
+
+  window.doPray = () => {
+    if (gameOver) return;
+    prayCount++;
+    document.getElementById('pFill').style.width = Math.min(100,prayCount/prayGoal*100)+'%';
+    document.querySelector('[style*="Faith meter"]').textContent = `Faith meter ${prayCount}/${prayGoal}`;
+    // Push waves back
+    despairs.forEach(d => { d.y -= 60; d.el.style.top = d.y+'px'; });
+    despairs = despairs.filter(d => { if (d.y < -60) { d.el.remove(); return false; } return true; });
+    burst(canvas, W/2-20, H-100, '✨');
+    if (!midDone && prayCount >= Math.floor(prayGoal/2)) {
+      midDone = true;
+      showMidQ(lv.gameConfig.mid, ()=>{});
+    }
+    if (prayCount >= prayGoal) {
+      gameOver = true;
+      clearInterval(spawnInt);
+      cancelAnimationFrame(raf);
+      showWin(dayIdx, `startJonah(${dayIdx})`);
+    }
+  };
+
+  const spawnInt = setInterval(()=>{ if (!gameOver) spawnDespair(); }, bigKids?1200:1800);
+  let raf;
+  function loop() {
+    if (gameOver) return;
+    despairs.forEach(d => { d.y += 0.8; d.el.style.top = d.y+'px'; });
+    despairs = despairs.filter(d => {
+      if (d.y > H-80) {
+        d.el.remove();
+        if (bigKids) {
+          // In big kids mode, reaching the bottom costs prayer
+          prayCount = Math.max(0, prayCount-1);
+          document.getElementById('pFill').style.width = Math.min(100,prayCount/prayGoal*100)+'%';
+        }
+        return false;
+      }
+      return true;
+    });
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+}
+
+// ── STORM / CATCH (Sun - Jonah 3-4) ──────────────────────────────────────────
+function startStorm(dayIdx) {
+  const lv = LEVELS[dayIdx];
+  const cfg = lv.gameConfig;
+  const bigKids = G.mode === 'big';
+  const goal = bigKids ? Math.ceil(cfg.goal*1.6) : cfg.goal;
+  let score = 0, lives = 3, timer = 70, midDone = false, gameOver = false;
+  let items = [];
+
+  showScreen(`
+    <div class="scr-header">
+      <button class="back-btn" onclick="gameOver=true;goHub()">←</button>
+      <span class="scr-title">${lv.icon} ${lv.title}</span>
+    </div>
+    <div style="font-size:.8rem;color:#caf0f8;text-align:center">${cfg.hint}</div>
+    <div class="game-wrap" id="gWrap" style="background:${cfg.bg}">
+      ${gameHeader(dayIdx, score, goal, bigKids?lives:null, bigKids?timer:null)}
+      <div class="game-canvas" id="gCanvas"></div>
+      <div class="ground-bar">${cfg.ground}</div>
+    </div>
+  `);
+
+  const wrap = document.getElementById('gWrap');
+  const canvas = document.getElementById('gCanvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight - 52;
+
+  function spawnFalling() {
+    if (gameOver) return;
+    const isBad = bigKids && Math.random() < 0.3;
+    const emoji = isBad ? cfg.bad : cfg.alt[Math.floor(Math.random()*cfg.alt.length)];
+    const el = document.createElement('div');
+    el.className = 'falling-item';
+    el.textContent = emoji;
+    const x = 20+Math.random()*(W-50);
+    el.style.left = x+'px'; el.style.top = '-40px';
+    canvas.appendChild(el);
+    let y = -40;
+    const speed = (bigKids?130:95) + Math.random()*40;
+    let done = false;
+    const fall = setInterval(()=>{
+      if (gameOver||done){clearInterval(fall);return;}
+      y += speed/30;
+      el.style.top = y+'px';
+      if (y > H-20) {
+        el.remove(); clearInterval(fall); done=true;
+        items=items.filter(it=>it.el!==el);
+        if (!isBad) {
+          if (bigKids) { lives--; document.querySelector('.lives-row').textContent='❤️'.repeat(Math.max(0,lives)); if(lives<=0){gameOver=true;showGameOver(dayIdx);} }
+        }
+      }
+    }, 33);
+    const item = {el, isBad};
+    items.push(item);
+    el.addEventListener('click', ()=>{
+      if (gameOver||done) return;
+      done=true; clearInterval(fall);
+      burst(canvas,x,y,isBad?'💥':cfg.turn);
+      el.remove(); items=items.filter(it=>it.el!==el);
+      if (!isBad) {
+        score++;
+        document.querySelector('.info-bar span').textContent=`${lv.icon} ${score}/${goal}`;
+        document.getElementById('progBar').style.width=Math.min(100,score/goal*100)+'%';
+        if (!midDone&&score>=Math.floor(goal/2)){
+          midDone=true;
+          showMidQ(lv.gameConfig.mid,()=>{});
+        }
+        if (score>=goal){gameOver=true;showWin(dayIdx,`startStorm(${dayIdx})`);}
+      } else if (bigKids) {
+        lives--; document.querySelector('.lives-row').textContent='❤️'.repeat(Math.max(0,lives));
+        if(lives<=0){gameOver=true;showGameOver(dayIdx);}
+      }
+    });
+  }
+
+  const spawnInt = setInterval(()=>{ if(!gameOver) spawnFalling(); }, bigKids?700:950);
+  if (bigKids) {
+    const tInt = setInterval(()=>{
+      if(gameOver){clearInterval(tInt);return;}
+      timer--; const tt=document.querySelector('.timer-txt'); if(tt) tt.textContent=`⏱ ${timer}s`;
+      if(timer<=0){gameOver=true;clearInterval(tInt);clearInterval(spawnInt);showGameOver(dayIdx);}
+    },1000);
+  }
+}
+
+// ═══ BOOT ════════════════════════════════════════════════════════════════════
+loadState();
+setMode(G.mode);
+renderHub();
+</script>
+
+<!-- Service worker registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../../sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
